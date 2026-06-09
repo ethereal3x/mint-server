@@ -1,0 +1,400 @@
+syntax = "proto3";
+
+package mint_server.agent;
+
+option go_package = "github.com/ethereal3x/mint-server/api/gen/go/mint_server/agent;agentpb";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+service AgentService {
+    rpc StreamChat(StreamChatRequest) returns (stream StreamChatResponse) {
+        option (google.api.http) = {
+            post: "/api/v1/agent/chat/stream"
+            body: "*"
+        };
+    }
+
+    rpc GenerateChat(GenerateChatRequest) returns (GenerateChatResponse) {
+        option (google.api.http) = {
+            post: "/api/v1/agent/chat"
+            body: "*"
+        };
+    }
+
+    rpc ListModels(ListModelsRequest) returns (ListModelsResponse) {
+        option (google.api.http) = {
+            get: "/api/v1/agent/models"
+        };
+    }
+
+    rpc GetHistory(GetHistoryRequest) returns (GetHistoryResponse) {
+        option (google.api.http) = {
+            get: "/api/v1/agent/history/{dialogue_id}"
+        };
+    }
+
+    rpc ListDialogues(ListDialoguesRequest) returns (ListDialoguesResponse) {
+        option (google.api.http) = {
+            get: "/api/v1/agent/dialogues"
+        };
+    }
+}
+
+service StrategyService {
+    rpc ListStrategies(ListStrategiesRequest) returns (ListStrategiesResponse) {
+        option (google.api.http) = {
+            get: "/admin/v1/strategies"
+        };
+    }
+
+    rpc GetStrategy(GetStrategyRequest) returns (Strategy) {
+        option (google.api.http) = {
+            get: "/admin/v1/strategies/{rule_id}"
+        };
+    }
+
+    rpc CreateStrategy(CreateStrategyRequest) returns (Strategy) {
+        option (google.api.http) = {
+            post: "/admin/v1/strategies"
+            body: "*"
+        };
+    }
+
+    rpc UpdateStrategy(UpdateStrategyRequest) returns (Strategy) {
+        option (google.api.http) = {
+            put: "/admin/v1/strategies/{rule_id}"
+            body: "*"
+        };
+    }
+
+    rpc DeleteStrategy(DeleteStrategyRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/admin/v1/strategies/{rule_id}"
+        };
+    }
+}
+
+service MappingService {
+    rpc ListMappings(ListMappingsRequest) returns (ListMappingsResponse) {
+        option (google.api.http) = {
+            get: "/admin/v1/mappings"
+        };
+    }
+
+    rpc GetMapping(GetMappingRequest) returns (ModelMapping) {
+        option (google.api.http) = {
+            get: "/admin/v1/mappings/{id}"
+        };
+    }
+
+    rpc CreateMapping(CreateMappingRequest) returns (ModelMapping) {
+        option (google.api.http) = {
+            post: "/admin/v1/mappings"
+            body: "*"
+        };
+    }
+
+    rpc UpdateMapping(UpdateMappingRequest) returns (ModelMapping) {
+        option (google.api.http) = {
+            put: "/admin/v1/mappings/{id}"
+            body: "*"
+        };
+    }
+
+    rpc DeleteMapping(DeleteMappingRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/admin/v1/mappings/{id}"
+        };
+    }
+}
+
+message StreamChatRequest {
+    // 用户ID
+    string user_id = 1;
+    // 用户提问内容
+    string question = 2;
+    // 模型标识
+    string model = 3;
+    // 对话ID，为空时自动生成
+    string dialogue_id = 4;
+    // 记录ID，为空时自动生成
+    string record_id = 5;
+    // 上传文件名
+    string file_name = 6;
+    // 上传文件数据
+    bytes file_data = 7;
+}
+
+message StreamChatResponse {
+    // 流式响应内容块
+    string content = 1;
+    // 对话ID
+    string dialogue_id = 2;
+    // 记录ID
+    string record_id = 3;
+    // 是否完成
+    bool done = 4;
+    // 错误信息
+    string error = 5;
+}
+
+message GenerateChatRequest {
+    // 用户ID
+    string user_id = 1;
+    // 用户提问内容
+    string question = 2;
+    // 模型标识
+    string model = 3;
+    // 对话ID，为空时自动生成
+    string dialogue_id = 4;
+    // 记录ID，为空时自动生成
+    string record_id = 5;
+    // 上传文件名
+    string file_name = 6;
+    // 上传文件数据
+    bytes file_data = 7;
+}
+
+message GenerateChatResponse {
+    // 完整回答内容
+    string content = 1;
+    // 对话ID
+    string dialogue_id = 2;
+    // 记录ID
+    string record_id = 3;
+    // 错误信息
+    string error = 4;
+}
+
+message ListModelsRequest {}
+
+message ListModelsResponse {
+    // 可用模型列表
+    repeated ModelInfo models = 1;
+}
+
+message ModelInfo {
+    // 模型标识
+    string model = 1;
+    // 厂商名称
+    string manufacturer = 2;
+    // 模型描述
+    string description = 3;
+}
+
+message GetHistoryRequest {
+    // 对话ID
+    string dialogue_id = 1;
+}
+
+message GetHistoryResponse {
+    // 历史记录列表
+    repeated HistoryRecord records = 1;
+}
+
+message HistoryRecord {
+    // 记录ID
+    string record_id = 1;
+    // 用户消息
+    string user_content = 2;
+    // AI 回复
+    string agent_content = 3;
+    // 模型标识
+    string model = 4;
+    // 总 token 数
+    int64 total_tokens = 5;
+}
+
+message Strategy {
+    // 自增主键
+    int32 id = 1;
+    // 策略规则唯一标识
+    string rule_id = 2;
+    // API密钥
+    string api_key = 3;
+    // 模型名称
+    string agent_model = 4;
+    // 模型厂商
+    string agent_manufacturer = 5;
+    // 生成类型
+    string agent_generate_type = 6;
+    // API 地址
+    string url = 7;
+    // 最大 token 数
+    int32 max_tokens = 8;
+    // 是否启用流式
+    bool stream = 9;
+    // 温度参数
+    float temperature = 10;
+    // Top-P 采样参数
+    float top_p = 11;
+    // 生成候选数
+    int32 n = 12;
+    // 存在惩罚系数
+    float presence_penalty = 13;
+    // 频率惩罚系数
+    float frequency_penalty = 14;
+    // 路由标识
+    string route = 15;
+    // 是否启用：0-禁用，1-启用
+    int32 is_enabled = 16;
+}
+
+message ListStrategiesRequest {
+    // 页码，从 1 开始
+    int32 page = 1;
+    // 每页条数
+    int32 page_size = 2;
+}
+
+message ListStrategiesResponse {
+    // 策略规则列表
+    repeated Strategy strategies = 1;
+    // 总条数
+    int64 total = 2;
+}
+
+message GetStrategyRequest {
+    // 策略规则ID
+    string rule_id = 1;
+}
+
+message CreateStrategyRequest {
+    // API密钥
+    string api_key = 1;
+    // 模型名称
+    string agent_model = 2;
+    // 模型厂商
+    string agent_manufacturer = 3;
+    // 生成类型
+    string agent_generate_type = 4;
+    // API 地址
+    string url = 5;
+    // 最大 token 数
+    int32 max_tokens = 6;
+    // 是否启用流式
+    bool stream = 7;
+    // 温度参数
+    float temperature = 8;
+    // Top-P 采样参数
+    float top_p = 9;
+    // 生成候选数
+    int32 n = 10;
+    // 存在惩罚系数
+    float presence_penalty = 11;
+    // 频率惩罚系数
+    float frequency_penalty = 12;
+    // 路由标识
+    string route = 13;
+}
+
+message UpdateStrategyRequest {
+    // 策略规则ID
+    string rule_id = 1;
+    // API密钥
+    string api_key = 2;
+    // 模型名称
+    string agent_model = 3;
+    // 模型厂商
+    string agent_manufacturer = 4;
+    // 生成类型
+    string agent_generate_type = 5;
+    // API 地址
+    string url = 6;
+    // 最大 token 数
+    int32 max_tokens = 7;
+    // 是否启用流式
+    bool stream = 8;
+    // 温度参数
+    float temperature = 9;
+    // Top-P 采样参数
+    float top_p = 10;
+    // 生成候选数
+    int32 n = 11;
+    // 存在惩罚系数
+    float presence_penalty = 12;
+    // 频率惩罚系数
+    float frequency_penalty = 13;
+    // 路由标识
+    string route = 14;
+    // 是否启用：0-禁用，1-启用
+    int32 is_enabled = 15;
+}
+
+message DeleteStrategyRequest {
+    // 策略规则ID
+    string rule_id = 1;
+}
+
+message ModelMapping {
+    // 自增主键
+    int32 id = 1;
+    // 模型类型标识
+    string model_type = 2;
+    // 厂商名称
+    string manufacturer = 3;
+    // 模型描述
+    string description = 4;
+}
+
+message ListMappingsRequest {
+    // 厂商过滤条件，为空时返回全部
+    string manufacturer = 1;
+}
+
+message ListMappingsResponse {
+    // 模型映射列表
+    repeated ModelMapping mappings = 1;
+}
+
+message GetMappingRequest {
+    // 映射ID
+    int32 id = 1;
+}
+
+message CreateMappingRequest {
+    // 模型类型标识
+    string model_type = 1;
+    // 厂商名称
+    string manufacturer = 2;
+    // 模型描述
+    string description = 3;
+}
+
+message UpdateMappingRequest {
+    // 映射ID
+    int32 id = 1;
+    // 模型类型标识
+    string model_type = 2;
+    // 厂商名称
+    string manufacturer = 3;
+    // 模型描述
+    string description = 4;
+}
+
+message DeleteMappingRequest {
+    // 映射ID
+    int32 id = 1;
+}
+
+message ListDialoguesRequest {
+    // 用户ID，为空时返回全部
+    string user_id = 1;
+}
+
+message DialogueSummary {
+    // 对话ID
+    string dialogue_id = 1;
+    // 对话标题（首条用户消息）
+    string title = 2;
+    // 消息数量
+    int32 message_count = 3;
+    // 最后更新时间
+    string updated_time = 4;
+}
+
+message ListDialoguesResponse {
+    // 对话摘要列表
+    repeated DialogueSummary dialogues = 1;
+}

@@ -1,0 +1,10 @@
+bin/
+.DS_Store
+.idea
+.vscode
+*.log
+config.yaml
+AGENT.md
+CLAUDE.md
+configs/dev/config.yaml
+github.com/

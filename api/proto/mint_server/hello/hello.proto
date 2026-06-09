@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package mint_server.hello;
+
+option go_package = "github.com/ethereal3x/mint-server/api/gen/go/mint_server/hello;hellopb";
+
+import "google/api/annotations.proto";
+
+service HelloService {
+    rpc HelloCheck(HelloCheckRequest) returns (HelloCheckResponse) {
+        option (google.api.http) = {
+            post: "/hello/v1/check"
+            body: "*"
+        };
+    }
+}
+
+message HelloCheckRequest {
+    // 健康检查输入
+    string check = 1;
+}
+
+message HelloCheckResponse {
+    // 健康检查结果
+    string check_down = 1;
+}
