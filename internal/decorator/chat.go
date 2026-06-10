@@ -3,7 +3,6 @@ package decorator
 import (
 	"context"
 
-	"github.com/ethereal3x/apc/logger"
 	"github.com/ethereal3x/apc/tracing"
 	"github.com/ethereal3x/mint-server/internal/dto"
 	"github.com/ethereal3x/mint-server/internal/model"
@@ -32,76 +31,44 @@ func NewChatDecorator(inner chatLogic) *ChatDecorator {
 
 // StreamChat 执行流式聊天并装饰 tracing/logging
 func (d *ChatDecorator) StreamChat(ctx context.Context, req *dto.ChatRequest, contentChan chan<- string) (*dto.ChatResult, error) {
-	ctx, span := tracing.Start(ctx, "Chat.StreamChat")
-	defer span.End()
-	logger.ContextInfo(ctx, "Chat.StreamChat", zap.String("model", req.Model), zap.String("dialogue_id", req.DialogueID))
-	result, err := d.inner.StreamChat(ctx, req, contentChan)
-	if err != nil {
-		tracing.RecordError(ctx, err)
-		logger.ContextError(ctx, "Chat.StreamChat", zap.Error(err))
-	}
-	return result, err
+	return wrap(ctx, "Chat.StreamChat", func(ctx context.Context) (*dto.ChatResult, error) {
+		return d.inner.StreamChat(ctx, req, contentChan)
+	}, zap.String("model", req.Model), zap.String("dialogue_id", req.DialogueID))
 }
 
 // GenerateChat 执行非流式聊天并装饰 tracing/logging
 func (d *ChatDecorator) GenerateChat(ctx context.Context, req *dto.ChatRequest) (*dto.ChatResult, error) {
-	ctx, span := tracing.Start(ctx, "Chat.GenerateChat")
-	defer span.End()
-	logger.ContextInfo(ctx, "Chat.GenerateChat", zap.String("model", req.Model))
-	result, err := d.inner.GenerateChat(ctx, req)
-	if err != nil {
-		tracing.RecordError(ctx, err)
-		logger.ContextError(ctx, "Chat.GenerateChat", zap.Error(err))
-	}
-	return result, err
+	return wrap(ctx, "Chat.GenerateChat", func(ctx context.Context) (*dto.ChatResult, error) {
+		return d.inner.GenerateChat(ctx, req)
+	}, zap.String("model", req.Model))
 }
 
 // SaveRecord 持久化对话记录并装饰 tracing/logging
 func (d *ChatDecorator) SaveRecord(ctx context.Context, req *dto.SaveRecordRequest) error {
-	ctx, span := tracing.Start(ctx, "Chat.SaveRecord")
-	defer span.End()
-	err := d.inner.SaveRecord(ctx, req)
-	if err != nil {
-		tracing.RecordError(ctx, err)
-		logger.ContextError(ctx, "Chat.SaveRecord", zap.Error(err))
-	}
-	return err
+	return wrapErr(ctx, "Chat.SaveRecord", func(ctx context.Context) error {
+		return d.inner.SaveRecord(ctx, req)
+	})
 }
 
 // GetHistory 获取对话历史并装饰 tracing/logging
 func (d *ChatDecorator) GetHistory(ctx context.Context, query *model.DialogueQuery) ([]*model.DialogueRecord, error) {
-	ctx, span := tracing.Start(ctx, "Chat.GetHistory")
-	defer span.End()
-	records, err := d.inner.GetHistory(ctx, query)
-	if err != nil {
-		tracing.RecordError(ctx, err)
-		logger.ContextError(ctx, "Chat.GetHistory", zap.Error(err))
-	}
-	return records, err
+	return wrap(ctx, "Chat.GetHistory", func(ctx context.Context) ([]*model.DialogueRecord, error) {
+		return d.inner.GetHistory(ctx, query)
+	})
 }
 
 // ListDialogues 获取对话列表并装饰 tracing/logging
 func (d *ChatDecorator) ListDialogues(ctx context.Context, userID string) ([]*model.DialogueSummary, error) {
-	ctx, span := tracing.Start(ctx, "Chat.ListDialogues")
-	defer span.End()
-	summaries, err := d.inner.ListDialogues(ctx, userID)
-	if err != nil {
-		tracing.RecordError(ctx, err)
-		logger.ContextError(ctx, "Chat.ListDialogues", zap.Error(err))
-	}
-	return summaries, err
+	return wrap(ctx, "Chat.ListDialogues", func(ctx context.Context) ([]*model.DialogueSummary, error) {
+		return d.inner.ListDialogues(ctx, userID)
+	})
 }
 
 // AggregateByModel 按模型聚合统计并装饰 tracing/logging
 func (d *ChatDecorator) AggregateByModel(ctx context.Context, userID string) ([]*model.ModelStat, error) {
-	ctx, span := tracing.Start(ctx, "Chat.AggregateByModel")
-	defer span.End()
-	stats, err := d.inner.AggregateByModel(ctx, userID)
-	if err != nil {
-		tracing.RecordError(ctx, err)
-		logger.ContextError(ctx, "Chat.AggregateByModel", zap.Error(err))
-	}
-	return stats, err
+	return wrap(ctx, "Chat.AggregateByModel", func(ctx context.Context) ([]*model.ModelStat, error) {
+		return d.inner.AggregateByModel(ctx, userID)
+	})
 }
 
 // configLogic ConfigDecorator 需要的配置业务接口
@@ -126,14 +93,9 @@ func NewConfigDecorator(inner configLogic) *ConfigDecorator {
 
 // ListAll 获取全部模型配置并装饰 tracing/logging
 func (d *ConfigDecorator) ListAll(ctx context.Context, userID string) ([]*model.ChatModelConfig, error) {
-	ctx, span := tracing.Start(ctx, "Config.ListAll")
-	defer span.End()
-	configs, err := d.inner.ListAll(ctx, userID)
-	if err != nil {
-		tracing.RecordError(ctx, err)
-		logger.ContextError(ctx, "Config.ListAll", zap.Error(err))
-	}
-	return configs, err
+	return wrap(ctx, "Config.ListAll", func(ctx context.Context) ([]*model.ChatModelConfig, error) {
+		return d.inner.ListAll(ctx, userID)
+	})
 }
 
 // List 分页查询配置并装饰 tracing/logging
@@ -143,55 +105,34 @@ func (d *ConfigDecorator) List(ctx context.Context, page, pageSize int32, userID
 	configs, total, err := d.inner.List(ctx, page, pageSize, userID)
 	if err != nil {
 		tracing.RecordError(ctx, err)
-		logger.ContextError(ctx, "Config.List", zap.Error(err))
 	}
 	return configs, total, err
 }
 
 // GetByID 按 ID 查询配置并装饰 tracing/logging
 func (d *ConfigDecorator) GetByID(ctx context.Context, id int32, userID string) (*model.ChatModelConfig, error) {
-	ctx, span := tracing.Start(ctx, "Config.GetByID")
-	defer span.End()
-	config, err := d.inner.GetByID(ctx, id, userID)
-	if err != nil {
-		tracing.RecordError(ctx, err)
-		logger.ContextError(ctx, "Config.GetByID", zap.Error(err))
-	}
-	return config, err
+	return wrap(ctx, "Config.GetByID", func(ctx context.Context) (*model.ChatModelConfig, error) {
+		return d.inner.GetByID(ctx, id, userID)
+	})
 }
 
 // Create 创建配置并装饰 tracing/logging
 func (d *ConfigDecorator) Create(ctx context.Context, config *model.ChatModelConfig) error {
-	ctx, span := tracing.Start(ctx, "Config.Create")
-	defer span.End()
-	err := d.inner.Create(ctx, config)
-	if err != nil {
-		tracing.RecordError(ctx, err)
-		logger.ContextError(ctx, "Config.Create", zap.Error(err))
-	}
-	return err
+	return wrapErr(ctx, "Config.Create", func(ctx context.Context) error {
+		return d.inner.Create(ctx, config)
+	})
 }
 
 // Update 更新配置并装饰 tracing/logging
 func (d *ConfigDecorator) Update(ctx context.Context, config *model.ChatModelConfig, userID string) error {
-	ctx, span := tracing.Start(ctx, "Config.Update")
-	defer span.End()
-	err := d.inner.Update(ctx, config, userID)
-	if err != nil {
-		tracing.RecordError(ctx, err)
-		logger.ContextError(ctx, "Config.Update", zap.Error(err))
-	}
-	return err
+	return wrapErr(ctx, "Config.Update", func(ctx context.Context) error {
+		return d.inner.Update(ctx, config, userID)
+	})
 }
 
 // Delete 删除配置并装饰 tracing/logging
 func (d *ConfigDecorator) Delete(ctx context.Context, id int32, userID string) error {
-	ctx, span := tracing.Start(ctx, "Config.Delete")
-	defer span.End()
-	err := d.inner.Delete(ctx, id, userID)
-	if err != nil {
-		tracing.RecordError(ctx, err)
-		logger.ContextError(ctx, "Config.Delete", zap.Error(err))
-	}
-	return err
+	return wrapErr(ctx, "Config.Delete", func(ctx context.Context) error {
+		return d.inner.Delete(ctx, id, userID)
+	})
 }

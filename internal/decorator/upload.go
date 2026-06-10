@@ -3,8 +3,6 @@ package decorator
 import (
 	"context"
 
-	"github.com/ethereal3x/apc/logger"
-	"github.com/ethereal3x/apc/tracing"
 	"github.com/ethereal3x/mint-server/internal/dto"
 	"github.com/ethereal3x/mint-server/internal/model"
 	"go.uber.org/zap"
@@ -29,37 +27,21 @@ func NewUploadDecorator(inner uploadLogic) *UploadDecorator {
 
 // Upload 文件上传并装饰 tracing/logging
 func (d *UploadDecorator) Upload(ctx context.Context, req *dto.UploadRequest) (*dto.UploadResult, error) {
-	ctx, span := tracing.Start(ctx, "Upload.Upload")
-	defer span.End()
-	logger.ContextInfo(ctx, "Upload.Upload", zap.String("filename", req.FileName))
-	result, err := d.inner.Upload(ctx, req)
-	if err != nil {
-		tracing.RecordError(ctx, err)
-		logger.ContextError(ctx, "Upload.Upload", zap.Error(err))
-	}
-	return result, err
+	return wrap(ctx, "Upload.Upload", func(ctx context.Context) (*dto.UploadResult, error) {
+		return d.inner.Upload(ctx, req)
+	}, zap.String("filename", req.FileName))
 }
 
 // GetUpload 查询上传记录并装饰 tracing/logging
 func (d *UploadDecorator) GetUpload(ctx context.Context, query *model.FileUploadQuery) (*model.FileUpload, error) {
-	ctx, span := tracing.Start(ctx, "Upload.GetUpload")
-	defer span.End()
-	record, err := d.inner.GetUpload(ctx, query)
-	if err != nil {
-		tracing.RecordError(ctx, err)
-		logger.ContextError(ctx, "Upload.GetUpload", zap.Error(err))
-	}
-	return record, err
+	return wrap(ctx, "Upload.GetUpload", func(ctx context.Context) (*model.FileUpload, error) {
+		return d.inner.GetUpload(ctx, query)
+	})
 }
 
 // ListUploads 查询上传记录列表并装饰 tracing/logging
 func (d *UploadDecorator) ListUploads(ctx context.Context, userID string) ([]*model.FileUpload, error) {
-	ctx, span := tracing.Start(ctx, "Upload.ListUploads")
-	defer span.End()
-	list, err := d.inner.ListUploads(ctx, userID)
-	if err != nil {
-		tracing.RecordError(ctx, err)
-		logger.ContextError(ctx, "Upload.ListUploads", zap.Error(err))
-	}
-	return list, err
+	return wrap(ctx, "Upload.ListUploads", func(ctx context.Context) ([]*model.FileUpload, error) {
+		return d.inner.ListUploads(ctx, userID)
+	})
 }
