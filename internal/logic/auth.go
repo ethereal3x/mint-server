@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/ethereal3x/apc/logger"
-	"github.com/ethereal3x/apc/tracing"
 	"github.com/ethereal3x/mint-server/internal/auth"
+	"github.com/ethereal3x/mint-server/internal/dto"
 	mint_err "github.com/ethereal3x/mint-server/internal/errs"
 	"github.com/ethereal3x/mint-server/internal/idgen"
 	"github.com/ethereal3x/mint-server/internal/model"
@@ -30,27 +30,6 @@ type Auth struct {
 	tokenManager *auth.TokenManager
 }
 
-// RegisterAccountRequest 账号密码注册参数
-type RegisterAccountRequest struct {
-	Account     string
-	Password    string
-	DisplayName string
-	AvatarURL   string
-}
-
-// LoginRequest 登录参数
-type LoginRequest struct {
-	Provider   string
-	Identifier string
-	Credential string
-}
-
-// AuthResult 登录态结果
-type AuthResult struct {
-	User  *model.BaseUser
-	Token *auth.TokenResult
-}
-
 // issueTokenRequest 签发登录态参数
 type issueTokenRequest struct {
 	User       *model.BaseUser
@@ -64,10 +43,7 @@ func NewAuth(repo UserStore, tokenManager *auth.TokenManager) *Auth {
 }
 
 // RegisterAccount 执行账号密码注册并签发登录令牌
-func (s *Auth) RegisterAccount(ctx context.Context, req *RegisterAccountRequest) (*AuthResult, error) {
-	ctx, span := tracing.Start(ctx, "logic.Auth.RegisterAccount")
-	defer span.End()
-
+func (s *Auth) RegisterAccount(ctx context.Context, req *dto.RegisterAccountRequest) (*dto.AuthResult, error) {
 	account := normalizeIdentifier(req.Account)
 	if account == "" {
 		return nil, mint_err.ErrParam
@@ -87,15 +63,14 @@ func (s *Auth) RegisterAccount(ctx context.Context, req *RegisterAccountRequest)
 	}
 	now := time.Now().Unix()
 	user := &model.BaseUser{
-		UserID:   idgen.GenIntUUID(),
+		UserID:    idgen.GenIntUUID(),
 		Username:  account,
 		Nickname:  nickname,
 		AvatarURL: strings.TrimSpace(req.AvatarURL),
 		Password:  credentialHash,
-		RegTime:  now,
+		RegTime:   now,
 	}
 	if err := s.repo.CreateBaseUser(ctx, user); err != nil {
-		tracing.RecordError(ctx, err)
 		if errors.Is(err, mint_err.ErrUserExists) {
 			return nil, mint_err.ErrUserExists
 		}
@@ -106,10 +81,7 @@ func (s *Auth) RegisterAccount(ctx context.Context, req *RegisterAccountRequest)
 }
 
 // Login 校验登录凭证并签发登录令牌
-func (s *Auth) Login(ctx context.Context, req *LoginRequest) (*AuthResult, error) {
-	ctx, span := tracing.Start(ctx, "logic.Auth.Login")
-	defer span.End()
-
+func (s *Auth) Login(ctx context.Context, req *dto.LoginRequest) (*dto.AuthResult, error) {
 	provider := req.Provider
 	if provider == "" {
 		provider = model.AUTH_PROVIDER_ACCOUNT_PASSWORD
@@ -120,7 +92,6 @@ func (s *Auth) Login(ctx context.Context, req *LoginRequest) (*AuthResult, error
 	}
 	user, err := s.repo.FindBaseUserByUsername(ctx, &model.BaseUserQuery{Username: identifier})
 	if err != nil {
-		tracing.RecordError(ctx, err)
 		logger.ContextError(ctx, "Auth.Login", zap.String("provider", provider), zap.String("identifier", identifier), zap.Error(err))
 		return nil, mint_err.ErrDBQuery
 	}
@@ -132,60 +103,33 @@ func (s *Auth) Login(ctx context.Context, req *LoginRequest) (*AuthResult, error
 
 // GetMe 获取当前登录用户信息
 func (s *Auth) GetMe(ctx context.Context, userID string) (*model.BaseUser, error) {
-	numericUserID, err := strconv.ParseInt(userID, 10, 64)
-	if err != nil {
-		return nil, mint_err.ErrTokenInvalid
-	}
-	user, err := s.repo.FindBaseUserByUserID(ctx, &model.BaseUserQuery{UserID: numericUserID})
-	if err != nil {
-		logger.ContextError(ctx, "Auth.GetMe", zap.String("user_id", userID), zap.Error(err))
-		return nil, mint_err.ErrDBQuery
-	}
-	if user == nil {
-		return nil, mint_err.ErrUserNotFound
-	}
-	return user, nil
+	_, user, err := s.resolveUser(ctx, userID)
+	return user, err
 }
 
 // UpdateAvatar 更新当前用户的头像
 func (s *Auth) UpdateAvatar(ctx context.Context, userID string, avatarURL string) (*model.BaseUser, error) {
-	numericUserID, err := strconv.ParseInt(userID, 10, 64)
-	if err != nil {
-		return nil, mint_err.ErrTokenInvalid
-	}
 	avatarURL = strings.TrimSpace(avatarURL)
 	if avatarURL == "" {
 		return nil, mint_err.ErrParam
 	}
-	if err := s.repo.UpdateBaseUser(ctx, numericUserID, map[string]any{"avatar_url": avatarURL}); err != nil {
-		logger.ContextError(ctx, "Auth.UpdateAvatar", zap.String("user_id", userID), zap.Error(err))
-		return nil, mint_err.ErrDBUpdate
-	}
-	user, err := s.repo.FindBaseUserByUserID(ctx, &model.BaseUserQuery{UserID: numericUserID})
+	numericUserID, _, err := s.resolveUser(ctx, userID)
 	if err != nil {
-		return nil, mint_err.ErrDBQuery
+		return nil, err
 	}
-	if user == nil {
-		return nil, mint_err.ErrUserNotFound
-	}
-	return user, nil
+	return s.updateAndRefetch(ctx, numericUserID, map[string]any{"avatar_url": avatarURL})
 }
 
 // UpdatePassword 更新当前用户的登录密码
 func (s *Auth) UpdatePassword(ctx context.Context, userID string, oldPassword string, newPassword string) error {
-	numericUserID, err := strconv.ParseInt(userID, 10, 64)
-	if err != nil {
-		return mint_err.ErrTokenInvalid
-	}
 	if oldPassword == "" || newPassword == "" {
 		return mint_err.ErrParam
 	}
-	user, err := s.repo.FindBaseUserByUserID(ctx, &model.BaseUserQuery{UserID: numericUserID})
+	_, user, err := s.resolveUser(ctx, userID)
 	if err != nil {
-		logger.ContextError(ctx, "Auth.UpdatePassword", zap.String("user_id", userID), zap.Error(err))
-		return mint_err.ErrDBQuery
+		return err
 	}
-	if user == nil || !auth.ComparePassword(user.Password, oldPassword) {
+	if !auth.ComparePassword(user.Password, oldPassword) {
 		return mint_err.ErrInvalidCredential
 	}
 	credentialHash, err := auth.HashPassword(newPassword)
@@ -196,7 +140,7 @@ func (s *Auth) UpdatePassword(ctx context.Context, userID string, oldPassword st
 		logger.ContextError(ctx, "Auth.UpdatePassword", zap.Error(err))
 		return mint_err.ErrInternal
 	}
-	if err := s.repo.UpdateBaseUser(ctx, numericUserID, map[string]any{"password": credentialHash}); err != nil {
+	if err := s.repo.UpdateBaseUser(ctx, user.UserID, map[string]any{"password": credentialHash}); err != nil {
 		logger.ContextError(ctx, "Auth.UpdatePassword", zap.String("user_id", userID), zap.Error(err))
 		return mint_err.ErrDBUpdate
 	}
@@ -205,19 +149,41 @@ func (s *Auth) UpdatePassword(ctx context.Context, userID string, oldPassword st
 
 // UpdateNickname 更新当前用户的展示名称
 func (s *Auth) UpdateNickname(ctx context.Context, userID string, nickname string) (*model.BaseUser, error) {
-	numericUserID, err := strconv.ParseInt(userID, 10, 64)
-	if err != nil {
-		return nil, mint_err.ErrTokenInvalid
-	}
 	nickname = strings.TrimSpace(nickname)
 	if nickname == "" {
 		return nil, mint_err.ErrParam
 	}
-	if err := s.repo.UpdateBaseUser(ctx, numericUserID, map[string]any{"nickname": nickname}); err != nil {
-		logger.ContextError(ctx, "Auth.UpdateNickname", zap.String("user_id", userID), zap.Error(err))
-		return nil, mint_err.ErrDBUpdate
+	numericUserID, _, err := s.resolveUser(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	return s.updateAndRefetch(ctx, numericUserID, map[string]any{"nickname": nickname})
+}
+
+// resolveUser 解析用户ID字符串并查找用户，返回数值ID和用户实体
+func (s *Auth) resolveUser(ctx context.Context, userID string) (int64, *model.BaseUser, error) {
+	numericUserID, err := strconv.ParseInt(userID, 10, 64)
+	if err != nil {
+		return 0, nil, mint_err.ErrTokenInvalid
 	}
 	user, err := s.repo.FindBaseUserByUserID(ctx, &model.BaseUserQuery{UserID: numericUserID})
+	if err != nil {
+		logger.ContextError(ctx, "Auth.resolveUser", zap.String("user_id", userID), zap.Error(err))
+		return 0, nil, mint_err.ErrDBQuery
+	}
+	if user == nil {
+		return 0, nil, mint_err.ErrUserNotFound
+	}
+	return numericUserID, user, nil
+}
+
+// updateAndRefetch 更新用户字段后回查最新用户信息
+func (s *Auth) updateAndRefetch(ctx context.Context, userID int64, updates map[string]any) (*model.BaseUser, error) {
+	if err := s.repo.UpdateBaseUser(ctx, userID, updates); err != nil {
+		logger.ContextError(ctx, "Auth.updateAndRefetch", zap.Int64("user_id", userID), zap.Error(err))
+		return nil, mint_err.ErrDBUpdate
+	}
+	user, err := s.repo.FindBaseUserByUserID(ctx, &model.BaseUserQuery{UserID: userID})
 	if err != nil {
 		return nil, mint_err.ErrDBQuery
 	}
@@ -228,13 +194,13 @@ func (s *Auth) UpdateNickname(ctx context.Context, userID string, nickname strin
 }
 
 // issueToken 为用户签发访问令牌
-func (s *Auth) issueToken(ctx context.Context, req *issueTokenRequest) (*AuthResult, error) {
+func (s *Auth) issueToken(ctx context.Context, req *issueTokenRequest) (*dto.AuthResult, error) {
 	token, err := s.tokenManager.IssueAccessToken(ctx, &auth.TokenInput{UserID: strconv.FormatInt(req.User.UserID, 10), Provider: req.Provider, Identifier: req.Identifier})
 	if err != nil {
 		logger.ContextError(ctx, "Auth.issueToken", zap.Int64("user_id", req.User.UserID), zap.Error(err))
 		return nil, mint_err.ErrInternal
 	}
-	return &AuthResult{User: req.User, Token: token}, nil
+	return &dto.AuthResult{User: req.User, Token: token}, nil
 }
 
 // normalizeIdentifier 规范化登录标识

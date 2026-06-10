@@ -8,8 +8,8 @@ import (
 
 	"github.com/ethereal3x/apc/logger"
 	"github.com/ethereal3x/mint-server/internal/auth"
+	"github.com/ethereal3x/mint-server/internal/dto"
 	mint_err "github.com/ethereal3x/mint-server/internal/errs"
-	"github.com/ethereal3x/mint-server/internal/logic"
 	"github.com/ethereal3x/mint-server/internal/model"
 	"go.uber.org/zap"
 )
@@ -18,13 +18,13 @@ const httpMaxUploadSize = 50 << 20 // 50MB
 
 // UploadHandler 文件上传 HTTP 处理器
 type UploadHandler struct {
-	logic        *logic.UploadLogic
+	logic        UploadServiceLogic
 	tokenManager *auth.TokenManager
 }
 
 // NewUploadHandler 创建上传 HTTP 处理器
-func NewUploadHandler(logic *logic.UploadLogic, tokenManager *auth.TokenManager) *UploadHandler {
-	return &UploadHandler{logic: logic, tokenManager: tokenManager}
+func NewUploadHandler(uploadLogic UploadServiceLogic, tokenManager *auth.TokenManager) *UploadHandler {
+	return &UploadHandler{logic: uploadLogic, tokenManager: tokenManager}
 }
 
 // HandleUpload 处理文件上传请求
@@ -51,7 +51,7 @@ func (h *UploadHandler) HandleUpload(w http.ResponseWriter, r *http.Request) {
 		contentType = "application/octet-stream"
 	}
 
-	result, err := h.logic.Upload(r.Context(), &logic.UploadRequest{
+	result, err := h.logic.Upload(r.Context(), &dto.UploadRequest{
 		UserID:      userID,
 		FileName:    header.Filename,
 		Reader:      file,

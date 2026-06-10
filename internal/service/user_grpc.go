@@ -2,25 +2,23 @@ package service
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/ethereal3x/apc/errs"
 	userpb "github.com/ethereal3x/mint-server/api/gen/go/mint_server/user"
 	"github.com/ethereal3x/mint-server/internal/auth"
+	"github.com/ethereal3x/mint-server/internal/dto"
 	mint_err "github.com/ethereal3x/mint-server/internal/errs"
-	"github.com/ethereal3x/mint-server/internal/logic"
-	"github.com/ethereal3x/mint-server/internal/model"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // UserServer UserService gRPC 处理器
 type UserServer struct {
 	userpb.UnimplementedUserServiceServer
-	logic *logic.Auth
+	logic UserServiceLogic
 }
 
 // NewUserServer 创建用户 gRPC 处理器
-func NewUserServer(authLogic *logic.Auth) *UserServer {
+func NewUserServer(authLogic UserServiceLogic) *UserServer {
 	return &UserServer{logic: authLogic}
 }
 
@@ -35,7 +33,7 @@ func (s *UserServer) GetMe(ctx context.Context, _ *emptypb.Empty) (*userpb.GetMe
 	if err != nil {
 		return errs.GenProtoReply(rsp, err)
 	}
-	rsp.User = userInfoToProto(user)
+	rsp.User = dto.UserToUserProto(user)
 	return rsp, nil
 }
 
@@ -50,7 +48,7 @@ func (s *UserServer) UpdateAvatar(ctx context.Context, req *userpb.UpdateAvatarR
 	if err != nil {
 		return errs.GenProtoReply(rsp, err)
 	}
-	rsp.User = userInfoToProto(user)
+	rsp.User = dto.UserToUserProto(user)
 	return rsp, nil
 }
 
@@ -78,19 +76,6 @@ func (s *UserServer) UpdateNickname(ctx context.Context, req *userpb.UpdateNickn
 	if err != nil {
 		return errs.GenProtoReply(rsp, err)
 	}
-	rsp.User = userInfoToProto(user)
+	rsp.User = dto.UserToUserProto(user)
 	return rsp, nil
-}
-
-// userInfoToProto 转换用户模型为 proto
-func userInfoToProto(user *model.BaseUser) *userpb.UserInfo {
-	if user == nil {
-		return nil
-	}
-	return &userpb.UserInfo{
-		UserId:      strconv.FormatInt(user.UserID, 10),
-		DisplayName: user.Nickname,
-		AvatarUrl:   user.AvatarURL,
-		Status:      1,
-	}
 }

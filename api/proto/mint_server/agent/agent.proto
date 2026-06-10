@@ -144,6 +144,8 @@ message ModelInfo {
     string model = 1;
     // 模型描述
     string description = 2;
+    // 是否支持多模态（图片输入）
+    bool supports_multimodal = 3;
 }
 
 message GetHistoryRequest {
@@ -204,6 +206,8 @@ message ModelConfig {
     string agent_generate_type = 16;
     string route = 17;
     int32 is_enabled = 18;
+    // 是否支持多模态（图片输入）
+    bool supports_multimodal = 19;
 }
 
 message ConfigReply {
@@ -246,6 +250,8 @@ message CreateConfigRequest {
     string agent_generate_type = 15;
     string route = 16;
     int32 is_enabled = 17;
+    // 是否支持多模态（图片输入）
+    bool supports_multimodal = 18;
 }
 
 message UpdateConfigRequest {
@@ -267,6 +273,8 @@ message UpdateConfigRequest {
     string agent_generate_type = 16;
     string route = 17;
     int32 is_enabled = 18;
+    // 是否支持多模态（图片输入）
+    bool supports_multimodal = 19;
 }
 
 message DeleteConfigRequest {

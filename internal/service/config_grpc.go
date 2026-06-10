@@ -6,21 +6,20 @@ import (
 	"github.com/ethereal3x/apc/errs"
 	agentpb "github.com/ethereal3x/mint-server/api/gen/go/mint_server/agent"
 	"github.com/ethereal3x/mint-server/internal/auth"
+	"github.com/ethereal3x/mint-server/internal/dto"
 	mint_err "github.com/ethereal3x/mint-server/internal/errs"
-	"github.com/ethereal3x/mint-server/internal/logic"
-	"github.com/ethereal3x/mint-server/internal/model"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // ConfigServer ModelConfigService gRPC 处理器
 type ConfigServer struct {
 	agentpb.UnimplementedModelConfigServiceServer
-	logic *logic.Config
-	chat  *logic.Chat
+	logic ConfigCrudLogic
+	chat  ConfigStatsLogic
 }
 
 // NewConfigServer 创建模型配置 gRPC 处理器
-func NewConfigServer(configLogic *logic.Config, chat *logic.Chat) *ConfigServer {
+func NewConfigServer(configLogic ConfigCrudLogic, chat ConfigStatsLogic) *ConfigServer {
 	return &ConfigServer{logic: configLogic, chat: chat}
 }
 
@@ -44,7 +43,7 @@ func (s *ConfigServer) ListConfigs(ctx context.Context, req *agentpb.ListConfigs
 	}
 	configs := make([]*agentpb.ModelConfig, 0, len(list))
 	for _, c := range list {
-		configs = append(configs, configToProto(c))
+		configs = append(configs, dto.ConfigToProto(c))
 	}
 	rsp.Configs = configs
 	rsp.Total = total
@@ -67,7 +66,7 @@ func (s *ConfigServer) GetConfig(ctx context.Context, req *agentpb.GetConfigRequ
 	if config == nil {
 		return errs.GenProtoReply(rsp, mint_err.ErrConfigNotFound)
 	}
-	rsp.Config = configToProto(config)
+	rsp.Config = dto.ConfigToProto(config)
 	return rsp, nil
 }
 
@@ -80,12 +79,12 @@ func (s *ConfigServer) CreateConfig(ctx context.Context, req *agentpb.CreateConf
 	if req.ModelType == "" || req.ApiKey == "" {
 		return errs.GenProtoReply(rsp, mint_err.ErrParam)
 	}
-	config := createReqToModel(req)
+	config := dto.CreateReqToModel(req)
 	config.UserID = userID
 	if err := s.logic.Create(ctx, config); err != nil {
 		return errs.GenProtoReply(rsp, err)
 	}
-	rsp.Config = configToProto(config)
+	rsp.Config = dto.ConfigToProto(config)
 	return rsp, nil
 }
 
@@ -98,7 +97,7 @@ func (s *ConfigServer) UpdateConfig(ctx context.Context, req *agentpb.UpdateConf
 	if req.Id <= 0 {
 		return errs.GenProtoReply(rsp, mint_err.ErrParam)
 	}
-	config := updateReqToModel(req)
+	config := dto.UpdateReqToModel(req)
 	if err := s.logic.Update(ctx, config, userID); err != nil {
 		return errs.GenProtoReply(rsp, err)
 	}
@@ -106,70 +105,23 @@ func (s *ConfigServer) UpdateConfig(ctx context.Context, req *agentpb.UpdateConf
 	if err != nil {
 		return errs.GenProtoReply(rsp, err)
 	}
-	rsp.Config = configToProto(updated)
+	rsp.Config = dto.ConfigToProto(updated)
 	return rsp, nil
 }
 
 func (s *ConfigServer) DeleteConfig(ctx context.Context, req *agentpb.DeleteConfigRequest) (*emptypb.Empty, error) {
+	rsp := &emptypb.Empty{}
 	userID, err := auth.RequireUserID(ctx)
 	if err != nil {
-		return nil, nil
+		return errs.GenProtoReply(rsp, mint_err.ErrUnauthorized)
 	}
 	if req.Id <= 0 {
-		return nil, nil
+		return errs.GenProtoReply(rsp, mint_err.ErrParam)
 	}
 	if err := s.logic.Delete(ctx, req.Id, userID); err != nil {
-		return nil, nil
+		return errs.GenProtoReply(rsp, err)
 	}
-	return &emptypb.Empty{}, nil
-}
-
-func configToProto(c *model.ChatModelConfig) *agentpb.ModelConfig {
-	if c == nil {
-		return nil
-	}
-	return &agentpb.ModelConfig{
-		Id:                c.ID,
-		ModelType:         c.ModelType,
-		Manufacturer:      c.Manufacturer,
-		Description:       c.Description,
-		InputPrice:        c.InputPrice,
-		OutputPrice:       c.OutputPrice,
-		ApiKey:            c.APIKey,
-		Url:               c.URL,
-		MaxTokens:         c.MaxTokens,
-		Stream:            c.Stream,
-		Temperature:       c.Temperature,
-		TopP:              c.TopP,
-		N:                 c.N,
-		PresencePenalty:   c.PresencePenalty,
-		FrequencyPenalty:  c.FrequencyPenalty,
-		AgentGenerateType: c.AgentGenerateType,
-		Route:             c.Route,
-		IsEnabled:         c.IsEnabled,
-	}
-}
-
-func createReqToModel(req *agentpb.CreateConfigRequest) *model.ChatModelConfig {
-	return &model.ChatModelConfig{
-		ModelType:         req.ModelType,
-		Manufacturer:      req.Manufacturer,
-		Description:       req.Description,
-		InputPrice:        req.InputPrice,
-		OutputPrice:       req.OutputPrice,
-		APIKey:            req.ApiKey,
-		URL:               req.Url,
-		MaxTokens:         req.MaxTokens,
-		Stream:            req.Stream,
-		Temperature:       req.Temperature,
-		TopP:              req.TopP,
-		N:                 req.N,
-		PresencePenalty:   req.PresencePenalty,
-		FrequencyPenalty:  req.FrequencyPenalty,
-		AgentGenerateType: req.AgentGenerateType,
-		Route:             req.Route,
-		IsEnabled:         req.IsEnabled,
-	}
+	return rsp, nil
 }
 
 func (s *ConfigServer) GetModelStats(ctx context.Context, _ *emptypb.Empty) (*agentpb.ModelStatsResponse, error) {
@@ -184,37 +136,8 @@ func (s *ConfigServer) GetModelStats(ctx context.Context, _ *emptypb.Empty) (*ag
 	}
 	pbStats := make([]*agentpb.ModelStat, 0, len(stats))
 	for _, st := range stats {
-		pbStats = append(pbStats, &agentpb.ModelStat{
-			Model:             st.Model,
-			TotalInputTokens:  st.TotalInputTokens,
-			TotalOutputTokens: st.TotalOutputTokens,
-			TotalInputCost:    st.TotalInputCost,
-			TotalOutputCost:   st.TotalOutputCost,
-		})
+		pbStats = append(pbStats, dto.ModelStatToProto(st))
 	}
 	rsp.Stats = pbStats
 	return rsp, nil
-}
-
-func updateReqToModel(req *agentpb.UpdateConfigRequest) *model.ChatModelConfig {
-	return &model.ChatModelConfig{
-		ID:                req.Id,
-		ModelType:         req.ModelType,
-		Manufacturer:      req.Manufacturer,
-		Description:       req.Description,
-		InputPrice:        req.InputPrice,
-		OutputPrice:       req.OutputPrice,
-		APIKey:            req.ApiKey,
-		URL:               req.Url,
-		MaxTokens:         req.MaxTokens,
-		Stream:            req.Stream,
-		Temperature:       req.Temperature,
-		TopP:              req.TopP,
-		N:                 req.N,
-		PresencePenalty:   req.PresencePenalty,
-		FrequencyPenalty:  req.FrequencyPenalty,
-		AgentGenerateType: req.AgentGenerateType,
-		Route:             req.Route,
-		IsEnabled:         req.IsEnabled,
-	}
 }

@@ -554,9 +554,11 @@ type ModelInfo struct {
 	// 模型标识
 	Model string `protobuf:"bytes,1,opt,name=model,proto3" json:"model,omitempty"`
 	// 模型描述
-	Description   string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	// 是否支持多模态（图片输入）
+	SupportsMultimodal bool `protobuf:"varint,3,opt,name=supports_multimodal,json=supportsMultimodal,proto3" json:"supports_multimodal,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *ModelInfo) Reset() {
@@ -601,6 +603,13 @@ func (x *ModelInfo) GetDescription() string {
 		return x.Description
 	}
 	return ""
+}
+
+func (x *ModelInfo) GetSupportsMultimodal() bool {
+	if x != nil {
+		return x.SupportsMultimodal
+	}
+	return false
 }
 
 type GetHistoryRequest struct {
@@ -991,8 +1000,10 @@ type ModelConfig struct {
 	AgentGenerateType string                 `protobuf:"bytes,16,opt,name=agent_generate_type,json=agentGenerateType,proto3" json:"agent_generate_type,omitempty"`
 	Route             string                 `protobuf:"bytes,17,opt,name=route,proto3" json:"route,omitempty"`
 	IsEnabled         int32                  `protobuf:"varint,18,opt,name=is_enabled,json=isEnabled,proto3" json:"is_enabled,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	// 是否支持多模态（图片输入）
+	SupportsMultimodal bool `protobuf:"varint,19,opt,name=supports_multimodal,json=supportsMultimodal,proto3" json:"supports_multimodal,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *ModelConfig) Reset() {
@@ -1149,6 +1160,13 @@ func (x *ModelConfig) GetIsEnabled() int32 {
 		return x.IsEnabled
 	}
 	return 0
+}
+
+func (x *ModelConfig) GetSupportsMultimodal() bool {
+	if x != nil {
+		return x.SupportsMultimodal
+	}
+	return false
 }
 
 type ConfigReply struct {
@@ -1394,8 +1412,10 @@ type CreateConfigRequest struct {
 	AgentGenerateType string                 `protobuf:"bytes,15,opt,name=agent_generate_type,json=agentGenerateType,proto3" json:"agent_generate_type,omitempty"`
 	Route             string                 `protobuf:"bytes,16,opt,name=route,proto3" json:"route,omitempty"`
 	IsEnabled         int32                  `protobuf:"varint,17,opt,name=is_enabled,json=isEnabled,proto3" json:"is_enabled,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	// 是否支持多模态（图片输入）
+	SupportsMultimodal bool `protobuf:"varint,18,opt,name=supports_multimodal,json=supportsMultimodal,proto3" json:"supports_multimodal,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *CreateConfigRequest) Reset() {
@@ -1547,6 +1567,13 @@ func (x *CreateConfigRequest) GetIsEnabled() int32 {
 	return 0
 }
 
+func (x *CreateConfigRequest) GetSupportsMultimodal() bool {
+	if x != nil {
+		return x.SupportsMultimodal
+	}
+	return false
+}
+
 type UpdateConfigRequest struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
 	Id                int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -1567,8 +1594,10 @@ type UpdateConfigRequest struct {
 	AgentGenerateType string                 `protobuf:"bytes,16,opt,name=agent_generate_type,json=agentGenerateType,proto3" json:"agent_generate_type,omitempty"`
 	Route             string                 `protobuf:"bytes,17,opt,name=route,proto3" json:"route,omitempty"`
 	IsEnabled         int32                  `protobuf:"varint,18,opt,name=is_enabled,json=isEnabled,proto3" json:"is_enabled,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	// 是否支持多模态（图片输入）
+	SupportsMultimodal bool `protobuf:"varint,19,opt,name=supports_multimodal,json=supportsMultimodal,proto3" json:"supports_multimodal,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *UpdateConfigRequest) Reset() {
@@ -1725,6 +1754,13 @@ func (x *UpdateConfigRequest) GetIsEnabled() int32 {
 		return x.IsEnabled
 	}
 	return 0
+}
+
+func (x *UpdateConfigRequest) GetSupportsMultimodal() bool {
+	if x != nil {
+		return x.SupportsMultimodal
+	}
+	return false
 }
 
 type DeleteConfigRequest struct {
@@ -1958,10 +1994,11 @@ const file_mint_server_agent_agent_proto_rawDesc = "" +
 	"\rmanufacturers\x18\x03 \x03(\v2$.mint_server.agent.ManufacturerGroupR\rmanufacturers\"m\n" +
 	"\x11ManufacturerGroup\x12\"\n" +
 	"\fmanufacturer\x18\x01 \x01(\tR\fmanufacturer\x124\n" +
-	"\x06models\x18\x02 \x03(\v2\x1c.mint_server.agent.ModelInfoR\x06models\"C\n" +
+	"\x06models\x18\x02 \x03(\v2\x1c.mint_server.agent.ModelInfoR\x06models\"t\n" +
 	"\tModelInfo\x12\x14\n" +
 	"\x05model\x18\x01 \x01(\tR\x05model\x12 \n" +
-	"\vdescription\x18\x02 \x01(\tR\vdescription\"4\n" +
+	"\vdescription\x18\x02 \x01(\tR\vdescription\x12/\n" +
+	"\x13supports_multimodal\x18\x03 \x01(\bR\x12supportsMultimodal\"4\n" +
 	"\x11GetHistoryRequest\x12\x1f\n" +
 	"\vdialogue_id\x18\x01 \x01(\tR\n" +
 	"dialogueId\"~\n" +
@@ -1990,7 +2027,7 @@ const file_mint_server_agent_agent_proto_rawDesc = "" +
 	"\x15ListDialoguesResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12@\n" +
-	"\tdialogues\x18\x03 \x03(\v2\".mint_server.agent.DialogueSummaryR\tdialogues\"\xaa\x04\n" +
+	"\tdialogues\x18\x03 \x03(\v2\".mint_server.agent.DialogueSummaryR\tdialogues\"\xdb\x04\n" +
 	"\vModelConfig\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x1d\n" +
 	"\n" +
@@ -2014,7 +2051,8 @@ const file_mint_server_agent_agent_proto_rawDesc = "" +
 	"\x13agent_generate_type\x18\x10 \x01(\tR\x11agentGenerateType\x12\x14\n" +
 	"\x05route\x18\x11 \x01(\tR\x05route\x12\x1d\n" +
 	"\n" +
-	"is_enabled\x18\x12 \x01(\x05R\tisEnabled\"s\n" +
+	"is_enabled\x18\x12 \x01(\x05R\tisEnabled\x12/\n" +
+	"\x13supports_multimodal\x18\x13 \x01(\bR\x12supportsMultimodal\"s\n" +
 	"\vConfigReply\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x126\n" +
@@ -2028,7 +2066,7 @@ const file_mint_server_agent_agent_proto_rawDesc = "" +
 	"\aconfigs\x18\x03 \x03(\v2\x1e.mint_server.agent.ModelConfigR\aconfigs\x12\x14\n" +
 	"\x05total\x18\x04 \x01(\x03R\x05total\"\"\n" +
 	"\x10GetConfigRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x05R\x02id\"\xa2\x04\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\"\xd3\x04\n" +
 	"\x13CreateConfigRequest\x12\x1d\n" +
 	"\n" +
 	"model_type\x18\x01 \x01(\tR\tmodelType\x12\"\n" +
@@ -2051,7 +2089,8 @@ const file_mint_server_agent_agent_proto_rawDesc = "" +
 	"\x13agent_generate_type\x18\x0f \x01(\tR\x11agentGenerateType\x12\x14\n" +
 	"\x05route\x18\x10 \x01(\tR\x05route\x12\x1d\n" +
 	"\n" +
-	"is_enabled\x18\x11 \x01(\x05R\tisEnabled\"\xb2\x04\n" +
+	"is_enabled\x18\x11 \x01(\x05R\tisEnabled\x12/\n" +
+	"\x13supports_multimodal\x18\x12 \x01(\bR\x12supportsMultimodal\"\xe3\x04\n" +
 	"\x13UpdateConfigRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x1d\n" +
 	"\n" +
@@ -2075,7 +2114,8 @@ const file_mint_server_agent_agent_proto_rawDesc = "" +
 	"\x13agent_generate_type\x18\x10 \x01(\tR\x11agentGenerateType\x12\x14\n" +
 	"\x05route\x18\x11 \x01(\tR\x05route\x12\x1d\n" +
 	"\n" +
-	"is_enabled\x18\x12 \x01(\x05R\tisEnabled\"%\n" +
+	"is_enabled\x18\x12 \x01(\x05R\tisEnabled\x12/\n" +
+	"\x13supports_multimodal\x18\x13 \x01(\bR\x12supportsMultimodal\"%\n" +
 	"\x13DeleteConfigRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\"v\n" +
 	"\x12ModelStatsResponse\x12\x12\n" +

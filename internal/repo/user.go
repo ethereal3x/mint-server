@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/ethereal3x/apc/logger"
 	"github.com/ethereal3x/apc/tracing"
+	"github.com/go-sql-driver/mysql"
 	mint_err "github.com/ethereal3x/mint-server/internal/errs"
 	"github.com/ethereal3x/mint-server/internal/model"
 	"go.uber.org/zap"
@@ -81,9 +81,6 @@ func (r *UserRepo) UpdateBaseUser(ctx context.Context, userID int64, updates map
 
 // isDuplicateEntry 判断数据库错误是否为唯一键冲突
 func isDuplicateEntry(err error) bool {
-	if err == nil {
-		return false
-	}
-	message := err.Error()
-	return strings.Contains(message, "Duplicate entry") || strings.Contains(message, "UNIQUE constraint failed")
+	var mysqlErr *mysql.MySQLError
+	return errors.As(err, &mysqlErr) && mysqlErr.Number == 1062
 }

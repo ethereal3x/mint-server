@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/ethereal3x/apc/logger"
-	"github.com/ethereal3x/apc/tracing"
 	mint_err "github.com/ethereal3x/mint-server/internal/errs"
 	"github.com/ethereal3x/mint-server/internal/model"
 	"go.uber.org/zap"
@@ -22,12 +21,8 @@ func (s *Chat) GetHistory(ctx context.Context, query *model.DialogueQuery) ([]*m
 
 // ListDialogues 获取对话摘要列表
 func (s *Chat) ListDialogues(ctx context.Context, userID string) ([]*model.DialogueSummary, error) {
-	ctx, span := tracing.Start(ctx, "logic.Chat.ListDialogues")
-	defer span.End()
-
 	summaries, err := s.recordRepo.ListDialogues(ctx, userID)
 	if err != nil {
-		tracing.RecordError(ctx, err)
 		logger.ContextError(ctx, "Chat.ListDialogues", zap.String("user_id", userID), zap.Error(err))
 		return nil, mint_err.ErrListDialogues
 	}

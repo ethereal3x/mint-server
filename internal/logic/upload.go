@@ -3,13 +3,12 @@ package logic
 import (
 	"context"
 	"fmt"
-	"io"
 	"path/filepath"
 	"time"
 
 	"github.com/ethereal3x/apc/logger"
 	"github.com/ethereal3x/apc/storage"
-	"github.com/ethereal3x/apc/tracing"
+	"github.com/ethereal3x/mint-server/internal/dto"
 	mint_err "github.com/ethereal3x/mint-server/internal/errs"
 	"github.com/ethereal3x/mint-server/internal/model"
 	"github.com/google/uuid"
@@ -32,33 +31,13 @@ type UploadLogic struct {
 	repo    UploadRepo
 }
 
-// UploadRequest 文件上传请求参数
-type UploadRequest struct {
-	UserID      string
-	FileName    string
-	Reader      io.Reader
-	Size        int64
-	ContentType string
-}
-
-// UploadResult 上传结果
-type UploadResult struct {
-	ID       int32  `json:"id"`
-	URL      string `json:"url"`
-	FileName string `json:"file_name"`
-	FileSize int64  `json:"file_size"`
-}
-
 // NewUploadLogic 创建文件上传业务逻辑
 func NewUploadLogic(store storage.ObjectStorage, repo UploadRepo) *UploadLogic {
 	return &UploadLogic{storage: store, repo: repo}
 }
 
 // Upload 简单文件上传：接收文件流、上传对象存储、记录 DB 并返回 URL
-func (l *UploadLogic) Upload(ctx context.Context, req *UploadRequest) (*UploadResult, error) {
-	ctx, span := tracing.Start(ctx, "logic.UploadLogic.Upload")
-	defer span.End()
-
+func (l *UploadLogic) Upload(ctx context.Context, req *dto.UploadRequest) (*dto.UploadResult, error) {
 	if req.Size > maxUploadSize {
 		return nil, fmt.Errorf("file size %d exceeds max %d", req.Size, maxUploadSize)
 	}
@@ -95,7 +74,7 @@ func (l *UploadLogic) Upload(ctx context.Context, req *UploadRequest) (*UploadRe
 		return nil, mint_err.ErrDBUpdate
 	}
 
-	return &UploadResult{ID: record.ID, URL: record.URL, FileName: req.FileName, FileSize: req.Size}, nil
+	return &dto.UploadResult{ID: record.ID, URL: record.URL, FileName: req.FileName, FileSize: req.Size}, nil
 }
 
 // GetUpload 查询当前用户的上传记录

@@ -7,6 +7,7 @@ require (
 	github.com/cloudwego/eino v0.9.4
 	github.com/cloudwego/eino-ext/components/model/openai v0.1.13
 	github.com/ethereal3x/apc v1.2.4
+	github.com/go-sql-driver/mysql v1.10.0
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/google/uuid v1.6.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.29.0
@@ -48,7 +49,6 @@ require (
 	github.com/evanphx/json-patch v0.5.2 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
-	github.com/go-sql-driver/mysql v1.10.0 // indirect
 	github.com/goph/emperror v0.17.2 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect

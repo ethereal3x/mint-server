@@ -649,6 +649,10 @@
         "isEnabled": {
           "type": "integer",
           "format": "int32"
+        },
+        "supportsMultimodal": {
+          "type": "boolean",
+          "title": "是否支持多模态（图片输入）"
         }
       }
     },
@@ -729,6 +733,10 @@
         "isEnabled": {
           "type": "integer",
           "format": "int32"
+        },
+        "supportsMultimodal": {
+          "type": "boolean",
+          "title": "是否支持多模态（图片输入）"
         }
       }
     },
@@ -999,6 +1007,10 @@
         "isEnabled": {
           "type": "integer",
           "format": "int32"
+        },
+        "supportsMultimodal": {
+          "type": "boolean",
+          "title": "是否支持多模态（图片输入）"
         }
       }
     },
@@ -1012,6 +1024,10 @@
         "description": {
           "type": "string",
           "title": "模型描述"
+        },
+        "supportsMultimodal": {
+          "type": "boolean",
+          "title": "是否支持多模态（图片输入）"
         }
       }
     },

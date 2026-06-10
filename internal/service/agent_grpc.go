@@ -6,8 +6,8 @@ import (
 	"github.com/ethereal3x/apc/errs"
 	agentpb "github.com/ethereal3x/mint-server/api/gen/go/mint_server/agent"
 	"github.com/ethereal3x/mint-server/internal/auth"
+	"github.com/ethereal3x/mint-server/internal/dto"
 	mint_err "github.com/ethereal3x/mint-server/internal/errs"
-	"github.com/ethereal3x/mint-server/internal/logic"
 	"github.com/ethereal3x/mint-server/internal/model"
 	"github.com/google/uuid"
 	"google.golang.org/grpc"
@@ -18,12 +18,12 @@ import (
 // AgentServer AgentService gRPC 处理器
 type AgentServer struct {
 	agentpb.UnimplementedAgentServiceServer
-	chat   *logic.Chat
-	config *logic.Config
+	chat   AgentChatLogic
+	config AgentConfigLogic
 }
 
 // NewAgentServer 创建 Agent gRPC 处理器
-func NewAgentServer(chat *logic.Chat, config *logic.Config) *AgentServer {
+func NewAgentServer(chat AgentChatLogic, config AgentConfigLogic) *AgentServer {
 	return &AgentServer{chat: chat, config: config}
 }
 
@@ -37,7 +37,7 @@ func (s *AgentServer) StreamChat(req *agentpb.StreamChatRequest, stream grpc.Ser
 		return sendStreamError(stream, mint_err.ErrUnauthorized)
 	}
 	dialogueID, recordID := resolveIDs(req.DialogueId, req.RecordId)
-	chatReq := &logic.ChatRequest{
+	chatReq := &dto.ChatRequest{
 		UserID:     userID,
 		Question:   req.Question,
 		Model:      req.Model,
@@ -50,7 +50,7 @@ func (s *AgentServer) StreamChat(req *agentpb.StreamChatRequest, stream grpc.Ser
 
 	contentChan := make(chan string)
 	resultChan := make(chan struct {
-		result *logic.ChatResult
+		result *dto.ChatResult
 		err    error
 	}, 1)
 
@@ -61,7 +61,7 @@ func (s *AgentServer) StreamChat(req *agentpb.StreamChatRequest, stream grpc.Ser
 		result, err := s.chat.StreamChat(ctx, chatReq, contentChan)
 		select {
 		case resultChan <- struct {
-			result *logic.ChatResult
+			result *dto.ChatResult
 			err    error
 		}{result, err}:
 		case <-ctx.Done():
@@ -77,7 +77,7 @@ func (s *AgentServer) StreamChat(req *agentpb.StreamChatRequest, stream grpc.Ser
 				if res.err != nil {
 					return sendStreamError(stream, res.err)
 				}
-				if saveErr := s.chat.SaveRecord(ctx, &logic.SaveRecordRequest{ChatRequest: chatReq, Answer: fullAnswer, Config: res.result.Config, Usage: res.result.Usage}); saveErr != nil {
+				if saveErr := s.chat.SaveRecord(ctx, &dto.SaveRecordRequest{ChatRequest: chatReq, Answer: fullAnswer, Config: res.result.Config, Usage: res.result.Usage}); saveErr != nil {
 					return sendStreamError(stream, saveErr)
 				}
 				return stream.Send(&agentpb.StreamChatResponse{Done: true, DialogueId: dialogueID, RecordId: recordID})
@@ -103,7 +103,7 @@ func (s *AgentServer) GenerateChat(ctx context.Context, req *agentpb.GenerateCha
 		return errs.GenProtoReply(rsp, mint_err.ErrUnauthorized)
 	}
 	dialogueID, recordID := resolveIDs(req.DialogueId, req.RecordId)
-	chatReq := &logic.ChatRequest{
+	chatReq := &dto.ChatRequest{
 		UserID:     userID,
 		Question:   req.Question,
 		Model:      req.Model,
@@ -119,7 +119,7 @@ func (s *AgentServer) GenerateChat(ctx context.Context, req *agentpb.GenerateCha
 		return errs.GenProtoReply(rsp, err)
 	}
 
-	if saveErr := s.chat.SaveRecord(ctx, &logic.SaveRecordRequest{ChatRequest: chatReq, Answer: result.Content, Config: result.Config, Usage: result.Usage}); saveErr != nil {
+	if saveErr := s.chat.SaveRecord(ctx, &dto.SaveRecordRequest{ChatRequest: chatReq, Answer: result.Content, Config: result.Config, Usage: result.Usage}); saveErr != nil {
 		return errs.GenProtoReply(rsp, saveErr)
 	}
 
@@ -143,8 +143,9 @@ func (s *AgentServer) ListModels(ctx context.Context, _ *agentpb.ListModelsReque
 	groupMap := make(map[string][]*agentpb.ModelInfo)
 	for _, config := range configs {
 		groupMap[config.Manufacturer] = append(groupMap[config.Manufacturer], &agentpb.ModelInfo{
-			Model:       config.ModelType,
-			Description: config.Description,
+			Model:              config.ModelType,
+			Description:        config.Description,
+			SupportsMultimodal: config.SupportsMultimodal,
 		})
 	}
 	manufacturers := make([]*agentpb.ManufacturerGroup, 0, len(groupMap))

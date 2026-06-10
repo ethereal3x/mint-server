@@ -5,7 +5,7 @@ import (
 
 	"github.com/cloudwego/eino/schema"
 	"github.com/ethereal3x/apc/logger"
-	"github.com/ethereal3x/apc/tracing"
+	"github.com/ethereal3x/mint-server/internal/dto"
 	mint_err "github.com/ethereal3x/mint-server/internal/errs"
 	"github.com/ethereal3x/mint-server/internal/model"
 	"go.uber.org/zap"
@@ -31,40 +31,13 @@ type Chat struct {
 	adapter    LLMAdapter
 }
 
-// ChatResult 聊天调用结果
-type ChatResult struct {
-	Config  *model.ChatModelConfig
-	Content string
-	Usage   *schema.TokenUsage
-}
-
 // NewChat 创建聊天业务逻辑
 func NewChat(configRepo ModelConfigRepo, recordRepo ChatRecordRepo, adapter LLMAdapter) *Chat {
 	return &Chat{configRepo: configRepo, recordRepo: recordRepo, adapter: adapter}
 }
 
-// ChatRequest 聊天请求参数
-type ChatRequest struct {
-	UserID     string
-	Question   string
-	Model      string
-	DialogueID string
-	RecordID   string
-	FileData   []byte
-	FileName   string
-	ImageURLs  []string
-}
-
-// SaveRecordRequest 保存对话记录参数
-type SaveRecordRequest struct {
-	ChatRequest *ChatRequest
-	Answer      string
-	Config      *model.ChatModelConfig
-	Usage       *schema.TokenUsage
-}
-
 // prepareChat 查询模型配置→加载历史→构建上下文
-func (s *Chat) prepareChat(ctx context.Context, req *ChatRequest) (*model.ChatModelConfig, []*schema.Message, error) {
+func (s *Chat) prepareChat(ctx context.Context, req *dto.ChatRequest) (*model.ChatModelConfig, []*schema.Message, error) {
 	logger.ContextInfo(ctx, "Chat.prepareChat", zap.String("model", req.Model), zap.String("dialogue_id", req.DialogueID))
 
 	config, err := s.configRepo.FindByModelTypeForUser(ctx, req.Model, req.UserID)
@@ -94,51 +67,38 @@ func (s *Chat) prepareChat(ctx context.Context, req *ChatRequest) (*model.ChatMo
 }
 
 // StreamChat 执行流式聊天，增量内容通过 contentChan 返回
-func (s *Chat) StreamChat(ctx context.Context, req *ChatRequest, contentChan chan<- string) (*ChatResult, error) {
-	ctx, span := tracing.Start(ctx, "logic.Chat.StreamChat")
-	defer span.End()
-
+func (s *Chat) StreamChat(ctx context.Context, req *dto.ChatRequest, contentChan chan<- string) (*dto.ChatResult, error) {
 	defer close(contentChan)
 
 	config, messages, err := s.prepareChat(ctx, req)
 	if err != nil {
-		tracing.RecordError(ctx, err)
 		return nil, err
 	}
 
 	usage, err := s.adapter.Stream(ctx, config, messages, contentChan)
 	if err != nil {
-		tracing.RecordError(ctx, err)
 		return nil, err
 	}
-	return &ChatResult{Config: config, Usage: usage}, nil
+	return &dto.ChatResult{Config: config, Usage: usage}, nil
 }
 
 // GenerateChat 非流式生成聊天内容
-func (s *Chat) GenerateChat(ctx context.Context, req *ChatRequest) (*ChatResult, error) {
-	ctx, span := tracing.Start(ctx, "logic.Chat.GenerateChat")
-	defer span.End()
-
+func (s *Chat) GenerateChat(ctx context.Context, req *dto.ChatRequest) (*dto.ChatResult, error) {
 	config, messages, err := s.prepareChat(ctx, req)
 	if err != nil {
-		tracing.RecordError(ctx, err)
 		return nil, err
 	}
 
 	content, usage, err := s.adapter.Generate(ctx, config, messages)
 	if err != nil {
-		tracing.RecordError(ctx, err)
 		logger.ContextError(ctx, "Chat.GenerateChat", zap.Error(err))
 		return nil, mint_err.ErrChatGenerate
 	}
-	return &ChatResult{Config: config, Content: content, Usage: usage}, nil
+	return &dto.ChatResult{Config: config, Content: content, Usage: usage}, nil
 }
 
 // SaveRecord 持久化对话记录，根据 config 中的单价计算费用
-func (s *Chat) SaveRecord(ctx context.Context, req *SaveRecordRequest) error {
-	ctx, span := tracing.Start(ctx, "logic.Chat.SaveRecord")
-	defer span.End()
-
+func (s *Chat) SaveRecord(ctx context.Context, req *dto.SaveRecordRequest) error {
 	chatRequest := req.ChatRequest
 	record := &model.DialogueRecord{
 		DialogueID:   chatRequest.DialogueID,
@@ -159,7 +119,6 @@ func (s *Chat) SaveRecord(ctx context.Context, req *SaveRecordRequest) error {
 		}
 	}
 	if err := s.recordRepo.Create(ctx, record); err != nil {
-		tracing.RecordError(ctx, err)
 		logger.ContextError(ctx, "Chat.SaveRecord", zap.String("record_id", record.RecordID), zap.Error(err))
 		return mint_err.ErrSaveRecord
 	}
