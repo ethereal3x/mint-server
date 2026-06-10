@@ -10,391 +10,281 @@ import "google/protobuf/empty.proto";
 service AgentService {
     rpc StreamChat(StreamChatRequest) returns (stream StreamChatResponse) {
         option (google.api.http) = {
-            post: "/api/v1/agent/chat/stream"
+            post: "/api/v1/chat/stream"
             body: "*"
         };
     }
 
     rpc GenerateChat(GenerateChatRequest) returns (GenerateChatResponse) {
         option (google.api.http) = {
-            post: "/api/v1/agent/chat"
+            post: "/api/v1/chat/chat"
             body: "*"
         };
     }
 
     rpc ListModels(ListModelsRequest) returns (ListModelsResponse) {
         option (google.api.http) = {
-            get: "/api/v1/agent/models"
+            get: "/api/v1/chat/models"
         };
     }
 
     rpc GetHistory(GetHistoryRequest) returns (GetHistoryResponse) {
         option (google.api.http) = {
-            get: "/api/v1/agent/history/{dialogue_id}"
+            get: "/api/v1/chat/history/{dialogue_id}"
         };
     }
 
     rpc ListDialogues(ListDialoguesRequest) returns (ListDialoguesResponse) {
         option (google.api.http) = {
-            get: "/api/v1/agent/dialogues"
+            get: "/api/v1/chat/dialogues"
         };
     }
 }
 
-service StrategyService {
-    rpc ListStrategies(ListStrategiesRequest) returns (ListStrategiesResponse) {
+service ModelConfigService {
+    rpc ListConfigs(ListConfigsRequest) returns (ListConfigsResponse) {
         option (google.api.http) = {
-            get: "/admin/v1/strategies"
+            get: "/admin/v1/configs"
         };
     }
 
-    rpc GetStrategy(GetStrategyRequest) returns (Strategy) {
+    rpc GetConfig(GetConfigRequest) returns (ConfigReply) {
         option (google.api.http) = {
-            get: "/admin/v1/strategies/{rule_id}"
+            get: "/admin/v1/configs/{id}"
         };
     }
 
-    rpc CreateStrategy(CreateStrategyRequest) returns (Strategy) {
+    rpc CreateConfig(CreateConfigRequest) returns (ConfigReply) {
         option (google.api.http) = {
-            post: "/admin/v1/strategies"
+            post: "/admin/v1/configs"
             body: "*"
         };
     }
 
-    rpc UpdateStrategy(UpdateStrategyRequest) returns (Strategy) {
+    rpc UpdateConfig(UpdateConfigRequest) returns (ConfigReply) {
         option (google.api.http) = {
-            put: "/admin/v1/strategies/{rule_id}"
+            put: "/admin/v1/configs/{id}"
             body: "*"
         };
     }
 
-    rpc DeleteStrategy(DeleteStrategyRequest) returns (google.protobuf.Empty) {
+    rpc DeleteConfig(DeleteConfigRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            delete: "/admin/v1/strategies/{rule_id}"
+            delete: "/admin/v1/configs/{id}"
+        };
+    }
+
+    rpc GetModelStats(google.protobuf.Empty) returns (ModelStatsResponse) {
+        option (google.api.http) = {
+            get: "/admin/v1/stats/models"
         };
     }
 }
 
-service MappingService {
-    rpc ListMappings(ListMappingsRequest) returns (ListMappingsResponse) {
-        option (google.api.http) = {
-            get: "/admin/v1/mappings"
-        };
-    }
-
-    rpc GetMapping(GetMappingRequest) returns (ModelMapping) {
-        option (google.api.http) = {
-            get: "/admin/v1/mappings/{id}"
-        };
-    }
-
-    rpc CreateMapping(CreateMappingRequest) returns (ModelMapping) {
-        option (google.api.http) = {
-            post: "/admin/v1/mappings"
-            body: "*"
-        };
-    }
-
-    rpc UpdateMapping(UpdateMappingRequest) returns (ModelMapping) {
-        option (google.api.http) = {
-            put: "/admin/v1/mappings/{id}"
-            body: "*"
-        };
-    }
-
-    rpc DeleteMapping(DeleteMappingRequest) returns (google.protobuf.Empty) {
-        option (google.api.http) = {
-            delete: "/admin/v1/mappings/{id}"
-        };
-    }
-}
+// ---- Chat messages ----
 
 message StreamChatRequest {
-    // 用户ID
     string user_id = 1;
-    // 用户提问内容
     string question = 2;
-    // 模型标识
     string model = 3;
-    // 对话ID，为空时自动生成
     string dialogue_id = 4;
-    // 记录ID，为空时自动生成
     string record_id = 5;
-    // 上传文件名
     string file_name = 6;
-    // 上传文件数据
     bytes file_data = 7;
+    repeated string image_urls = 8;
 }
 
 message StreamChatResponse {
-    // 流式响应内容块
-    string content = 1;
-    // 对话ID
-    string dialogue_id = 2;
-    // 记录ID
-    string record_id = 3;
-    // 是否完成
-    bool done = 4;
-    // 错误信息
-    string error = 5;
+    int32 code = 1;
+    string message = 2;
+    string content = 3;
+    string dialogue_id = 4;
+    string record_id = 5;
+    bool done = 6;
+    string error = 7;
 }
 
 message GenerateChatRequest {
-    // 用户ID
     string user_id = 1;
-    // 用户提问内容
     string question = 2;
-    // 模型标识
     string model = 3;
-    // 对话ID，为空时自动生成
     string dialogue_id = 4;
-    // 记录ID，为空时自动生成
     string record_id = 5;
-    // 上传文件名
     string file_name = 6;
-    // 上传文件数据
     bytes file_data = 7;
+    repeated string image_urls = 8;
 }
 
 message GenerateChatResponse {
-    // 完整回答内容
-    string content = 1;
-    // 对话ID
-    string dialogue_id = 2;
-    // 记录ID
-    string record_id = 3;
-    // 错误信息
-    string error = 4;
+    int32 code = 1;
+    string message = 2;
+    string content = 3;
+    string dialogue_id = 4;
+    string record_id = 5;
+    string error = 6;
 }
 
 message ListModelsRequest {}
 
 message ListModelsResponse {
-    // 可用模型列表
-    repeated ModelInfo models = 1;
+    int32 code = 1;
+    string message = 2;
+    repeated ManufacturerGroup manufacturers = 3;
+}
+
+message ManufacturerGroup {
+    // 厂商名称
+    string manufacturer = 1;
+    // 该厂商下的模型列表
+    repeated ModelInfo models = 2;
 }
 
 message ModelInfo {
     // 模型标识
     string model = 1;
-    // 厂商名称
-    string manufacturer = 2;
     // 模型描述
-    string description = 3;
+    string description = 2;
 }
 
 message GetHistoryRequest {
-    // 对话ID
     string dialogue_id = 1;
 }
 
 message GetHistoryResponse {
-    // 历史记录列表
-    repeated HistoryRecord records = 1;
+    int32 code = 1;
+    string message = 2;
+    repeated HistoryRecord records = 3;
 }
 
 message HistoryRecord {
-    // 记录ID
     string record_id = 1;
-    // 用户消息
     string user_content = 2;
-    // AI 回复
     string agent_content = 3;
-    // 模型标识
     string model = 4;
-    // 总 token 数
     int64 total_tokens = 5;
-}
-
-message Strategy {
-    // 自增主键
-    int32 id = 1;
-    // 策略规则唯一标识
-    string rule_id = 2;
-    // API密钥
-    string api_key = 3;
-    // 模型名称
-    string agent_model = 4;
-    // 模型厂商
-    string agent_manufacturer = 5;
-    // 生成类型
-    string agent_generate_type = 6;
-    // API 地址
-    string url = 7;
-    // 最大 token 数
-    int32 max_tokens = 8;
-    // 是否启用流式
-    bool stream = 9;
-    // 温度参数
-    float temperature = 10;
-    // Top-P 采样参数
-    float top_p = 11;
-    // 生成候选数
-    int32 n = 12;
-    // 存在惩罚系数
-    float presence_penalty = 13;
-    // 频率惩罚系数
-    float frequency_penalty = 14;
-    // 路由标识
-    string route = 15;
-    // 是否启用：0-禁用，1-启用
-    int32 is_enabled = 16;
-}
-
-message ListStrategiesRequest {
-    // 页码，从 1 开始
-    int32 page = 1;
-    // 每页条数
-    int32 page_size = 2;
-}
-
-message ListStrategiesResponse {
-    // 策略规则列表
-    repeated Strategy strategies = 1;
-    // 总条数
-    int64 total = 2;
-}
-
-message GetStrategyRequest {
-    // 策略规则ID
-    string rule_id = 1;
-}
-
-message CreateStrategyRequest {
-    // API密钥
-    string api_key = 1;
-    // 模型名称
-    string agent_model = 2;
-    // 模型厂商
-    string agent_manufacturer = 3;
-    // 生成类型
-    string agent_generate_type = 4;
-    // API 地址
-    string url = 5;
-    // 最大 token 数
-    int32 max_tokens = 6;
-    // 是否启用流式
-    bool stream = 7;
-    // 温度参数
-    float temperature = 8;
-    // Top-P 采样参数
-    float top_p = 9;
-    // 生成候选数
-    int32 n = 10;
-    // 存在惩罚系数
-    float presence_penalty = 11;
-    // 频率惩罚系数
-    float frequency_penalty = 12;
-    // 路由标识
-    string route = 13;
-}
-
-message UpdateStrategyRequest {
-    // 策略规则ID
-    string rule_id = 1;
-    // API密钥
-    string api_key = 2;
-    // 模型名称
-    string agent_model = 3;
-    // 模型厂商
-    string agent_manufacturer = 4;
-    // 生成类型
-    string agent_generate_type = 5;
-    // API 地址
-    string url = 6;
-    // 最大 token 数
-    int32 max_tokens = 7;
-    // 是否启用流式
-    bool stream = 8;
-    // 温度参数
-    float temperature = 9;
-    // Top-P 采样参数
-    float top_p = 10;
-    // 生成候选数
-    int32 n = 11;
-    // 存在惩罚系数
-    float presence_penalty = 12;
-    // 频率惩罚系数
-    float frequency_penalty = 13;
-    // 路由标识
-    string route = 14;
-    // 是否启用：0-禁用，1-启用
-    int32 is_enabled = 15;
-}
-
-message DeleteStrategyRequest {
-    // 策略规则ID
-    string rule_id = 1;
-}
-
-message ModelMapping {
-    // 自增主键
-    int32 id = 1;
-    // 模型类型标识
-    string model_type = 2;
-    // 厂商名称
-    string manufacturer = 3;
-    // 模型描述
-    string description = 4;
-}
-
-message ListMappingsRequest {
-    // 厂商过滤条件，为空时返回全部
-    string manufacturer = 1;
-}
-
-message ListMappingsResponse {
-    // 模型映射列表
-    repeated ModelMapping mappings = 1;
-}
-
-message GetMappingRequest {
-    // 映射ID
-    int32 id = 1;
-}
-
-message CreateMappingRequest {
-    // 模型类型标识
-    string model_type = 1;
-    // 厂商名称
-    string manufacturer = 2;
-    // 模型描述
-    string description = 3;
-}
-
-message UpdateMappingRequest {
-    // 映射ID
-    int32 id = 1;
-    // 模型类型标识
-    string model_type = 2;
-    // 厂商名称
-    string manufacturer = 3;
-    // 模型描述
-    string description = 4;
-}
-
-message DeleteMappingRequest {
-    // 映射ID
-    int32 id = 1;
+    double input_cost = 6;
+    double output_cost = 7;
 }
 
 message ListDialoguesRequest {
-    // 用户ID，为空时返回全部
     string user_id = 1;
 }
 
 message DialogueSummary {
-    // 对话ID
     string dialogue_id = 1;
-    // 对话标题（首条用户消息）
     string title = 2;
-    // 消息数量
     int32 message_count = 3;
-    // 最后更新时间
     string updated_time = 4;
 }
 
 message ListDialoguesResponse {
-    // 对话摘要列表
-    repeated DialogueSummary dialogues = 1;
+    int32 code = 1;
+    string message = 2;
+    repeated DialogueSummary dialogues = 3;
+}
+
+// ---- Model config messages ----
+
+message ModelConfig {
+    int32 id = 1;
+    string model_type = 2;
+    string manufacturer = 3;
+    string description = 4;
+    double input_price = 5;
+    double output_price = 6;
+    string api_key = 7;
+    string url = 8;
+    int32 max_tokens = 9;
+    bool stream = 10;
+    float temperature = 11;
+    float top_p = 12;
+    int32 n = 13;
+    float presence_penalty = 14;
+    float frequency_penalty = 15;
+    string agent_generate_type = 16;
+    string route = 17;
+    int32 is_enabled = 18;
+}
+
+message ConfigReply {
+    int32 code = 1;
+    string message = 2;
+    ModelConfig config = 3;
+}
+
+message ListConfigsRequest {
+    int32 page = 1;
+    int32 page_size = 2;
+}
+
+message ListConfigsResponse {
+    int32 code = 1;
+    string message = 2;
+    repeated ModelConfig configs = 3;
+    int64 total = 4;
+}
+
+message GetConfigRequest {
+    int32 id = 1;
+}
+
+message CreateConfigRequest {
+    string model_type = 1;
+    string manufacturer = 2;
+    string description = 3;
+    double input_price = 4;
+    double output_price = 5;
+    string api_key = 6;
+    string url = 7;
+    int32 max_tokens = 8;
+    bool stream = 9;
+    float temperature = 10;
+    float top_p = 11;
+    int32 n = 12;
+    float presence_penalty = 13;
+    float frequency_penalty = 14;
+    string agent_generate_type = 15;
+    string route = 16;
+    int32 is_enabled = 17;
+}
+
+message UpdateConfigRequest {
+    int32 id = 1;
+    string model_type = 2;
+    string manufacturer = 3;
+    string description = 4;
+    double input_price = 5;
+    double output_price = 6;
+    string api_key = 7;
+    string url = 8;
+    int32 max_tokens = 9;
+    bool stream = 10;
+    float temperature = 11;
+    float top_p = 12;
+    int32 n = 13;
+    float presence_penalty = 14;
+    float frequency_penalty = 15;
+    string agent_generate_type = 16;
+    string route = 17;
+    int32 is_enabled = 18;
+}
+
+message DeleteConfigRequest {
+    int32 id = 1;
+}
+
+// ---- Stats messages ----
+
+message ModelStatsResponse {
+    int32 code = 1;
+    string message = 2;
+    repeated ModelStat stats = 3;
+}
+
+message ModelStat {
+    string model = 1;
+    int64 total_input_tokens = 2;
+    int64 total_output_tokens = 3;
+    double total_input_cost = 4;
+    double total_output_cost = 5;
 }

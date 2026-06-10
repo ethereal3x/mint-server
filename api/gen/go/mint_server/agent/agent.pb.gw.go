@@ -22,6 +22,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // Suppress "imported and not used" errors
@@ -180,11 +181,11 @@ func local_request_AgentService_ListDialogues_0(ctx context.Context, marshaler r
 	return msg, metadata, err
 }
 
-var filter_StrategyService_ListStrategies_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+var filter_ModelConfigService_ListConfigs_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 
-func request_StrategyService_ListStrategies_0(ctx context.Context, marshaler runtime.Marshaler, client StrategyServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ModelConfigService_ListConfigs_0(ctx context.Context, marshaler runtime.Marshaler, client ModelConfigServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq ListStrategiesRequest
+		protoReq ListConfigsRequest
 		metadata runtime.ServerMetadata
 	)
 	if req.Body != nil {
@@ -193,216 +194,31 @@ func request_StrategyService_ListStrategies_0(ctx context.Context, marshaler run
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_StrategyService_ListStrategies_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ModelConfigService_ListConfigs_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	msg, err := client.ListStrategies(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.ListConfigs(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 }
 
-func local_request_StrategyService_ListStrategies_0(ctx context.Context, marshaler runtime.Marshaler, server StrategyServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_ModelConfigService_ListConfigs_0(ctx context.Context, marshaler runtime.Marshaler, server ModelConfigServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq ListStrategiesRequest
+		protoReq ListConfigsRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_StrategyService_ListStrategies_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ModelConfigService_ListConfigs_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	msg, err := server.ListStrategies(ctx, &protoReq)
+	msg, err := server.ListConfigs(ctx, &protoReq)
 	return msg, metadata, err
 }
 
-func request_StrategyService_GetStrategy_0(ctx context.Context, marshaler runtime.Marshaler, client StrategyServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ModelConfigService_GetConfig_0(ctx context.Context, marshaler runtime.Marshaler, client ModelConfigServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq GetStrategyRequest
-		metadata runtime.ServerMetadata
-		err      error
-	)
-	if req.Body != nil {
-		_, _ = io.Copy(io.Discard, req.Body)
-	}
-	val, ok := pathParams["rule_id"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "rule_id")
-	}
-	protoReq.RuleId, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "rule_id", err)
-	}
-	msg, err := client.GetStrategy(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
-	return msg, metadata, err
-}
-
-func local_request_StrategyService_GetStrategy_0(ctx context.Context, marshaler runtime.Marshaler, server StrategyServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq GetStrategyRequest
-		metadata runtime.ServerMetadata
-		err      error
-	)
-	val, ok := pathParams["rule_id"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "rule_id")
-	}
-	protoReq.RuleId, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "rule_id", err)
-	}
-	msg, err := server.GetStrategy(ctx, &protoReq)
-	return msg, metadata, err
-}
-
-func request_StrategyService_CreateStrategy_0(ctx context.Context, marshaler runtime.Marshaler, client StrategyServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq CreateStrategyRequest
-		metadata runtime.ServerMetadata
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if req.Body != nil {
-		_, _ = io.Copy(io.Discard, req.Body)
-	}
-	msg, err := client.CreateStrategy(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
-	return msg, metadata, err
-}
-
-func local_request_StrategyService_CreateStrategy_0(ctx context.Context, marshaler runtime.Marshaler, server StrategyServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq CreateStrategyRequest
-		metadata runtime.ServerMetadata
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	msg, err := server.CreateStrategy(ctx, &protoReq)
-	return msg, metadata, err
-}
-
-func request_StrategyService_UpdateStrategy_0(ctx context.Context, marshaler runtime.Marshaler, client StrategyServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq UpdateStrategyRequest
-		metadata runtime.ServerMetadata
-		err      error
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if req.Body != nil {
-		_, _ = io.Copy(io.Discard, req.Body)
-	}
-	val, ok := pathParams["rule_id"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "rule_id")
-	}
-	protoReq.RuleId, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "rule_id", err)
-	}
-	msg, err := client.UpdateStrategy(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
-	return msg, metadata, err
-}
-
-func local_request_StrategyService_UpdateStrategy_0(ctx context.Context, marshaler runtime.Marshaler, server StrategyServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq UpdateStrategyRequest
-		metadata runtime.ServerMetadata
-		err      error
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	val, ok := pathParams["rule_id"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "rule_id")
-	}
-	protoReq.RuleId, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "rule_id", err)
-	}
-	msg, err := server.UpdateStrategy(ctx, &protoReq)
-	return msg, metadata, err
-}
-
-func request_StrategyService_DeleteStrategy_0(ctx context.Context, marshaler runtime.Marshaler, client StrategyServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq DeleteStrategyRequest
-		metadata runtime.ServerMetadata
-		err      error
-	)
-	if req.Body != nil {
-		_, _ = io.Copy(io.Discard, req.Body)
-	}
-	val, ok := pathParams["rule_id"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "rule_id")
-	}
-	protoReq.RuleId, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "rule_id", err)
-	}
-	msg, err := client.DeleteStrategy(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
-	return msg, metadata, err
-}
-
-func local_request_StrategyService_DeleteStrategy_0(ctx context.Context, marshaler runtime.Marshaler, server StrategyServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq DeleteStrategyRequest
-		metadata runtime.ServerMetadata
-		err      error
-	)
-	val, ok := pathParams["rule_id"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "rule_id")
-	}
-	protoReq.RuleId, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "rule_id", err)
-	}
-	msg, err := server.DeleteStrategy(ctx, &protoReq)
-	return msg, metadata, err
-}
-
-var filter_MappingService_ListMappings_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
-
-func request_MappingService_ListMappings_0(ctx context.Context, marshaler runtime.Marshaler, client MappingServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq ListMappingsRequest
-		metadata runtime.ServerMetadata
-	)
-	if req.Body != nil {
-		_, _ = io.Copy(io.Discard, req.Body)
-	}
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MappingService_ListMappings_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	msg, err := client.ListMappings(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
-	return msg, metadata, err
-}
-
-func local_request_MappingService_ListMappings_0(ctx context.Context, marshaler runtime.Marshaler, server MappingServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq ListMappingsRequest
-		metadata runtime.ServerMetadata
-	)
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_MappingService_ListMappings_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	msg, err := server.ListMappings(ctx, &protoReq)
-	return msg, metadata, err
-}
-
-func request_MappingService_GetMapping_0(ctx context.Context, marshaler runtime.Marshaler, client MappingServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq GetMappingRequest
+		protoReq GetConfigRequest
 		metadata runtime.ServerMetadata
 		err      error
 	)
@@ -417,13 +233,13 @@ func request_MappingService_GetMapping_0(ctx context.Context, marshaler runtime.
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
 	}
-	msg, err := client.GetMapping(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.GetConfig(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 }
 
-func local_request_MappingService_GetMapping_0(ctx context.Context, marshaler runtime.Marshaler, server MappingServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_ModelConfigService_GetConfig_0(ctx context.Context, marshaler runtime.Marshaler, server ModelConfigServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq GetMappingRequest
+		protoReq GetConfigRequest
 		metadata runtime.ServerMetadata
 		err      error
 	)
@@ -435,13 +251,13 @@ func local_request_MappingService_GetMapping_0(ctx context.Context, marshaler ru
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
 	}
-	msg, err := server.GetMapping(ctx, &protoReq)
+	msg, err := server.GetConfig(ctx, &protoReq)
 	return msg, metadata, err
 }
 
-func request_MappingService_CreateMapping_0(ctx context.Context, marshaler runtime.Marshaler, client MappingServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ModelConfigService_CreateConfig_0(ctx context.Context, marshaler runtime.Marshaler, client ModelConfigServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq CreateMappingRequest
+		protoReq CreateConfigRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
@@ -450,25 +266,25 @@ func request_MappingService_CreateMapping_0(ctx context.Context, marshaler runti
 	if req.Body != nil {
 		_, _ = io.Copy(io.Discard, req.Body)
 	}
-	msg, err := client.CreateMapping(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.CreateConfig(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 }
 
-func local_request_MappingService_CreateMapping_0(ctx context.Context, marshaler runtime.Marshaler, server MappingServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_ModelConfigService_CreateConfig_0(ctx context.Context, marshaler runtime.Marshaler, server ModelConfigServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq CreateMappingRequest
+		protoReq CreateConfigRequest
 		metadata runtime.ServerMetadata
 	)
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-	msg, err := server.CreateMapping(ctx, &protoReq)
+	msg, err := server.CreateConfig(ctx, &protoReq)
 	return msg, metadata, err
 }
 
-func request_MappingService_UpdateMapping_0(ctx context.Context, marshaler runtime.Marshaler, client MappingServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ModelConfigService_UpdateConfig_0(ctx context.Context, marshaler runtime.Marshaler, client ModelConfigServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq UpdateMappingRequest
+		protoReq UpdateConfigRequest
 		metadata runtime.ServerMetadata
 		err      error
 	)
@@ -486,13 +302,13 @@ func request_MappingService_UpdateMapping_0(ctx context.Context, marshaler runti
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
 	}
-	msg, err := client.UpdateMapping(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.UpdateConfig(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 }
 
-func local_request_MappingService_UpdateMapping_0(ctx context.Context, marshaler runtime.Marshaler, server MappingServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_ModelConfigService_UpdateConfig_0(ctx context.Context, marshaler runtime.Marshaler, server ModelConfigServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq UpdateMappingRequest
+		protoReq UpdateConfigRequest
 		metadata runtime.ServerMetadata
 		err      error
 	)
@@ -507,13 +323,13 @@ func local_request_MappingService_UpdateMapping_0(ctx context.Context, marshaler
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
 	}
-	msg, err := server.UpdateMapping(ctx, &protoReq)
+	msg, err := server.UpdateConfig(ctx, &protoReq)
 	return msg, metadata, err
 }
 
-func request_MappingService_DeleteMapping_0(ctx context.Context, marshaler runtime.Marshaler, client MappingServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ModelConfigService_DeleteConfig_0(ctx context.Context, marshaler runtime.Marshaler, client ModelConfigServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq DeleteMappingRequest
+		protoReq DeleteConfigRequest
 		metadata runtime.ServerMetadata
 		err      error
 	)
@@ -528,13 +344,13 @@ func request_MappingService_DeleteMapping_0(ctx context.Context, marshaler runti
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
 	}
-	msg, err := client.DeleteMapping(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.DeleteConfig(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 }
 
-func local_request_MappingService_DeleteMapping_0(ctx context.Context, marshaler runtime.Marshaler, server MappingServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_ModelConfigService_DeleteConfig_0(ctx context.Context, marshaler runtime.Marshaler, server ModelConfigServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq DeleteMappingRequest
+		protoReq DeleteConfigRequest
 		metadata runtime.ServerMetadata
 		err      error
 	)
@@ -546,7 +362,28 @@ func local_request_MappingService_DeleteMapping_0(ctx context.Context, marshaler
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
 	}
-	msg, err := server.DeleteMapping(ctx, &protoReq)
+	msg, err := server.DeleteConfig(ctx, &protoReq)
+	return msg, metadata, err
+}
+
+func request_ModelConfigService_GetModelStats_0(ctx context.Context, marshaler runtime.Marshaler, client ModelConfigServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq emptypb.Empty
+		metadata runtime.ServerMetadata
+	)
+	if req.Body != nil {
+		_, _ = io.Copy(io.Discard, req.Body)
+	}
+	msg, err := client.GetModelStats(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_ModelConfigService_GetModelStats_0(ctx context.Context, marshaler runtime.Marshaler, server ModelConfigServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq emptypb.Empty
+		metadata runtime.ServerMetadata
+	)
+	msg, err := server.GetModelStats(ctx, &protoReq)
 	return msg, metadata, err
 }
 
@@ -568,7 +405,7 @@ func RegisterAgentServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/mint_server.agent.AgentService/GenerateChat", runtime.WithHTTPPathPattern("/api/v1/agent/chat"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/mint_server.agent.AgentService/GenerateChat", runtime.WithHTTPPathPattern("/api/v1/chat/chat"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -588,7 +425,7 @@ func RegisterAgentServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/mint_server.agent.AgentService/ListModels", runtime.WithHTTPPathPattern("/api/v1/agent/models"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/mint_server.agent.AgentService/ListModels", runtime.WithHTTPPathPattern("/api/v1/chat/models"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -608,7 +445,7 @@ func RegisterAgentServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/mint_server.agent.AgentService/GetHistory", runtime.WithHTTPPathPattern("/api/v1/agent/history/{dialogue_id}"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/mint_server.agent.AgentService/GetHistory", runtime.WithHTTPPathPattern("/api/v1/chat/history/{dialogue_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -628,7 +465,7 @@ func RegisterAgentServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/mint_server.agent.AgentService/ListDialogues", runtime.WithHTTPPathPattern("/api/v1/agent/dialogues"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/mint_server.agent.AgentService/ListDialogues", runtime.WithHTTPPathPattern("/api/v1/chat/dialogues"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -646,221 +483,131 @@ func RegisterAgentServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 	return nil
 }
 
-// RegisterStrategyServiceHandlerServer registers the http handlers for service StrategyService to "mux".
-// UnaryRPC     :call StrategyServiceServer directly.
+// RegisterModelConfigServiceHandlerServer registers the http handlers for service ModelConfigService to "mux".
+// UnaryRPC     :call ModelConfigServiceServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
-// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterStrategyServiceHandlerFromEndpoint instead.
+// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterModelConfigServiceHandlerFromEndpoint instead.
 // GRPC interceptors will not work for this type of registration. To use interceptors, you must use the "runtime.WithMiddlewares" option in the "runtime.NewServeMux" call.
-func RegisterStrategyServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server StrategyServiceServer) error {
-	mux.Handle(http.MethodGet, pattern_StrategyService_ListStrategies_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+func RegisterModelConfigServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server ModelConfigServiceServer) error {
+	mux.Handle(http.MethodGet, pattern_ModelConfigService_ListConfigs_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/mint_server.agent.StrategyService/ListStrategies", runtime.WithHTTPPathPattern("/admin/v1/strategies"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/mint_server.agent.ModelConfigService/ListConfigs", runtime.WithHTTPPathPattern("/admin/v1/configs"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_StrategyService_ListStrategies_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ModelConfigService_ListConfigs_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_StrategyService_ListStrategies_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ModelConfigService_ListConfigs_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodGet, pattern_StrategyService_GetStrategy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_ModelConfigService_GetConfig_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/mint_server.agent.StrategyService/GetStrategy", runtime.WithHTTPPathPattern("/admin/v1/strategies/{rule_id}"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/mint_server.agent.ModelConfigService/GetConfig", runtime.WithHTTPPathPattern("/admin/v1/configs/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_StrategyService_GetStrategy_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ModelConfigService_GetConfig_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_StrategyService_GetStrategy_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ModelConfigService_GetConfig_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodPost, pattern_StrategyService_CreateStrategy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodPost, pattern_ModelConfigService_CreateConfig_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/mint_server.agent.StrategyService/CreateStrategy", runtime.WithHTTPPathPattern("/admin/v1/strategies"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/mint_server.agent.ModelConfigService/CreateConfig", runtime.WithHTTPPathPattern("/admin/v1/configs"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_StrategyService_CreateStrategy_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ModelConfigService_CreateConfig_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_StrategyService_CreateStrategy_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ModelConfigService_CreateConfig_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodPut, pattern_StrategyService_UpdateStrategy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodPut, pattern_ModelConfigService_UpdateConfig_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/mint_server.agent.StrategyService/UpdateStrategy", runtime.WithHTTPPathPattern("/admin/v1/strategies/{rule_id}"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/mint_server.agent.ModelConfigService/UpdateConfig", runtime.WithHTTPPathPattern("/admin/v1/configs/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_StrategyService_UpdateStrategy_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ModelConfigService_UpdateConfig_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_StrategyService_UpdateStrategy_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ModelConfigService_UpdateConfig_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodDelete, pattern_StrategyService_DeleteStrategy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodDelete, pattern_ModelConfigService_DeleteConfig_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/mint_server.agent.StrategyService/DeleteStrategy", runtime.WithHTTPPathPattern("/admin/v1/strategies/{rule_id}"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/mint_server.agent.ModelConfigService/DeleteConfig", runtime.WithHTTPPathPattern("/admin/v1/configs/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_StrategyService_DeleteStrategy_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ModelConfigService_DeleteConfig_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_StrategyService_DeleteStrategy_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ModelConfigService_DeleteConfig_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-
-	return nil
-}
-
-// RegisterMappingServiceHandlerServer registers the http handlers for service MappingService to "mux".
-// UnaryRPC     :call MappingServiceServer directly.
-// StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
-// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterMappingServiceHandlerFromEndpoint instead.
-// GRPC interceptors will not work for this type of registration. To use interceptors, you must use the "runtime.WithMiddlewares" option in the "runtime.NewServeMux" call.
-func RegisterMappingServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server MappingServiceServer) error {
-	mux.Handle(http.MethodGet, pattern_MappingService_ListMappings_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_ModelConfigService_GetModelStats_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/mint_server.agent.MappingService/ListMappings", runtime.WithHTTPPathPattern("/admin/v1/mappings"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/mint_server.agent.ModelConfigService/GetModelStats", runtime.WithHTTPPathPattern("/admin/v1/stats/models"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_MappingService_ListMappings_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_ModelConfigService_GetModelStats_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_MappingService_ListMappings_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-	})
-	mux.Handle(http.MethodGet, pattern_MappingService_GetMapping_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		var stream runtime.ServerTransportStream
-		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/mint_server.agent.MappingService/GetMapping", runtime.WithHTTPPathPattern("/admin/v1/mappings/{id}"))
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := local_request_MappingService_GetMapping_0(annotatedContext, inboundMarshaler, server, req, pathParams)
-		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		forward_MappingService_GetMapping_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-	})
-	mux.Handle(http.MethodPost, pattern_MappingService_CreateMapping_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		var stream runtime.ServerTransportStream
-		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/mint_server.agent.MappingService/CreateMapping", runtime.WithHTTPPathPattern("/admin/v1/mappings"))
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := local_request_MappingService_CreateMapping_0(annotatedContext, inboundMarshaler, server, req, pathParams)
-		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		forward_MappingService_CreateMapping_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-	})
-	mux.Handle(http.MethodPut, pattern_MappingService_UpdateMapping_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		var stream runtime.ServerTransportStream
-		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/mint_server.agent.MappingService/UpdateMapping", runtime.WithHTTPPathPattern("/admin/v1/mappings/{id}"))
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := local_request_MappingService_UpdateMapping_0(annotatedContext, inboundMarshaler, server, req, pathParams)
-		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		forward_MappingService_UpdateMapping_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-	})
-	mux.Handle(http.MethodDelete, pattern_MappingService_DeleteMapping_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		var stream runtime.ServerTransportStream
-		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/mint_server.agent.MappingService/DeleteMapping", runtime.WithHTTPPathPattern("/admin/v1/mappings/{id}"))
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := local_request_MappingService_DeleteMapping_0(annotatedContext, inboundMarshaler, server, req, pathParams)
-		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		forward_MappingService_DeleteMapping_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ModelConfigService_GetModelStats_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
 
 	return nil
@@ -906,7 +653,7 @@ func RegisterAgentServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/mint_server.agent.AgentService/StreamChat", runtime.WithHTTPPathPattern("/api/v1/agent/chat/stream"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/mint_server.agent.AgentService/StreamChat", runtime.WithHTTPPathPattern("/api/v1/chat/stream"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -923,7 +670,7 @@ func RegisterAgentServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/mint_server.agent.AgentService/GenerateChat", runtime.WithHTTPPathPattern("/api/v1/agent/chat"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/mint_server.agent.AgentService/GenerateChat", runtime.WithHTTPPathPattern("/api/v1/chat/chat"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -940,7 +687,7 @@ func RegisterAgentServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/mint_server.agent.AgentService/ListModels", runtime.WithHTTPPathPattern("/api/v1/agent/models"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/mint_server.agent.AgentService/ListModels", runtime.WithHTTPPathPattern("/api/v1/chat/models"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -957,7 +704,7 @@ func RegisterAgentServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/mint_server.agent.AgentService/GetHistory", runtime.WithHTTPPathPattern("/api/v1/agent/history/{dialogue_id}"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/mint_server.agent.AgentService/GetHistory", runtime.WithHTTPPathPattern("/api/v1/chat/history/{dialogue_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -974,7 +721,7 @@ func RegisterAgentServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/mint_server.agent.AgentService/ListDialogues", runtime.WithHTTPPathPattern("/api/v1/agent/dialogues"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/mint_server.agent.AgentService/ListDialogues", runtime.WithHTTPPathPattern("/api/v1/chat/dialogues"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -991,11 +738,11 @@ func RegisterAgentServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 }
 
 var (
-	pattern_AgentService_StreamChat_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v1", "agent", "chat", "stream"}, ""))
-	pattern_AgentService_GenerateChat_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "agent", "chat"}, ""))
-	pattern_AgentService_ListModels_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "agent", "models"}, ""))
-	pattern_AgentService_GetHistory_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "agent", "history", "dialogue_id"}, ""))
-	pattern_AgentService_ListDialogues_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "agent", "dialogues"}, ""))
+	pattern_AgentService_StreamChat_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "chat", "stream"}, ""))
+	pattern_AgentService_GenerateChat_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 2}, []string{"api", "v1", "chat"}, ""))
+	pattern_AgentService_ListModels_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "chat", "models"}, ""))
+	pattern_AgentService_GetHistory_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "chat", "history", "dialogue_id"}, ""))
+	pattern_AgentService_ListDialogues_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "chat", "dialogues"}, ""))
 )
 
 var (
@@ -1006,9 +753,9 @@ var (
 	forward_AgentService_ListDialogues_0 = runtime.ForwardResponseMessage
 )
 
-// RegisterStrategyServiceHandlerFromEndpoint is same as RegisterStrategyServiceHandler but
+// RegisterModelConfigServiceHandlerFromEndpoint is same as RegisterModelConfigServiceHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
-func RegisterStrategyServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
+func RegisterModelConfigServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
 	conn, err := grpc.NewClient(endpoint, opts...)
 	if err != nil {
 		return err
@@ -1027,261 +774,140 @@ func RegisterStrategyServiceHandlerFromEndpoint(ctx context.Context, mux *runtim
 			}
 		}()
 	}()
-	return RegisterStrategyServiceHandler(ctx, mux, conn)
+	return RegisterModelConfigServiceHandler(ctx, mux, conn)
 }
 
-// RegisterStrategyServiceHandler registers the http handlers for service StrategyService to "mux".
+// RegisterModelConfigServiceHandler registers the http handlers for service ModelConfigService to "mux".
 // The handlers forward requests to the grpc endpoint over "conn".
-func RegisterStrategyServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
-	return RegisterStrategyServiceHandlerClient(ctx, mux, NewStrategyServiceClient(conn))
+func RegisterModelConfigServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return RegisterModelConfigServiceHandlerClient(ctx, mux, NewModelConfigServiceClient(conn))
 }
 
-// RegisterStrategyServiceHandlerClient registers the http handlers for service StrategyService
-// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "StrategyServiceClient".
-// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "StrategyServiceClient"
+// RegisterModelConfigServiceHandlerClient registers the http handlers for service ModelConfigService
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "ModelConfigServiceClient".
+// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "ModelConfigServiceClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
-// "StrategyServiceClient" to call the correct interceptors. This client ignores the HTTP middlewares.
-func RegisterStrategyServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client StrategyServiceClient) error {
-	mux.Handle(http.MethodGet, pattern_StrategyService_ListStrategies_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+// "ModelConfigServiceClient" to call the correct interceptors. This client ignores the HTTP middlewares.
+func RegisterModelConfigServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client ModelConfigServiceClient) error {
+	mux.Handle(http.MethodGet, pattern_ModelConfigService_ListConfigs_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/mint_server.agent.StrategyService/ListStrategies", runtime.WithHTTPPathPattern("/admin/v1/strategies"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/mint_server.agent.ModelConfigService/ListConfigs", runtime.WithHTTPPathPattern("/admin/v1/configs"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_StrategyService_ListStrategies_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ModelConfigService_ListConfigs_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_StrategyService_ListStrategies_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ModelConfigService_ListConfigs_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodGet, pattern_StrategyService_GetStrategy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_ModelConfigService_GetConfig_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/mint_server.agent.StrategyService/GetStrategy", runtime.WithHTTPPathPattern("/admin/v1/strategies/{rule_id}"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/mint_server.agent.ModelConfigService/GetConfig", runtime.WithHTTPPathPattern("/admin/v1/configs/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_StrategyService_GetStrategy_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ModelConfigService_GetConfig_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_StrategyService_GetStrategy_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ModelConfigService_GetConfig_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodPost, pattern_StrategyService_CreateStrategy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodPost, pattern_ModelConfigService_CreateConfig_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/mint_server.agent.StrategyService/CreateStrategy", runtime.WithHTTPPathPattern("/admin/v1/strategies"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/mint_server.agent.ModelConfigService/CreateConfig", runtime.WithHTTPPathPattern("/admin/v1/configs"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_StrategyService_CreateStrategy_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ModelConfigService_CreateConfig_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_StrategyService_CreateStrategy_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ModelConfigService_CreateConfig_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodPut, pattern_StrategyService_UpdateStrategy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodPut, pattern_ModelConfigService_UpdateConfig_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/mint_server.agent.StrategyService/UpdateStrategy", runtime.WithHTTPPathPattern("/admin/v1/strategies/{rule_id}"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/mint_server.agent.ModelConfigService/UpdateConfig", runtime.WithHTTPPathPattern("/admin/v1/configs/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_StrategyService_UpdateStrategy_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ModelConfigService_UpdateConfig_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_StrategyService_UpdateStrategy_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ModelConfigService_UpdateConfig_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodDelete, pattern_StrategyService_DeleteStrategy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodDelete, pattern_ModelConfigService_DeleteConfig_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/mint_server.agent.StrategyService/DeleteStrategy", runtime.WithHTTPPathPattern("/admin/v1/strategies/{rule_id}"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/mint_server.agent.ModelConfigService/DeleteConfig", runtime.WithHTTPPathPattern("/admin/v1/configs/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_StrategyService_DeleteStrategy_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ModelConfigService_DeleteConfig_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_StrategyService_DeleteStrategy_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ModelConfigService_DeleteConfig_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_ModelConfigService_GetModelStats_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/mint_server.agent.ModelConfigService/GetModelStats", runtime.WithHTTPPathPattern("/admin/v1/stats/models"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_ModelConfigService_GetModelStats_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_ModelConfigService_GetModelStats_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
 	return nil
 }
 
 var (
-	pattern_StrategyService_ListStrategies_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"admin", "v1", "strategies"}, ""))
-	pattern_StrategyService_GetStrategy_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"admin", "v1", "strategies", "rule_id"}, ""))
-	pattern_StrategyService_CreateStrategy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"admin", "v1", "strategies"}, ""))
-	pattern_StrategyService_UpdateStrategy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"admin", "v1", "strategies", "rule_id"}, ""))
-	pattern_StrategyService_DeleteStrategy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"admin", "v1", "strategies", "rule_id"}, ""))
+	pattern_ModelConfigService_ListConfigs_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"admin", "v1", "configs"}, ""))
+	pattern_ModelConfigService_GetConfig_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"admin", "v1", "configs", "id"}, ""))
+	pattern_ModelConfigService_CreateConfig_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"admin", "v1", "configs"}, ""))
+	pattern_ModelConfigService_UpdateConfig_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"admin", "v1", "configs", "id"}, ""))
+	pattern_ModelConfigService_DeleteConfig_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"admin", "v1", "configs", "id"}, ""))
+	pattern_ModelConfigService_GetModelStats_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"admin", "v1", "stats", "models"}, ""))
 )
 
 var (
-	forward_StrategyService_ListStrategies_0 = runtime.ForwardResponseMessage
-	forward_StrategyService_GetStrategy_0    = runtime.ForwardResponseMessage
-	forward_StrategyService_CreateStrategy_0 = runtime.ForwardResponseMessage
-	forward_StrategyService_UpdateStrategy_0 = runtime.ForwardResponseMessage
-	forward_StrategyService_DeleteStrategy_0 = runtime.ForwardResponseMessage
-)
-
-// RegisterMappingServiceHandlerFromEndpoint is same as RegisterMappingServiceHandler but
-// automatically dials to "endpoint" and closes the connection when "ctx" gets done.
-func RegisterMappingServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
-	conn, err := grpc.NewClient(endpoint, opts...)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if err != nil {
-			if cerr := conn.Close(); cerr != nil {
-				grpclog.Errorf("Failed to close conn to %s: %v", endpoint, cerr)
-			}
-			return
-		}
-		go func() {
-			<-ctx.Done()
-			if cerr := conn.Close(); cerr != nil {
-				grpclog.Errorf("Failed to close conn to %s: %v", endpoint, cerr)
-			}
-		}()
-	}()
-	return RegisterMappingServiceHandler(ctx, mux, conn)
-}
-
-// RegisterMappingServiceHandler registers the http handlers for service MappingService to "mux".
-// The handlers forward requests to the grpc endpoint over "conn".
-func RegisterMappingServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
-	return RegisterMappingServiceHandlerClient(ctx, mux, NewMappingServiceClient(conn))
-}
-
-// RegisterMappingServiceHandlerClient registers the http handlers for service MappingService
-// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "MappingServiceClient".
-// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "MappingServiceClient"
-// doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
-// "MappingServiceClient" to call the correct interceptors. This client ignores the HTTP middlewares.
-func RegisterMappingServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client MappingServiceClient) error {
-	mux.Handle(http.MethodGet, pattern_MappingService_ListMappings_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/mint_server.agent.MappingService/ListMappings", runtime.WithHTTPPathPattern("/admin/v1/mappings"))
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := request_MappingService_ListMappings_0(annotatedContext, inboundMarshaler, client, req, pathParams)
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		forward_MappingService_ListMappings_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-	})
-	mux.Handle(http.MethodGet, pattern_MappingService_GetMapping_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/mint_server.agent.MappingService/GetMapping", runtime.WithHTTPPathPattern("/admin/v1/mappings/{id}"))
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := request_MappingService_GetMapping_0(annotatedContext, inboundMarshaler, client, req, pathParams)
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		forward_MappingService_GetMapping_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-	})
-	mux.Handle(http.MethodPost, pattern_MappingService_CreateMapping_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/mint_server.agent.MappingService/CreateMapping", runtime.WithHTTPPathPattern("/admin/v1/mappings"))
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := request_MappingService_CreateMapping_0(annotatedContext, inboundMarshaler, client, req, pathParams)
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		forward_MappingService_CreateMapping_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-	})
-	mux.Handle(http.MethodPut, pattern_MappingService_UpdateMapping_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/mint_server.agent.MappingService/UpdateMapping", runtime.WithHTTPPathPattern("/admin/v1/mappings/{id}"))
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := request_MappingService_UpdateMapping_0(annotatedContext, inboundMarshaler, client, req, pathParams)
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		forward_MappingService_UpdateMapping_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-	})
-	mux.Handle(http.MethodDelete, pattern_MappingService_DeleteMapping_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/mint_server.agent.MappingService/DeleteMapping", runtime.WithHTTPPathPattern("/admin/v1/mappings/{id}"))
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := request_MappingService_DeleteMapping_0(annotatedContext, inboundMarshaler, client, req, pathParams)
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		forward_MappingService_DeleteMapping_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-	})
-	return nil
-}
-
-var (
-	pattern_MappingService_ListMappings_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"admin", "v1", "mappings"}, ""))
-	pattern_MappingService_GetMapping_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"admin", "v1", "mappings", "id"}, ""))
-	pattern_MappingService_CreateMapping_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"admin", "v1", "mappings"}, ""))
-	pattern_MappingService_UpdateMapping_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"admin", "v1", "mappings", "id"}, ""))
-	pattern_MappingService_DeleteMapping_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"admin", "v1", "mappings", "id"}, ""))
-)
-
-var (
-	forward_MappingService_ListMappings_0  = runtime.ForwardResponseMessage
-	forward_MappingService_GetMapping_0    = runtime.ForwardResponseMessage
-	forward_MappingService_CreateMapping_0 = runtime.ForwardResponseMessage
-	forward_MappingService_UpdateMapping_0 = runtime.ForwardResponseMessage
-	forward_MappingService_DeleteMapping_0 = runtime.ForwardResponseMessage
+	forward_ModelConfigService_ListConfigs_0   = runtime.ForwardResponseMessage
+	forward_ModelConfigService_GetConfig_0     = runtime.ForwardResponseMessage
+	forward_ModelConfigService_CreateConfig_0  = runtime.ForwardResponseMessage
+	forward_ModelConfigService_UpdateConfig_0  = runtime.ForwardResponseMessage
+	forward_ModelConfigService_DeleteConfig_0  = runtime.ForwardResponseMessage
+	forward_ModelConfigService_GetModelStats_0 = runtime.ForwardResponseMessage
 )

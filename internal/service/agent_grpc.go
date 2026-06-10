@@ -3,9 +3,10 @@ package service
 import (
 	"context"
 
+	"github.com/ethereal3x/apc/errs"
 	agentpb "github.com/ethereal3x/mint-server/api/gen/go/mint_server/agent"
+	mint_err "github.com/ethereal3x/mint-server/internal/errs"
 	"github.com/ethereal3x/mint-server/internal/logic"
-	"github.com/cloudwego/eino/schema"
 	"github.com/google/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -15,18 +16,13 @@ import (
 // AgentServer AgentService gRPC 处理器
 type AgentServer struct {
 	agentpb.UnimplementedAgentServiceServer
-	chat    *logic.Chat
-	mapping *logic.Mapping
+	chat   *logic.Chat
+	config *logic.Config
 }
 
 // NewAgentServer 创建 Agent gRPC 处理器
-func NewAgentServer(chat *logic.Chat, mapping *logic.Mapping) *AgentServer {
-	return &AgentServer{chat: chat, mapping: mapping}
-}
-
-type streamResult struct {
-	usage *schema.TokenUsage
-	err   error
+func NewAgentServer(chat *logic.Chat, config *logic.Config) *AgentServer {
+	return &AgentServer{chat: chat, config: config}
 }
 
 // StreamChat 流式聊天
@@ -43,18 +39,25 @@ func (s *AgentServer) StreamChat(req *agentpb.StreamChatRequest, stream grpc.Ser
 		RecordID:   recordID,
 		FileData:   req.FileData,
 		FileName:   req.FileName,
+		ImageURLs:  req.ImageUrls,
 	}
 
 	contentChan := make(chan string)
-	resultChan := make(chan streamResult, 1)
+	resultChan := make(chan struct {
+		result *logic.ChatResult
+		err    error
+	}, 1)
 
 	ctx, cancel := context.WithCancel(stream.Context())
 	defer cancel()
 
 	go func() {
-		usage, err := s.chat.StreamChat(ctx, chatReq, contentChan)
+		result, err := s.chat.StreamChat(ctx, chatReq, contentChan)
 		select {
-		case resultChan <- streamResult{usage: usage, err: err}:
+		case resultChan <- struct {
+			result *logic.ChatResult
+			err    error
+		}{result, err}:
 		case <-ctx.Done():
 		}
 	}()
@@ -64,12 +67,12 @@ func (s *AgentServer) StreamChat(req *agentpb.StreamChatRequest, stream grpc.Ser
 		select {
 		case content, ok := <-contentChan:
 			if !ok {
-				result := <-resultChan
-				if result.err != nil {
-					return status.Errorf(codes.Internal, "chat stream: %v", result.err)
+				res := <-resultChan
+				if res.err != nil {
+					return sendStreamError(stream, res.err)
 				}
-				if saveErr := s.chat.SaveRecord(ctx, chatReq, fullAnswer, result.usage); saveErr != nil {
-					return status.Errorf(codes.Internal, "save record: %v", saveErr)
+				if saveErr := s.chat.SaveRecord(ctx, chatReq, fullAnswer, res.result.Config, res.result.Usage); saveErr != nil {
+					return sendStreamError(stream, saveErr)
 				}
 				return stream.Send(&agentpb.StreamChatResponse{Done: true, DialogueId: dialogueID, RecordId: recordID})
 			}
@@ -85,8 +88,9 @@ func (s *AgentServer) StreamChat(req *agentpb.StreamChatRequest, stream grpc.Ser
 
 // GenerateChat 非流式聊天
 func (s *AgentServer) GenerateChat(ctx context.Context, req *agentpb.GenerateChatRequest) (*agentpb.GenerateChatResponse, error) {
+	rsp := &agentpb.GenerateChatResponse{}
 	if req.Question == "" || req.Model == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "chat: missing question or model")
+		return errs.GenProtoReply(rsp, mint_err.ErrParam)
 	}
 	dialogueID, recordID := resolveIDs(req.DialogueId, req.RecordId)
 	chatReq := &logic.ChatRequest{
@@ -97,49 +101,58 @@ func (s *AgentServer) GenerateChat(ctx context.Context, req *agentpb.GenerateCha
 		RecordID:   recordID,
 		FileData:   req.FileData,
 		FileName:   req.FileName,
+		ImageURLs:  req.ImageUrls,
 	}
 
-	answer, usage, err := s.chat.GenerateChat(ctx, chatReq)
+	result, err := s.chat.GenerateChat(ctx, chatReq)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "chat: %v", err)
+		return errs.GenProtoReply(rsp, err)
 	}
 
-	if err := s.chat.SaveRecord(ctx, chatReq, answer, usage); err != nil {
-		return nil, status.Errorf(codes.Internal, "save record: %v", err)
+	if saveErr := s.chat.SaveRecord(ctx, chatReq, result.Content, result.Config, result.Usage); saveErr != nil {
+		return errs.GenProtoReply(rsp, saveErr)
 	}
 
-	return &agentpb.GenerateChatResponse{
-		Content:    answer,
-		DialogueId: dialogueID,
-		RecordId:   recordID,
-	}, nil
+	rsp.Content = result.Content
+	rsp.DialogueId = dialogueID
+	rsp.RecordId = recordID
+	return rsp, nil
 }
 
-// ListModels 获取可用模型列表
+// ListModels 获取可用模型列表，按厂商分组
 func (s *AgentServer) ListModels(ctx context.Context, _ *agentpb.ListModelsRequest) (*agentpb.ListModelsResponse, error) {
-	mappings, err := s.mapping.ListAll(ctx)
+	rsp := &agentpb.ListModelsResponse{}
+	configs, err := s.config.ListAll(ctx)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "list models: %v", err)
+		return errs.GenProtoReply(rsp, err)
 	}
-	models := make([]*agentpb.ModelInfo, 0, len(mappings))
-	for _, m := range mappings {
-		models = append(models, &agentpb.ModelInfo{
-			Model:        m.ModelType,
-			Manufacturer: m.Manufacturer,
-			Description:  m.Description,
+	groupMap := make(map[string][]*agentpb.ModelInfo)
+	for _, c := range configs {
+		groupMap[c.Manufacturer] = append(groupMap[c.Manufacturer], &agentpb.ModelInfo{
+			Model:       c.ModelType,
+			Description: c.Description,
 		})
 	}
-	return &agentpb.ListModelsResponse{Models: models}, nil
+	manufacturers := make([]*agentpb.ManufacturerGroup, 0, len(groupMap))
+	for name, models := range groupMap {
+		manufacturers = append(manufacturers, &agentpb.ManufacturerGroup{
+			Manufacturer: name,
+			Models:       models,
+		})
+	}
+	rsp.Manufacturers = manufacturers
+	return rsp, nil
 }
 
 // GetHistory 获取对话历史
 func (s *AgentServer) GetHistory(ctx context.Context, req *agentpb.GetHistoryRequest) (*agentpb.GetHistoryResponse, error) {
+	rsp := &agentpb.GetHistoryResponse{}
 	if req.DialogueId == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "get history: missing dialogue_id")
+		return errs.GenProtoReply(rsp, mint_err.ErrParam)
 	}
 	records, err := s.chat.GetHistory(ctx, req.DialogueId)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "get history: %v", err)
+		return errs.GenProtoReply(rsp, err)
 	}
 	pbRecords := make([]*agentpb.HistoryRecord, 0, len(records))
 	for _, r := range records {
@@ -148,17 +161,21 @@ func (s *AgentServer) GetHistory(ctx context.Context, req *agentpb.GetHistoryReq
 			UserContent:  r.UserContent,
 			AgentContent: r.AgentContent,
 			Model:        r.Model,
-			TotalTokens:  r.TotalToken,
+			TotalTokens:  r.TotalTokens,
+			InputCost:    r.InputCost,
+			OutputCost:   r.OutputCost,
 		})
 	}
-	return &agentpb.GetHistoryResponse{Records: pbRecords}, nil
+	rsp.Records = pbRecords
+	return rsp, nil
 }
 
 // ListDialogues 获取对话摘要列表
 func (s *AgentServer) ListDialogues(ctx context.Context, req *agentpb.ListDialoguesRequest) (*agentpb.ListDialoguesResponse, error) {
+	rsp := &agentpb.ListDialoguesResponse{}
 	summaries, err := s.chat.ListDialogues(ctx, req.UserId)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "list dialogues: %v", err)
+		return errs.GenProtoReply(rsp, err)
 	}
 	pbDialogues := make([]*agentpb.DialogueSummary, 0, len(summaries))
 	for _, d := range summaries {
@@ -169,7 +186,8 @@ func (s *AgentServer) ListDialogues(ctx context.Context, req *agentpb.ListDialog
 			UpdatedTime:  d.UpdatedTime,
 		})
 	}
-	return &agentpb.ListDialoguesResponse{Dialogues: pbDialogues}, nil
+	rsp.Dialogues = pbDialogues
+	return rsp, nil
 }
 
 func resolveIDs(dialogueID, recordID string) (string, string) {
@@ -180,4 +198,14 @@ func resolveIDs(dialogueID, recordID string) (string, string) {
 		recordID = uuid.NewString()
 	}
 	return dialogueID, recordID
+}
+
+// sendStreamError 将 error 写入流式响应并发送
+func sendStreamError(stream grpc.ServerStreamingServer[agentpb.StreamChatResponse], err error) error {
+	rsp := &agentpb.StreamChatResponse{}
+	if setErr := errs.SetErrMsg(rsp, err); setErr != nil {
+		rsp.Code = int32(mint_err.ERR_CODE_INTERNAL)
+		rsp.Message = err.Error()
+	}
+	return stream.Send(rsp)
 }

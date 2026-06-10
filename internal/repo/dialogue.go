@@ -111,3 +111,27 @@ func (r *DialogueRepo) ListDialogues(ctx context.Context, userID string) ([]*mod
 	}
 	return summaries, nil
 }
+
+// AggregateByModel 按模型聚合 token 消耗和费用
+func (r *DialogueRepo) AggregateByModel(ctx context.Context) ([]*model.ModelStat, error) {
+	ctx, span := tracing.Start(ctx, "repo.DialogueRepo.AggregateByModel")
+	defer span.End()
+
+	var stats []*model.ModelStat
+	sql := `SELECT
+		model,
+		SUM(user_tokens) AS total_input_tokens,
+		SUM(agent_tokens) AS total_output_tokens,
+		SUM(input_cost) AS total_input_cost,
+		SUM(output_cost) AS total_output_cost
+	FROM tb_user_agent_dialogues
+	GROUP BY model
+	ORDER BY total_input_tokens + total_output_tokens DESC`
+
+	if err := r.db.WithContext(ctx).Raw(sql).Scan(&stats).Error; err != nil {
+		tracing.RecordError(ctx, err)
+		logger.ContextError(ctx, "DialogueRepo.AggregateByModel", zap.Error(err))
+		return nil, fmt.Errorf("aggregate by model: %w", err)
+	}
+	return stats, nil
+}

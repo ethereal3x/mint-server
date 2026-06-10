@@ -276,503 +276,289 @@ var AgentService_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	StrategyService_ListStrategies_FullMethodName = "/mint_server.agent.StrategyService/ListStrategies"
-	StrategyService_GetStrategy_FullMethodName    = "/mint_server.agent.StrategyService/GetStrategy"
-	StrategyService_CreateStrategy_FullMethodName = "/mint_server.agent.StrategyService/CreateStrategy"
-	StrategyService_UpdateStrategy_FullMethodName = "/mint_server.agent.StrategyService/UpdateStrategy"
-	StrategyService_DeleteStrategy_FullMethodName = "/mint_server.agent.StrategyService/DeleteStrategy"
+	ModelConfigService_ListConfigs_FullMethodName   = "/mint_server.agent.ModelConfigService/ListConfigs"
+	ModelConfigService_GetConfig_FullMethodName     = "/mint_server.agent.ModelConfigService/GetConfig"
+	ModelConfigService_CreateConfig_FullMethodName  = "/mint_server.agent.ModelConfigService/CreateConfig"
+	ModelConfigService_UpdateConfig_FullMethodName  = "/mint_server.agent.ModelConfigService/UpdateConfig"
+	ModelConfigService_DeleteConfig_FullMethodName  = "/mint_server.agent.ModelConfigService/DeleteConfig"
+	ModelConfigService_GetModelStats_FullMethodName = "/mint_server.agent.ModelConfigService/GetModelStats"
 )
 
-// StrategyServiceClient is the client API for StrategyService service.
+// ModelConfigServiceClient is the client API for ModelConfigService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type StrategyServiceClient interface {
-	ListStrategies(ctx context.Context, in *ListStrategiesRequest, opts ...grpc.CallOption) (*ListStrategiesResponse, error)
-	GetStrategy(ctx context.Context, in *GetStrategyRequest, opts ...grpc.CallOption) (*Strategy, error)
-	CreateStrategy(ctx context.Context, in *CreateStrategyRequest, opts ...grpc.CallOption) (*Strategy, error)
-	UpdateStrategy(ctx context.Context, in *UpdateStrategyRequest, opts ...grpc.CallOption) (*Strategy, error)
-	DeleteStrategy(ctx context.Context, in *DeleteStrategyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+type ModelConfigServiceClient interface {
+	ListConfigs(ctx context.Context, in *ListConfigsRequest, opts ...grpc.CallOption) (*ListConfigsResponse, error)
+	GetConfig(ctx context.Context, in *GetConfigRequest, opts ...grpc.CallOption) (*ConfigReply, error)
+	CreateConfig(ctx context.Context, in *CreateConfigRequest, opts ...grpc.CallOption) (*ConfigReply, error)
+	UpdateConfig(ctx context.Context, in *UpdateConfigRequest, opts ...grpc.CallOption) (*ConfigReply, error)
+	DeleteConfig(ctx context.Context, in *DeleteConfigRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetModelStats(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ModelStatsResponse, error)
 }
 
-type strategyServiceClient struct {
+type modelConfigServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewStrategyServiceClient(cc grpc.ClientConnInterface) StrategyServiceClient {
-	return &strategyServiceClient{cc}
+func NewModelConfigServiceClient(cc grpc.ClientConnInterface) ModelConfigServiceClient {
+	return &modelConfigServiceClient{cc}
 }
 
-func (c *strategyServiceClient) ListStrategies(ctx context.Context, in *ListStrategiesRequest, opts ...grpc.CallOption) (*ListStrategiesResponse, error) {
+func (c *modelConfigServiceClient) ListConfigs(ctx context.Context, in *ListConfigsRequest, opts ...grpc.CallOption) (*ListConfigsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListStrategiesResponse)
-	err := c.cc.Invoke(ctx, StrategyService_ListStrategies_FullMethodName, in, out, cOpts...)
+	out := new(ListConfigsResponse)
+	err := c.cc.Invoke(ctx, ModelConfigService_ListConfigs_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *strategyServiceClient) GetStrategy(ctx context.Context, in *GetStrategyRequest, opts ...grpc.CallOption) (*Strategy, error) {
+func (c *modelConfigServiceClient) GetConfig(ctx context.Context, in *GetConfigRequest, opts ...grpc.CallOption) (*ConfigReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Strategy)
-	err := c.cc.Invoke(ctx, StrategyService_GetStrategy_FullMethodName, in, out, cOpts...)
+	out := new(ConfigReply)
+	err := c.cc.Invoke(ctx, ModelConfigService_GetConfig_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *strategyServiceClient) CreateStrategy(ctx context.Context, in *CreateStrategyRequest, opts ...grpc.CallOption) (*Strategy, error) {
+func (c *modelConfigServiceClient) CreateConfig(ctx context.Context, in *CreateConfigRequest, opts ...grpc.CallOption) (*ConfigReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Strategy)
-	err := c.cc.Invoke(ctx, StrategyService_CreateStrategy_FullMethodName, in, out, cOpts...)
+	out := new(ConfigReply)
+	err := c.cc.Invoke(ctx, ModelConfigService_CreateConfig_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *strategyServiceClient) UpdateStrategy(ctx context.Context, in *UpdateStrategyRequest, opts ...grpc.CallOption) (*Strategy, error) {
+func (c *modelConfigServiceClient) UpdateConfig(ctx context.Context, in *UpdateConfigRequest, opts ...grpc.CallOption) (*ConfigReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Strategy)
-	err := c.cc.Invoke(ctx, StrategyService_UpdateStrategy_FullMethodName, in, out, cOpts...)
+	out := new(ConfigReply)
+	err := c.cc.Invoke(ctx, ModelConfigService_UpdateConfig_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *strategyServiceClient) DeleteStrategy(ctx context.Context, in *DeleteStrategyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *modelConfigServiceClient) DeleteConfig(ctx context.Context, in *DeleteConfigRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, StrategyService_DeleteStrategy_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, ModelConfigService_DeleteConfig_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// StrategyServiceServer is the server API for StrategyService service.
-// All implementations should embed UnimplementedStrategyServiceServer
-// for forward compatibility.
-type StrategyServiceServer interface {
-	ListStrategies(context.Context, *ListStrategiesRequest) (*ListStrategiesResponse, error)
-	GetStrategy(context.Context, *GetStrategyRequest) (*Strategy, error)
-	CreateStrategy(context.Context, *CreateStrategyRequest) (*Strategy, error)
-	UpdateStrategy(context.Context, *UpdateStrategyRequest) (*Strategy, error)
-	DeleteStrategy(context.Context, *DeleteStrategyRequest) (*emptypb.Empty, error)
+func (c *modelConfigServiceClient) GetModelStats(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ModelStatsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ModelStatsResponse)
+	err := c.cc.Invoke(ctx, ModelConfigService_GetModelStats_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
-// UnimplementedStrategyServiceServer should be embedded to have
+// ModelConfigServiceServer is the server API for ModelConfigService service.
+// All implementations should embed UnimplementedModelConfigServiceServer
+// for forward compatibility.
+type ModelConfigServiceServer interface {
+	ListConfigs(context.Context, *ListConfigsRequest) (*ListConfigsResponse, error)
+	GetConfig(context.Context, *GetConfigRequest) (*ConfigReply, error)
+	CreateConfig(context.Context, *CreateConfigRequest) (*ConfigReply, error)
+	UpdateConfig(context.Context, *UpdateConfigRequest) (*ConfigReply, error)
+	DeleteConfig(context.Context, *DeleteConfigRequest) (*emptypb.Empty, error)
+	GetModelStats(context.Context, *emptypb.Empty) (*ModelStatsResponse, error)
+}
+
+// UnimplementedModelConfigServiceServer should be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedStrategyServiceServer struct{}
+type UnimplementedModelConfigServiceServer struct{}
 
-func (UnimplementedStrategyServiceServer) ListStrategies(context.Context, *ListStrategiesRequest) (*ListStrategiesResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method ListStrategies not implemented")
+func (UnimplementedModelConfigServiceServer) ListConfigs(context.Context, *ListConfigsRequest) (*ListConfigsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListConfigs not implemented")
 }
-func (UnimplementedStrategyServiceServer) GetStrategy(context.Context, *GetStrategyRequest) (*Strategy, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetStrategy not implemented")
+func (UnimplementedModelConfigServiceServer) GetConfig(context.Context, *GetConfigRequest) (*ConfigReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetConfig not implemented")
 }
-func (UnimplementedStrategyServiceServer) CreateStrategy(context.Context, *CreateStrategyRequest) (*Strategy, error) {
-	return nil, status.Error(codes.Unimplemented, "method CreateStrategy not implemented")
+func (UnimplementedModelConfigServiceServer) CreateConfig(context.Context, *CreateConfigRequest) (*ConfigReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateConfig not implemented")
 }
-func (UnimplementedStrategyServiceServer) UpdateStrategy(context.Context, *UpdateStrategyRequest) (*Strategy, error) {
-	return nil, status.Error(codes.Unimplemented, "method UpdateStrategy not implemented")
+func (UnimplementedModelConfigServiceServer) UpdateConfig(context.Context, *UpdateConfigRequest) (*ConfigReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateConfig not implemented")
 }
-func (UnimplementedStrategyServiceServer) DeleteStrategy(context.Context, *DeleteStrategyRequest) (*emptypb.Empty, error) {
-	return nil, status.Error(codes.Unimplemented, "method DeleteStrategy not implemented")
+func (UnimplementedModelConfigServiceServer) DeleteConfig(context.Context, *DeleteConfigRequest) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteConfig not implemented")
 }
-func (UnimplementedStrategyServiceServer) testEmbeddedByValue() {}
+func (UnimplementedModelConfigServiceServer) GetModelStats(context.Context, *emptypb.Empty) (*ModelStatsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetModelStats not implemented")
+}
+func (UnimplementedModelConfigServiceServer) testEmbeddedByValue() {}
 
-// UnsafeStrategyServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to StrategyServiceServer will
+// UnsafeModelConfigServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to ModelConfigServiceServer will
 // result in compilation errors.
-type UnsafeStrategyServiceServer interface {
-	mustEmbedUnimplementedStrategyServiceServer()
+type UnsafeModelConfigServiceServer interface {
+	mustEmbedUnimplementedModelConfigServiceServer()
 }
 
-func RegisterStrategyServiceServer(s grpc.ServiceRegistrar, srv StrategyServiceServer) {
-	// If the following call panics, it indicates UnimplementedStrategyServiceServer was
+func RegisterModelConfigServiceServer(s grpc.ServiceRegistrar, srv ModelConfigServiceServer) {
+	// If the following call panics, it indicates UnimplementedModelConfigServiceServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&StrategyService_ServiceDesc, srv)
+	s.RegisterService(&ModelConfigService_ServiceDesc, srv)
 }
 
-func _StrategyService_ListStrategies_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListStrategiesRequest)
+func _ModelConfigService_ListConfigs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListConfigsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(StrategyServiceServer).ListStrategies(ctx, in)
+		return srv.(ModelConfigServiceServer).ListConfigs(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: StrategyService_ListStrategies_FullMethodName,
+		FullMethod: ModelConfigService_ListConfigs_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StrategyServiceServer).ListStrategies(ctx, req.(*ListStrategiesRequest))
+		return srv.(ModelConfigServiceServer).ListConfigs(ctx, req.(*ListConfigsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _StrategyService_GetStrategy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetStrategyRequest)
+func _ModelConfigService_GetConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetConfigRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(StrategyServiceServer).GetStrategy(ctx, in)
+		return srv.(ModelConfigServiceServer).GetConfig(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: StrategyService_GetStrategy_FullMethodName,
+		FullMethod: ModelConfigService_GetConfig_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StrategyServiceServer).GetStrategy(ctx, req.(*GetStrategyRequest))
+		return srv.(ModelConfigServiceServer).GetConfig(ctx, req.(*GetConfigRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _StrategyService_CreateStrategy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateStrategyRequest)
+func _ModelConfigService_CreateConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateConfigRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(StrategyServiceServer).CreateStrategy(ctx, in)
+		return srv.(ModelConfigServiceServer).CreateConfig(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: StrategyService_CreateStrategy_FullMethodName,
+		FullMethod: ModelConfigService_CreateConfig_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StrategyServiceServer).CreateStrategy(ctx, req.(*CreateStrategyRequest))
+		return srv.(ModelConfigServiceServer).CreateConfig(ctx, req.(*CreateConfigRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _StrategyService_UpdateStrategy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateStrategyRequest)
+func _ModelConfigService_UpdateConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateConfigRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(StrategyServiceServer).UpdateStrategy(ctx, in)
+		return srv.(ModelConfigServiceServer).UpdateConfig(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: StrategyService_UpdateStrategy_FullMethodName,
+		FullMethod: ModelConfigService_UpdateConfig_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StrategyServiceServer).UpdateStrategy(ctx, req.(*UpdateStrategyRequest))
+		return srv.(ModelConfigServiceServer).UpdateConfig(ctx, req.(*UpdateConfigRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _StrategyService_DeleteStrategy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteStrategyRequest)
+func _ModelConfigService_DeleteConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteConfigRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(StrategyServiceServer).DeleteStrategy(ctx, in)
+		return srv.(ModelConfigServiceServer).DeleteConfig(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: StrategyService_DeleteStrategy_FullMethodName,
+		FullMethod: ModelConfigService_DeleteConfig_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StrategyServiceServer).DeleteStrategy(ctx, req.(*DeleteStrategyRequest))
+		return srv.(ModelConfigServiceServer).DeleteConfig(ctx, req.(*DeleteConfigRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// StrategyService_ServiceDesc is the grpc.ServiceDesc for StrategyService service.
+func _ModelConfigService_GetModelStats_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ModelConfigServiceServer).GetModelStats(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ModelConfigService_GetModelStats_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ModelConfigServiceServer).GetModelStats(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// ModelConfigService_ServiceDesc is the grpc.ServiceDesc for ModelConfigService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var StrategyService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "mint_server.agent.StrategyService",
-	HandlerType: (*StrategyServiceServer)(nil),
+var ModelConfigService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "mint_server.agent.ModelConfigService",
+	HandlerType: (*ModelConfigServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "ListStrategies",
-			Handler:    _StrategyService_ListStrategies_Handler,
+			MethodName: "ListConfigs",
+			Handler:    _ModelConfigService_ListConfigs_Handler,
 		},
 		{
-			MethodName: "GetStrategy",
-			Handler:    _StrategyService_GetStrategy_Handler,
+			MethodName: "GetConfig",
+			Handler:    _ModelConfigService_GetConfig_Handler,
 		},
 		{
-			MethodName: "CreateStrategy",
-			Handler:    _StrategyService_CreateStrategy_Handler,
+			MethodName: "CreateConfig",
+			Handler:    _ModelConfigService_CreateConfig_Handler,
 		},
 		{
-			MethodName: "UpdateStrategy",
-			Handler:    _StrategyService_UpdateStrategy_Handler,
+			MethodName: "UpdateConfig",
+			Handler:    _ModelConfigService_UpdateConfig_Handler,
 		},
 		{
-			MethodName: "DeleteStrategy",
-			Handler:    _StrategyService_DeleteStrategy_Handler,
-		},
-	},
-	Streams:  []grpc.StreamDesc{},
-	Metadata: "mint_server/agent/agent.proto",
-}
-
-const (
-	MappingService_ListMappings_FullMethodName  = "/mint_server.agent.MappingService/ListMappings"
-	MappingService_GetMapping_FullMethodName    = "/mint_server.agent.MappingService/GetMapping"
-	MappingService_CreateMapping_FullMethodName = "/mint_server.agent.MappingService/CreateMapping"
-	MappingService_UpdateMapping_FullMethodName = "/mint_server.agent.MappingService/UpdateMapping"
-	MappingService_DeleteMapping_FullMethodName = "/mint_server.agent.MappingService/DeleteMapping"
-)
-
-// MappingServiceClient is the client API for MappingService service.
-//
-// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type MappingServiceClient interface {
-	ListMappings(ctx context.Context, in *ListMappingsRequest, opts ...grpc.CallOption) (*ListMappingsResponse, error)
-	GetMapping(ctx context.Context, in *GetMappingRequest, opts ...grpc.CallOption) (*ModelMapping, error)
-	CreateMapping(ctx context.Context, in *CreateMappingRequest, opts ...grpc.CallOption) (*ModelMapping, error)
-	UpdateMapping(ctx context.Context, in *UpdateMappingRequest, opts ...grpc.CallOption) (*ModelMapping, error)
-	DeleteMapping(ctx context.Context, in *DeleteMappingRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-}
-
-type mappingServiceClient struct {
-	cc grpc.ClientConnInterface
-}
-
-func NewMappingServiceClient(cc grpc.ClientConnInterface) MappingServiceClient {
-	return &mappingServiceClient{cc}
-}
-
-func (c *mappingServiceClient) ListMappings(ctx context.Context, in *ListMappingsRequest, opts ...grpc.CallOption) (*ListMappingsResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListMappingsResponse)
-	err := c.cc.Invoke(ctx, MappingService_ListMappings_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *mappingServiceClient) GetMapping(ctx context.Context, in *GetMappingRequest, opts ...grpc.CallOption) (*ModelMapping, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ModelMapping)
-	err := c.cc.Invoke(ctx, MappingService_GetMapping_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *mappingServiceClient) CreateMapping(ctx context.Context, in *CreateMappingRequest, opts ...grpc.CallOption) (*ModelMapping, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ModelMapping)
-	err := c.cc.Invoke(ctx, MappingService_CreateMapping_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *mappingServiceClient) UpdateMapping(ctx context.Context, in *UpdateMappingRequest, opts ...grpc.CallOption) (*ModelMapping, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ModelMapping)
-	err := c.cc.Invoke(ctx, MappingService_UpdateMapping_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *mappingServiceClient) DeleteMapping(ctx context.Context, in *DeleteMappingRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, MappingService_DeleteMapping_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// MappingServiceServer is the server API for MappingService service.
-// All implementations should embed UnimplementedMappingServiceServer
-// for forward compatibility.
-type MappingServiceServer interface {
-	ListMappings(context.Context, *ListMappingsRequest) (*ListMappingsResponse, error)
-	GetMapping(context.Context, *GetMappingRequest) (*ModelMapping, error)
-	CreateMapping(context.Context, *CreateMappingRequest) (*ModelMapping, error)
-	UpdateMapping(context.Context, *UpdateMappingRequest) (*ModelMapping, error)
-	DeleteMapping(context.Context, *DeleteMappingRequest) (*emptypb.Empty, error)
-}
-
-// UnimplementedMappingServiceServer should be embedded to have
-// forward compatible implementations.
-//
-// NOTE: this should be embedded by value instead of pointer to avoid a nil
-// pointer dereference when methods are called.
-type UnimplementedMappingServiceServer struct{}
-
-func (UnimplementedMappingServiceServer) ListMappings(context.Context, *ListMappingsRequest) (*ListMappingsResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method ListMappings not implemented")
-}
-func (UnimplementedMappingServiceServer) GetMapping(context.Context, *GetMappingRequest) (*ModelMapping, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetMapping not implemented")
-}
-func (UnimplementedMappingServiceServer) CreateMapping(context.Context, *CreateMappingRequest) (*ModelMapping, error) {
-	return nil, status.Error(codes.Unimplemented, "method CreateMapping not implemented")
-}
-func (UnimplementedMappingServiceServer) UpdateMapping(context.Context, *UpdateMappingRequest) (*ModelMapping, error) {
-	return nil, status.Error(codes.Unimplemented, "method UpdateMapping not implemented")
-}
-func (UnimplementedMappingServiceServer) DeleteMapping(context.Context, *DeleteMappingRequest) (*emptypb.Empty, error) {
-	return nil, status.Error(codes.Unimplemented, "method DeleteMapping not implemented")
-}
-func (UnimplementedMappingServiceServer) testEmbeddedByValue() {}
-
-// UnsafeMappingServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to MappingServiceServer will
-// result in compilation errors.
-type UnsafeMappingServiceServer interface {
-	mustEmbedUnimplementedMappingServiceServer()
-}
-
-func RegisterMappingServiceServer(s grpc.ServiceRegistrar, srv MappingServiceServer) {
-	// If the following call panics, it indicates UnimplementedMappingServiceServer was
-	// embedded by pointer and is nil.  This will cause panics if an
-	// unimplemented method is ever invoked, so we test this at initialization
-	// time to prevent it from happening at runtime later due to I/O.
-	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
-		t.testEmbeddedByValue()
-	}
-	s.RegisterService(&MappingService_ServiceDesc, srv)
-}
-
-func _MappingService_ListMappings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListMappingsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MappingServiceServer).ListMappings(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MappingService_ListMappings_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MappingServiceServer).ListMappings(ctx, req.(*ListMappingsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _MappingService_GetMapping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetMappingRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MappingServiceServer).GetMapping(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MappingService_GetMapping_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MappingServiceServer).GetMapping(ctx, req.(*GetMappingRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _MappingService_CreateMapping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateMappingRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MappingServiceServer).CreateMapping(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MappingService_CreateMapping_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MappingServiceServer).CreateMapping(ctx, req.(*CreateMappingRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _MappingService_UpdateMapping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateMappingRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MappingServiceServer).UpdateMapping(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MappingService_UpdateMapping_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MappingServiceServer).UpdateMapping(ctx, req.(*UpdateMappingRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _MappingService_DeleteMapping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteMappingRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MappingServiceServer).DeleteMapping(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MappingService_DeleteMapping_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MappingServiceServer).DeleteMapping(ctx, req.(*DeleteMappingRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-// MappingService_ServiceDesc is the grpc.ServiceDesc for MappingService service.
-// It's only intended for direct use with grpc.RegisterService,
-// and not to be introspected or modified (even as a copy)
-var MappingService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "mint_server.agent.MappingService",
-	HandlerType: (*MappingServiceServer)(nil),
-	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "ListMappings",
-			Handler:    _MappingService_ListMappings_Handler,
+			MethodName: "DeleteConfig",
+			Handler:    _ModelConfigService_DeleteConfig_Handler,
 		},
 		{
-			MethodName: "GetMapping",
-			Handler:    _MappingService_GetMapping_Handler,
-		},
-		{
-			MethodName: "CreateMapping",
-			Handler:    _MappingService_CreateMapping_Handler,
-		},
-		{
-			MethodName: "UpdateMapping",
-			Handler:    _MappingService_UpdateMapping_Handler,
-		},
-		{
-			MethodName: "DeleteMapping",
-			Handler:    _MappingService_DeleteMapping_Handler,
+			MethodName: "GetModelStats",
+			Handler:    _ModelConfigService_GetModelStats_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

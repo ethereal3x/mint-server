@@ -9,10 +9,7 @@
       "name": "AgentService"
     },
     {
-      "name": "StrategyService"
-    },
-    {
-      "name": "MappingService"
+      "name": "ModelConfigService"
     },
     {
       "name": "HelloService"
@@ -25,176 +22,14 @@
     "application/json"
   ],
   "paths": {
-    "/admin/v1/mappings": {
+    "/admin/v1/configs": {
       "get": {
-        "operationId": "MappingService_ListMappings",
+        "operationId": "ModelConfigService_ListConfigs",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/agentListMappingsResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "manufacturer",
-            "description": "厂商过滤条件，为空时返回全部",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "MappingService"
-        ]
-      },
-      "post": {
-        "operationId": "MappingService_CreateMapping",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/agentModelMapping"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/agentCreateMappingRequest"
-            }
-          }
-        ],
-        "tags": [
-          "MappingService"
-        ]
-      }
-    },
-    "/admin/v1/mappings/{id}": {
-      "get": {
-        "operationId": "MappingService_GetMapping",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/agentModelMapping"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "description": "映射ID",
-            "in": "path",
-            "required": true,
-            "type": "integer",
-            "format": "int32"
-          }
-        ],
-        "tags": [
-          "MappingService"
-        ]
-      },
-      "delete": {
-        "operationId": "MappingService_DeleteMapping",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "type": "object",
-              "properties": {}
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "description": "映射ID",
-            "in": "path",
-            "required": true,
-            "type": "integer",
-            "format": "int32"
-          }
-        ],
-        "tags": [
-          "MappingService"
-        ]
-      },
-      "put": {
-        "operationId": "MappingService_UpdateMapping",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/agentModelMapping"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "description": "映射ID",
-            "in": "path",
-            "required": true,
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/MappingServiceUpdateMappingBody"
-            }
-          }
-        ],
-        "tags": [
-          "MappingService"
-        ]
-      }
-    },
-    "/admin/v1/strategies": {
-      "get": {
-        "operationId": "StrategyService_ListStrategies",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/agentListStrategiesResponse"
+              "$ref": "#/definitions/agentListConfigsResponse"
             }
           },
           "default": {
@@ -207,7 +42,6 @@
         "parameters": [
           {
             "name": "page",
-            "description": "页码，从 1 开始",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -215,7 +49,6 @@
           },
           {
             "name": "pageSize",
-            "description": "每页条数",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -223,16 +56,16 @@
           }
         ],
         "tags": [
-          "StrategyService"
+          "ModelConfigService"
         ]
       },
       "post": {
-        "operationId": "StrategyService_CreateStrategy",
+        "operationId": "ModelConfigService_CreateConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/agentStrategy"
+              "$ref": "#/definitions/agentConfigReply"
             }
           },
           "default": {
@@ -248,23 +81,23 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/agentCreateStrategyRequest"
+              "$ref": "#/definitions/agentCreateConfigRequest"
             }
           }
         ],
         "tags": [
-          "StrategyService"
+          "ModelConfigService"
         ]
       }
     },
-    "/admin/v1/strategies/{ruleId}": {
+    "/admin/v1/configs/{id}": {
       "get": {
-        "operationId": "StrategyService_GetStrategy",
+        "operationId": "ModelConfigService_GetConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/agentStrategy"
+              "$ref": "#/definitions/agentConfigReply"
             }
           },
           "default": {
@@ -276,19 +109,19 @@
         },
         "parameters": [
           {
-            "name": "ruleId",
-            "description": "策略规则ID",
+            "name": "id",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "integer",
+            "format": "int32"
           }
         ],
         "tags": [
-          "StrategyService"
+          "ModelConfigService"
         ]
       },
       "delete": {
-        "operationId": "StrategyService_DeleteStrategy",
+        "operationId": "ModelConfigService_DeleteConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -306,24 +139,24 @@
         },
         "parameters": [
           {
-            "name": "ruleId",
-            "description": "策略规则ID",
+            "name": "id",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "integer",
+            "format": "int32"
           }
         ],
         "tags": [
-          "StrategyService"
+          "ModelConfigService"
         ]
       },
       "put": {
-        "operationId": "StrategyService_UpdateStrategy",
+        "operationId": "ModelConfigService_UpdateConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/agentStrategy"
+              "$ref": "#/definitions/agentConfigReply"
             }
           },
           "default": {
@@ -335,27 +168,49 @@
         },
         "parameters": [
           {
-            "name": "ruleId",
-            "description": "策略规则ID",
+            "name": "id",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "integer",
+            "format": "int32"
           },
           {
             "name": "body",
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/StrategyServiceUpdateStrategyBody"
+              "$ref": "#/definitions/ModelConfigServiceUpdateConfigBody"
             }
           }
         ],
         "tags": [
-          "StrategyService"
+          "ModelConfigService"
         ]
       }
     },
-    "/api/v1/agent/chat": {
+    "/admin/v1/stats/models": {
+      "get": {
+        "operationId": "ModelConfigService_GetModelStats",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/agentModelStatsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "ModelConfigService"
+        ]
+      }
+    },
+    "/api/v1/chat/chat": {
       "post": {
         "operationId": "AgentService_GenerateChat",
         "responses": {
@@ -387,7 +242,89 @@
         ]
       }
     },
-    "/api/v1/agent/chat/stream": {
+    "/api/v1/chat/dialogues": {
+      "get": {
+        "operationId": "AgentService_ListDialogues",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/agentListDialoguesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AgentService"
+        ]
+      }
+    },
+    "/api/v1/chat/history/{dialogueId}": {
+      "get": {
+        "operationId": "AgentService_GetHistory",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/agentGetHistoryResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "dialogueId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AgentService"
+        ]
+      }
+    },
+    "/api/v1/chat/models": {
+      "get": {
+        "operationId": "AgentService_ListModels",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/agentListModelsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "AgentService"
+        ]
+      }
+    },
+    "/api/v1/chat/stream": {
       "post": {
         "operationId": "AgentService_StreamChat",
         "responses": {
@@ -428,90 +365,6 @@
         ]
       }
     },
-    "/api/v1/agent/dialogues": {
-      "get": {
-        "operationId": "AgentService_ListDialogues",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/agentListDialoguesResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "userId",
-            "description": "用户ID，为空时返回全部",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "AgentService"
-        ]
-      }
-    },
-    "/api/v1/agent/history/{dialogueId}": {
-      "get": {
-        "operationId": "AgentService_GetHistory",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/agentGetHistoryResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "dialogueId",
-            "description": "对话ID",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "AgentService"
-        ]
-      }
-    },
-    "/api/v1/agent/models": {
-      "get": {
-        "operationId": "AgentService_ListModels",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/agentListModelsResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "tags": [
-          "AgentService"
-        ]
-      }
-    },
     "/hello/v1/check": {
       "post": {
         "operationId": "HelloService_HelloCheck",
@@ -546,168 +399,148 @@
     }
   },
   "definitions": {
-    "MappingServiceUpdateMappingBody": {
+    "ModelConfigServiceUpdateConfigBody": {
       "type": "object",
       "properties": {
         "modelType": {
-          "type": "string",
-          "title": "模型类型标识"
+          "type": "string"
         },
         "manufacturer": {
-          "type": "string",
-          "title": "厂商名称"
+          "type": "string"
         },
         "description": {
-          "type": "string",
-          "title": "模型描述"
-        }
-      }
-    },
-    "StrategyServiceUpdateStrategyBody": {
-      "type": "object",
-      "properties": {
+          "type": "string"
+        },
+        "inputPrice": {
+          "type": "number",
+          "format": "double"
+        },
+        "outputPrice": {
+          "type": "number",
+          "format": "double"
+        },
         "apiKey": {
-          "type": "string",
-          "title": "API密钥"
-        },
-        "agentModel": {
-          "type": "string",
-          "title": "模型名称"
-        },
-        "agentManufacturer": {
-          "type": "string",
-          "title": "模型厂商"
-        },
-        "agentGenerateType": {
-          "type": "string",
-          "title": "生成类型"
+          "type": "string"
         },
         "url": {
-          "type": "string",
-          "title": "API 地址"
+          "type": "string"
         },
         "maxTokens": {
           "type": "integer",
-          "format": "int32",
-          "title": "最大 token 数"
+          "format": "int32"
         },
         "stream": {
-          "type": "boolean",
-          "title": "是否启用流式"
+          "type": "boolean"
         },
         "temperature": {
           "type": "number",
-          "format": "float",
-          "title": "温度参数"
+          "format": "float"
         },
         "topP": {
           "type": "number",
-          "format": "float",
-          "title": "Top-P 采样参数"
+          "format": "float"
         },
         "n": {
           "type": "integer",
-          "format": "int32",
-          "title": "生成候选数"
+          "format": "int32"
         },
         "presencePenalty": {
           "type": "number",
-          "format": "float",
-          "title": "存在惩罚系数"
+          "format": "float"
         },
         "frequencyPenalty": {
           "type": "number",
-          "format": "float",
-          "title": "频率惩罚系数"
+          "format": "float"
+        },
+        "agentGenerateType": {
+          "type": "string"
         },
         "route": {
-          "type": "string",
-          "title": "路由标识"
+          "type": "string"
         },
         "isEnabled": {
           "type": "integer",
-          "format": "int32",
-          "title": "是否启用：0-禁用，1-启用"
+          "format": "int32"
         }
       }
     },
-    "agentCreateMappingRequest": {
+    "agentConfigReply": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "config": {
+          "$ref": "#/definitions/agentModelConfig"
+        }
+      }
+    },
+    "agentCreateConfigRequest": {
       "type": "object",
       "properties": {
         "modelType": {
-          "type": "string",
-          "title": "模型类型标识"
+          "type": "string"
         },
         "manufacturer": {
-          "type": "string",
-          "title": "厂商名称"
+          "type": "string"
         },
         "description": {
-          "type": "string",
-          "title": "模型描述"
-        }
-      }
-    },
-    "agentCreateStrategyRequest": {
-      "type": "object",
-      "properties": {
+          "type": "string"
+        },
+        "inputPrice": {
+          "type": "number",
+          "format": "double"
+        },
+        "outputPrice": {
+          "type": "number",
+          "format": "double"
+        },
         "apiKey": {
-          "type": "string",
-          "title": "API密钥"
-        },
-        "agentModel": {
-          "type": "string",
-          "title": "模型名称"
-        },
-        "agentManufacturer": {
-          "type": "string",
-          "title": "模型厂商"
-        },
-        "agentGenerateType": {
-          "type": "string",
-          "title": "生成类型"
+          "type": "string"
         },
         "url": {
-          "type": "string",
-          "title": "API 地址"
+          "type": "string"
         },
         "maxTokens": {
           "type": "integer",
-          "format": "int32",
-          "title": "最大 token 数"
+          "format": "int32"
         },
         "stream": {
-          "type": "boolean",
-          "title": "是否启用流式"
+          "type": "boolean"
         },
         "temperature": {
           "type": "number",
-          "format": "float",
-          "title": "温度参数"
+          "format": "float"
         },
         "topP": {
           "type": "number",
-          "format": "float",
-          "title": "Top-P 采样参数"
+          "format": "float"
         },
         "n": {
           "type": "integer",
-          "format": "int32",
-          "title": "生成候选数"
+          "format": "int32"
         },
         "presencePenalty": {
           "type": "number",
-          "format": "float",
-          "title": "存在惩罚系数"
+          "format": "float"
         },
         "frequencyPenalty": {
           "type": "number",
-          "format": "float",
-          "title": "频率惩罚系数"
+          "format": "float"
+        },
+        "agentGenerateType": {
+          "type": "string"
         },
         "route": {
-          "type": "string",
-          "title": "路由标识"
+          "type": "string"
+        },
+        "isEnabled": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -715,21 +548,17 @@
       "type": "object",
       "properties": {
         "dialogueId": {
-          "type": "string",
-          "title": "对话ID"
+          "type": "string"
         },
         "title": {
-          "type": "string",
-          "title": "对话标题（首条用户消息）"
+          "type": "string"
         },
         "messageCount": {
           "type": "integer",
-          "format": "int32",
-          "title": "消息数量"
+          "format": "int32"
         },
         "updatedTime": {
-          "type": "string",
-          "title": "最后更新时间"
+          "type": "string"
         }
       }
     },
@@ -737,67 +566,75 @@
       "type": "object",
       "properties": {
         "userId": {
-          "type": "string",
-          "title": "用户ID"
+          "type": "string"
         },
         "question": {
-          "type": "string",
-          "title": "用户提问内容"
+          "type": "string"
         },
         "model": {
-          "type": "string",
-          "title": "模型标识"
+          "type": "string"
         },
         "dialogueId": {
-          "type": "string",
-          "title": "对话ID，为空时自动生成"
+          "type": "string"
         },
         "recordId": {
-          "type": "string",
-          "title": "记录ID，为空时自动生成"
+          "type": "string"
         },
         "fileName": {
-          "type": "string",
-          "title": "上传文件名"
+          "type": "string"
         },
         "fileData": {
           "type": "string",
-          "format": "byte",
-          "title": "上传文件数据"
+          "format": "byte"
+        },
+        "imageUrls": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
     "agentGenerateChatResponse": {
       "type": "object",
       "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
         "content": {
-          "type": "string",
-          "title": "完整回答内容"
+          "type": "string"
         },
         "dialogueId": {
-          "type": "string",
-          "title": "对话ID"
+          "type": "string"
         },
         "recordId": {
-          "type": "string",
-          "title": "记录ID"
+          "type": "string"
         },
         "error": {
-          "type": "string",
-          "title": "错误信息"
+          "type": "string"
         }
       }
     },
     "agentGetHistoryResponse": {
       "type": "object",
       "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
         "records": {
           "type": "array",
           "items": {
             "type": "object",
             "$ref": "#/definitions/agentHistoryRecord"
-          },
-          "title": "历史记录列表"
+          }
         }
       }
     },
@@ -805,82 +642,175 @@
       "type": "object",
       "properties": {
         "recordId": {
-          "type": "string",
-          "title": "记录ID"
+          "type": "string"
         },
         "userContent": {
-          "type": "string",
-          "title": "用户消息"
+          "type": "string"
         },
         "agentContent": {
-          "type": "string",
-          "title": "AI 回复"
+          "type": "string"
         },
         "model": {
-          "type": "string",
-          "title": "模型标识"
+          "type": "string"
         },
         "totalTokens": {
           "type": "string",
-          "format": "int64",
-          "title": "总 token 数"
+          "format": "int64"
+        },
+        "inputCost": {
+          "type": "number",
+          "format": "double"
+        },
+        "outputCost": {
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "agentListConfigsResponse": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "configs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/agentModelConfig"
+          }
+        },
+        "total": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },
     "agentListDialoguesResponse": {
       "type": "object",
       "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
         "dialogues": {
           "type": "array",
           "items": {
             "type": "object",
             "$ref": "#/definitions/agentDialogueSummary"
-          },
-          "title": "对话摘要列表"
-        }
-      }
-    },
-    "agentListMappingsResponse": {
-      "type": "object",
-      "properties": {
-        "mappings": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/agentModelMapping"
-          },
-          "title": "模型映射列表"
+          }
         }
       }
     },
     "agentListModelsResponse": {
       "type": "object",
       "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "manufacturers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/agentManufacturerGroup"
+          }
+        }
+      }
+    },
+    "agentManufacturerGroup": {
+      "type": "object",
+      "properties": {
+        "manufacturer": {
+          "type": "string",
+          "title": "厂商名称"
+        },
         "models": {
           "type": "array",
           "items": {
             "type": "object",
             "$ref": "#/definitions/agentModelInfo"
           },
-          "title": "可用模型列表"
+          "title": "该厂商下的模型列表"
         }
       }
     },
-    "agentListStrategiesResponse": {
+    "agentModelConfig": {
       "type": "object",
       "properties": {
-        "strategies": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/agentStrategy"
-          },
-          "title": "策略规则列表"
+        "id": {
+          "type": "integer",
+          "format": "int32"
         },
-        "total": {
-          "type": "string",
-          "format": "int64",
-          "title": "总条数"
+        "modelType": {
+          "type": "string"
+        },
+        "manufacturer": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "inputPrice": {
+          "type": "number",
+          "format": "double"
+        },
+        "outputPrice": {
+          "type": "number",
+          "format": "double"
+        },
+        "apiKey": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "maxTokens": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "stream": {
+          "type": "boolean"
+        },
+        "temperature": {
+          "type": "number",
+          "format": "float"
+        },
+        "topP": {
+          "type": "number",
+          "format": "float"
+        },
+        "n": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "presencePenalty": {
+          "type": "number",
+          "format": "float"
+        },
+        "frequencyPenalty": {
+          "type": "number",
+          "format": "float"
+        },
+        "agentGenerateType": {
+          "type": "string"
+        },
+        "route": {
+          "type": "string"
+        },
+        "isEnabled": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -891,112 +821,52 @@
           "type": "string",
           "title": "模型标识"
         },
-        "manufacturer": {
-          "type": "string",
-          "title": "厂商名称"
-        },
         "description": {
           "type": "string",
           "title": "模型描述"
         }
       }
     },
-    "agentModelMapping": {
+    "agentModelStat": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "integer",
-          "format": "int32",
-          "title": "自增主键"
+        "model": {
+          "type": "string"
         },
-        "modelType": {
+        "totalInputTokens": {
           "type": "string",
-          "title": "模型类型标识"
+          "format": "int64"
         },
-        "manufacturer": {
+        "totalOutputTokens": {
           "type": "string",
-          "title": "厂商名称"
+          "format": "int64"
         },
-        "description": {
-          "type": "string",
-          "title": "模型描述"
+        "totalInputCost": {
+          "type": "number",
+          "format": "double"
+        },
+        "totalOutputCost": {
+          "type": "number",
+          "format": "double"
         }
       }
     },
-    "agentStrategy": {
+    "agentModelStatsResponse": {
       "type": "object",
       "properties": {
-        "id": {
+        "code": {
           "type": "integer",
-          "format": "int32",
-          "title": "自增主键"
+          "format": "int32"
         },
-        "ruleId": {
-          "type": "string",
-          "title": "策略规则唯一标识"
+        "message": {
+          "type": "string"
         },
-        "apiKey": {
-          "type": "string",
-          "title": "API密钥"
-        },
-        "agentModel": {
-          "type": "string",
-          "title": "模型名称"
-        },
-        "agentManufacturer": {
-          "type": "string",
-          "title": "模型厂商"
-        },
-        "agentGenerateType": {
-          "type": "string",
-          "title": "生成类型"
-        },
-        "url": {
-          "type": "string",
-          "title": "API 地址"
-        },
-        "maxTokens": {
-          "type": "integer",
-          "format": "int32",
-          "title": "最大 token 数"
-        },
-        "stream": {
-          "type": "boolean",
-          "title": "是否启用流式"
-        },
-        "temperature": {
-          "type": "number",
-          "format": "float",
-          "title": "温度参数"
-        },
-        "topP": {
-          "type": "number",
-          "format": "float",
-          "title": "Top-P 采样参数"
-        },
-        "n": {
-          "type": "integer",
-          "format": "int32",
-          "title": "生成候选数"
-        },
-        "presencePenalty": {
-          "type": "number",
-          "format": "float",
-          "title": "存在惩罚系数"
-        },
-        "frequencyPenalty": {
-          "type": "number",
-          "format": "float",
-          "title": "频率惩罚系数"
-        },
-        "route": {
-          "type": "string",
-          "title": "路由标识"
-        },
-        "isEnabled": {
-          "type": "integer",
-          "format": "int32",
-          "title": "是否启用：0-禁用，1-启用"
+        "stats": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/agentModelStat"
+          }
         }
       }
     },
@@ -1004,58 +874,59 @@
       "type": "object",
       "properties": {
         "userId": {
-          "type": "string",
-          "title": "用户ID"
+          "type": "string"
         },
         "question": {
-          "type": "string",
-          "title": "用户提问内容"
+          "type": "string"
         },
         "model": {
-          "type": "string",
-          "title": "模型标识"
+          "type": "string"
         },
         "dialogueId": {
-          "type": "string",
-          "title": "对话ID，为空时自动生成"
+          "type": "string"
         },
         "recordId": {
-          "type": "string",
-          "title": "记录ID，为空时自动生成"
+          "type": "string"
         },
         "fileName": {
-          "type": "string",
-          "title": "上传文件名"
+          "type": "string"
         },
         "fileData": {
           "type": "string",
-          "format": "byte",
-          "title": "上传文件数据"
+          "format": "byte"
+        },
+        "imageUrls": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
     "agentStreamChatResponse": {
       "type": "object",
       "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
         "content": {
-          "type": "string",
-          "title": "流式响应内容块"
+          "type": "string"
         },
         "dialogueId": {
-          "type": "string",
-          "title": "对话ID"
+          "type": "string"
         },
         "recordId": {
-          "type": "string",
-          "title": "记录ID"
+          "type": "string"
         },
         "done": {
-          "type": "boolean",
-          "title": "是否完成"
+          "type": "boolean"
         },
         "error": {
-          "type": "string",
-          "title": "错误信息"
+          "type": "string"
         }
       }
     },

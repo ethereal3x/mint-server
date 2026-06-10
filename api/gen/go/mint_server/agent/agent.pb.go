@@ -24,21 +24,15 @@ const (
 )
 
 type StreamChatRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// 用户ID
-	UserId string `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	// 用户提问内容
-	Question string `protobuf:"bytes,2,opt,name=question,proto3" json:"question,omitempty"`
-	// 模型标识
-	Model string `protobuf:"bytes,3,opt,name=model,proto3" json:"model,omitempty"`
-	// 对话ID，为空时自动生成
-	DialogueId string `protobuf:"bytes,4,opt,name=dialogue_id,json=dialogueId,proto3" json:"dialogue_id,omitempty"`
-	// 记录ID，为空时自动生成
-	RecordId string `protobuf:"bytes,5,opt,name=record_id,json=recordId,proto3" json:"record_id,omitempty"`
-	// 上传文件名
-	FileName string `protobuf:"bytes,6,opt,name=file_name,json=fileName,proto3" json:"file_name,omitempty"`
-	// 上传文件数据
-	FileData      []byte `protobuf:"bytes,7,opt,name=file_data,json=fileData,proto3" json:"file_data,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Question      string                 `protobuf:"bytes,2,opt,name=question,proto3" json:"question,omitempty"`
+	Model         string                 `protobuf:"bytes,3,opt,name=model,proto3" json:"model,omitempty"`
+	DialogueId    string                 `protobuf:"bytes,4,opt,name=dialogue_id,json=dialogueId,proto3" json:"dialogue_id,omitempty"`
+	RecordId      string                 `protobuf:"bytes,5,opt,name=record_id,json=recordId,proto3" json:"record_id,omitempty"`
+	FileName      string                 `protobuf:"bytes,6,opt,name=file_name,json=fileName,proto3" json:"file_name,omitempty"`
+	FileData      []byte                 `protobuf:"bytes,7,opt,name=file_data,json=fileData,proto3" json:"file_data,omitempty"`
+	ImageUrls     []string               `protobuf:"bytes,8,rep,name=image_urls,json=imageUrls,proto3" json:"image_urls,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -122,18 +116,22 @@ func (x *StreamChatRequest) GetFileData() []byte {
 	return nil
 }
 
+func (x *StreamChatRequest) GetImageUrls() []string {
+	if x != nil {
+		return x.ImageUrls
+	}
+	return nil
+}
+
 type StreamChatResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// 流式响应内容块
-	Content string `protobuf:"bytes,1,opt,name=content,proto3" json:"content,omitempty"`
-	// 对话ID
-	DialogueId string `protobuf:"bytes,2,opt,name=dialogue_id,json=dialogueId,proto3" json:"dialogue_id,omitempty"`
-	// 记录ID
-	RecordId string `protobuf:"bytes,3,opt,name=record_id,json=recordId,proto3" json:"record_id,omitempty"`
-	// 是否完成
-	Done bool `protobuf:"varint,4,opt,name=done,proto3" json:"done,omitempty"`
-	// 错误信息
-	Error         string `protobuf:"bytes,5,opt,name=error,proto3" json:"error,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Content       string                 `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`
+	DialogueId    string                 `protobuf:"bytes,4,opt,name=dialogue_id,json=dialogueId,proto3" json:"dialogue_id,omitempty"`
+	RecordId      string                 `protobuf:"bytes,5,opt,name=record_id,json=recordId,proto3" json:"record_id,omitempty"`
+	Done          bool                   `protobuf:"varint,6,opt,name=done,proto3" json:"done,omitempty"`
+	Error         string                 `protobuf:"bytes,7,opt,name=error,proto3" json:"error,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -166,6 +164,20 @@ func (x *StreamChatResponse) ProtoReflect() protoreflect.Message {
 // Deprecated: Use StreamChatResponse.ProtoReflect.Descriptor instead.
 func (*StreamChatResponse) Descriptor() ([]byte, []int) {
 	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *StreamChatResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *StreamChatResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
 }
 
 func (x *StreamChatResponse) GetContent() string {
@@ -204,21 +216,15 @@ func (x *StreamChatResponse) GetError() string {
 }
 
 type GenerateChatRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// 用户ID
-	UserId string `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	// 用户提问内容
-	Question string `protobuf:"bytes,2,opt,name=question,proto3" json:"question,omitempty"`
-	// 模型标识
-	Model string `protobuf:"bytes,3,opt,name=model,proto3" json:"model,omitempty"`
-	// 对话ID，为空时自动生成
-	DialogueId string `protobuf:"bytes,4,opt,name=dialogue_id,json=dialogueId,proto3" json:"dialogue_id,omitempty"`
-	// 记录ID，为空时自动生成
-	RecordId string `protobuf:"bytes,5,opt,name=record_id,json=recordId,proto3" json:"record_id,omitempty"`
-	// 上传文件名
-	FileName string `protobuf:"bytes,6,opt,name=file_name,json=fileName,proto3" json:"file_name,omitempty"`
-	// 上传文件数据
-	FileData      []byte `protobuf:"bytes,7,opt,name=file_data,json=fileData,proto3" json:"file_data,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Question      string                 `protobuf:"bytes,2,opt,name=question,proto3" json:"question,omitempty"`
+	Model         string                 `protobuf:"bytes,3,opt,name=model,proto3" json:"model,omitempty"`
+	DialogueId    string                 `protobuf:"bytes,4,opt,name=dialogue_id,json=dialogueId,proto3" json:"dialogue_id,omitempty"`
+	RecordId      string                 `protobuf:"bytes,5,opt,name=record_id,json=recordId,proto3" json:"record_id,omitempty"`
+	FileName      string                 `protobuf:"bytes,6,opt,name=file_name,json=fileName,proto3" json:"file_name,omitempty"`
+	FileData      []byte                 `protobuf:"bytes,7,opt,name=file_data,json=fileData,proto3" json:"file_data,omitempty"`
+	ImageUrls     []string               `protobuf:"bytes,8,rep,name=image_urls,json=imageUrls,proto3" json:"image_urls,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -302,16 +308,21 @@ func (x *GenerateChatRequest) GetFileData() []byte {
 	return nil
 }
 
+func (x *GenerateChatRequest) GetImageUrls() []string {
+	if x != nil {
+		return x.ImageUrls
+	}
+	return nil
+}
+
 type GenerateChatResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// 完整回答内容
-	Content string `protobuf:"bytes,1,opt,name=content,proto3" json:"content,omitempty"`
-	// 对话ID
-	DialogueId string `protobuf:"bytes,2,opt,name=dialogue_id,json=dialogueId,proto3" json:"dialogue_id,omitempty"`
-	// 记录ID
-	RecordId string `protobuf:"bytes,3,opt,name=record_id,json=recordId,proto3" json:"record_id,omitempty"`
-	// 错误信息
-	Error         string `protobuf:"bytes,4,opt,name=error,proto3" json:"error,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Content       string                 `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`
+	DialogueId    string                 `protobuf:"bytes,4,opt,name=dialogue_id,json=dialogueId,proto3" json:"dialogue_id,omitempty"`
+	RecordId      string                 `protobuf:"bytes,5,opt,name=record_id,json=recordId,proto3" json:"record_id,omitempty"`
+	Error         string                 `protobuf:"bytes,6,opt,name=error,proto3" json:"error,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -344,6 +355,20 @@ func (x *GenerateChatResponse) ProtoReflect() protoreflect.Message {
 // Deprecated: Use GenerateChatResponse.ProtoReflect.Descriptor instead.
 func (*GenerateChatResponse) Descriptor() ([]byte, []int) {
 	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *GenerateChatResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *GenerateChatResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
 }
 
 func (x *GenerateChatResponse) GetContent() string {
@@ -411,9 +436,10 @@ func (*ListModelsRequest) Descriptor() ([]byte, []int) {
 }
 
 type ListModelsResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// 可用模型列表
-	Models        []*ModelInfo `protobuf:"bytes,1,rep,name=models,proto3" json:"models,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Manufacturers []*ManufacturerGroup   `protobuf:"bytes,3,rep,name=manufacturers,proto3" json:"manufacturers,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -448,7 +474,75 @@ func (*ListModelsResponse) Descriptor() ([]byte, []int) {
 	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *ListModelsResponse) GetModels() []*ModelInfo {
+func (x *ListModelsResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *ListModelsResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *ListModelsResponse) GetManufacturers() []*ManufacturerGroup {
+	if x != nil {
+		return x.Manufacturers
+	}
+	return nil
+}
+
+type ManufacturerGroup struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// 厂商名称
+	Manufacturer string `protobuf:"bytes,1,opt,name=manufacturer,proto3" json:"manufacturer,omitempty"`
+	// 该厂商下的模型列表
+	Models        []*ModelInfo `protobuf:"bytes,2,rep,name=models,proto3" json:"models,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ManufacturerGroup) Reset() {
+	*x = ManufacturerGroup{}
+	mi := &file_mint_server_agent_agent_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ManufacturerGroup) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ManufacturerGroup) ProtoMessage() {}
+
+func (x *ManufacturerGroup) ProtoReflect() protoreflect.Message {
+	mi := &file_mint_server_agent_agent_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ManufacturerGroup.ProtoReflect.Descriptor instead.
+func (*ManufacturerGroup) Descriptor() ([]byte, []int) {
+	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *ManufacturerGroup) GetManufacturer() string {
+	if x != nil {
+		return x.Manufacturer
+	}
+	return ""
+}
+
+func (x *ManufacturerGroup) GetModels() []*ModelInfo {
 	if x != nil {
 		return x.Models
 	}
@@ -459,17 +553,15 @@ type ModelInfo struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// 模型标识
 	Model string `protobuf:"bytes,1,opt,name=model,proto3" json:"model,omitempty"`
-	// 厂商名称
-	Manufacturer string `protobuf:"bytes,2,opt,name=manufacturer,proto3" json:"manufacturer,omitempty"`
 	// 模型描述
-	Description   string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Description   string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ModelInfo) Reset() {
 	*x = ModelInfo{}
-	mi := &file_mint_server_agent_agent_proto_msgTypes[6]
+	mi := &file_mint_server_agent_agent_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -481,7 +573,7 @@ func (x *ModelInfo) String() string {
 func (*ModelInfo) ProtoMessage() {}
 
 func (x *ModelInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_mint_server_agent_agent_proto_msgTypes[6]
+	mi := &file_mint_server_agent_agent_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -494,19 +586,12 @@ func (x *ModelInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ModelInfo.ProtoReflect.Descriptor instead.
 func (*ModelInfo) Descriptor() ([]byte, []int) {
-	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{6}
+	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ModelInfo) GetModel() string {
 	if x != nil {
 		return x.Model
-	}
-	return ""
-}
-
-func (x *ModelInfo) GetManufacturer() string {
-	if x != nil {
-		return x.Manufacturer
 	}
 	return ""
 }
@@ -519,16 +604,15 @@ func (x *ModelInfo) GetDescription() string {
 }
 
 type GetHistoryRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// 对话ID
-	DialogueId    string `protobuf:"bytes,1,opt,name=dialogue_id,json=dialogueId,proto3" json:"dialogue_id,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	DialogueId    string                 `protobuf:"bytes,1,opt,name=dialogue_id,json=dialogueId,proto3" json:"dialogue_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *GetHistoryRequest) Reset() {
 	*x = GetHistoryRequest{}
-	mi := &file_mint_server_agent_agent_proto_msgTypes[7]
+	mi := &file_mint_server_agent_agent_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -540,7 +624,7 @@ func (x *GetHistoryRequest) String() string {
 func (*GetHistoryRequest) ProtoMessage() {}
 
 func (x *GetHistoryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_mint_server_agent_agent_proto_msgTypes[7]
+	mi := &file_mint_server_agent_agent_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -553,7 +637,7 @@ func (x *GetHistoryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetHistoryRequest.ProtoReflect.Descriptor instead.
 func (*GetHistoryRequest) Descriptor() ([]byte, []int) {
-	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{7}
+	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *GetHistoryRequest) GetDialogueId() string {
@@ -564,16 +648,17 @@ func (x *GetHistoryRequest) GetDialogueId() string {
 }
 
 type GetHistoryResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// 历史记录列表
-	Records       []*HistoryRecord `protobuf:"bytes,1,rep,name=records,proto3" json:"records,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Records       []*HistoryRecord       `protobuf:"bytes,3,rep,name=records,proto3" json:"records,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *GetHistoryResponse) Reset() {
 	*x = GetHistoryResponse{}
-	mi := &file_mint_server_agent_agent_proto_msgTypes[8]
+	mi := &file_mint_server_agent_agent_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -585,7 +670,7 @@ func (x *GetHistoryResponse) String() string {
 func (*GetHistoryResponse) ProtoMessage() {}
 
 func (x *GetHistoryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_mint_server_agent_agent_proto_msgTypes[8]
+	mi := &file_mint_server_agent_agent_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -598,7 +683,21 @@ func (x *GetHistoryResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetHistoryResponse.ProtoReflect.Descriptor instead.
 func (*GetHistoryResponse) Descriptor() ([]byte, []int) {
-	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{8}
+	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *GetHistoryResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *GetHistoryResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
 }
 
 func (x *GetHistoryResponse) GetRecords() []*HistoryRecord {
@@ -609,24 +708,21 @@ func (x *GetHistoryResponse) GetRecords() []*HistoryRecord {
 }
 
 type HistoryRecord struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// 记录ID
-	RecordId string `protobuf:"bytes,1,opt,name=record_id,json=recordId,proto3" json:"record_id,omitempty"`
-	// 用户消息
-	UserContent string `protobuf:"bytes,2,opt,name=user_content,json=userContent,proto3" json:"user_content,omitempty"`
-	// AI 回复
-	AgentContent string `protobuf:"bytes,3,opt,name=agent_content,json=agentContent,proto3" json:"agent_content,omitempty"`
-	// 模型标识
-	Model string `protobuf:"bytes,4,opt,name=model,proto3" json:"model,omitempty"`
-	// 总 token 数
-	TotalTokens   int64 `protobuf:"varint,5,opt,name=total_tokens,json=totalTokens,proto3" json:"total_tokens,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RecordId      string                 `protobuf:"bytes,1,opt,name=record_id,json=recordId,proto3" json:"record_id,omitempty"`
+	UserContent   string                 `protobuf:"bytes,2,opt,name=user_content,json=userContent,proto3" json:"user_content,omitempty"`
+	AgentContent  string                 `protobuf:"bytes,3,opt,name=agent_content,json=agentContent,proto3" json:"agent_content,omitempty"`
+	Model         string                 `protobuf:"bytes,4,opt,name=model,proto3" json:"model,omitempty"`
+	TotalTokens   int64                  `protobuf:"varint,5,opt,name=total_tokens,json=totalTokens,proto3" json:"total_tokens,omitempty"`
+	InputCost     float64                `protobuf:"fixed64,6,opt,name=input_cost,json=inputCost,proto3" json:"input_cost,omitempty"`
+	OutputCost    float64                `protobuf:"fixed64,7,opt,name=output_cost,json=outputCost,proto3" json:"output_cost,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *HistoryRecord) Reset() {
 	*x = HistoryRecord{}
-	mi := &file_mint_server_agent_agent_proto_msgTypes[9]
+	mi := &file_mint_server_agent_agent_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -638,7 +734,7 @@ func (x *HistoryRecord) String() string {
 func (*HistoryRecord) ProtoMessage() {}
 
 func (x *HistoryRecord) ProtoReflect() protoreflect.Message {
-	mi := &file_mint_server_agent_agent_proto_msgTypes[9]
+	mi := &file_mint_server_agent_agent_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -651,7 +747,7 @@ func (x *HistoryRecord) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HistoryRecord.ProtoReflect.Descriptor instead.
 func (*HistoryRecord) Descriptor() ([]byte, []int) {
-	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{9}
+	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *HistoryRecord) GetRecordId() string {
@@ -689,1106 +785,30 @@ func (x *HistoryRecord) GetTotalTokens() int64 {
 	return 0
 }
 
-type Strategy struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// 自增主键
-	Id int32 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	// 策略规则唯一标识
-	RuleId string `protobuf:"bytes,2,opt,name=rule_id,json=ruleId,proto3" json:"rule_id,omitempty"`
-	// API密钥
-	ApiKey string `protobuf:"bytes,3,opt,name=api_key,json=apiKey,proto3" json:"api_key,omitempty"`
-	// 模型名称
-	AgentModel string `protobuf:"bytes,4,opt,name=agent_model,json=agentModel,proto3" json:"agent_model,omitempty"`
-	// 模型厂商
-	AgentManufacturer string `protobuf:"bytes,5,opt,name=agent_manufacturer,json=agentManufacturer,proto3" json:"agent_manufacturer,omitempty"`
-	// 生成类型
-	AgentGenerateType string `protobuf:"bytes,6,opt,name=agent_generate_type,json=agentGenerateType,proto3" json:"agent_generate_type,omitempty"`
-	// API 地址
-	Url string `protobuf:"bytes,7,opt,name=url,proto3" json:"url,omitempty"`
-	// 最大 token 数
-	MaxTokens int32 `protobuf:"varint,8,opt,name=max_tokens,json=maxTokens,proto3" json:"max_tokens,omitempty"`
-	// 是否启用流式
-	Stream bool `protobuf:"varint,9,opt,name=stream,proto3" json:"stream,omitempty"`
-	// 温度参数
-	Temperature float32 `protobuf:"fixed32,10,opt,name=temperature,proto3" json:"temperature,omitempty"`
-	// Top-P 采样参数
-	TopP float32 `protobuf:"fixed32,11,opt,name=top_p,json=topP,proto3" json:"top_p,omitempty"`
-	// 生成候选数
-	N int32 `protobuf:"varint,12,opt,name=n,proto3" json:"n,omitempty"`
-	// 存在惩罚系数
-	PresencePenalty float32 `protobuf:"fixed32,13,opt,name=presence_penalty,json=presencePenalty,proto3" json:"presence_penalty,omitempty"`
-	// 频率惩罚系数
-	FrequencyPenalty float32 `protobuf:"fixed32,14,opt,name=frequency_penalty,json=frequencyPenalty,proto3" json:"frequency_penalty,omitempty"`
-	// 路由标识
-	Route string `protobuf:"bytes,15,opt,name=route,proto3" json:"route,omitempty"`
-	// 是否启用：0-禁用，1-启用
-	IsEnabled     int32 `protobuf:"varint,16,opt,name=is_enabled,json=isEnabled,proto3" json:"is_enabled,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Strategy) Reset() {
-	*x = Strategy{}
-	mi := &file_mint_server_agent_agent_proto_msgTypes[10]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Strategy) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Strategy) ProtoMessage() {}
-
-func (x *Strategy) ProtoReflect() protoreflect.Message {
-	mi := &file_mint_server_agent_agent_proto_msgTypes[10]
+func (x *HistoryRecord) GetInputCost() float64 {
 	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Strategy.ProtoReflect.Descriptor instead.
-func (*Strategy) Descriptor() ([]byte, []int) {
-	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{10}
-}
-
-func (x *Strategy) GetId() int32 {
-	if x != nil {
-		return x.Id
+		return x.InputCost
 	}
 	return 0
 }
 
-func (x *Strategy) GetRuleId() string {
+func (x *HistoryRecord) GetOutputCost() float64 {
 	if x != nil {
-		return x.RuleId
-	}
-	return ""
-}
-
-func (x *Strategy) GetApiKey() string {
-	if x != nil {
-		return x.ApiKey
-	}
-	return ""
-}
-
-func (x *Strategy) GetAgentModel() string {
-	if x != nil {
-		return x.AgentModel
-	}
-	return ""
-}
-
-func (x *Strategy) GetAgentManufacturer() string {
-	if x != nil {
-		return x.AgentManufacturer
-	}
-	return ""
-}
-
-func (x *Strategy) GetAgentGenerateType() string {
-	if x != nil {
-		return x.AgentGenerateType
-	}
-	return ""
-}
-
-func (x *Strategy) GetUrl() string {
-	if x != nil {
-		return x.Url
-	}
-	return ""
-}
-
-func (x *Strategy) GetMaxTokens() int32 {
-	if x != nil {
-		return x.MaxTokens
-	}
-	return 0
-}
-
-func (x *Strategy) GetStream() bool {
-	if x != nil {
-		return x.Stream
-	}
-	return false
-}
-
-func (x *Strategy) GetTemperature() float32 {
-	if x != nil {
-		return x.Temperature
-	}
-	return 0
-}
-
-func (x *Strategy) GetTopP() float32 {
-	if x != nil {
-		return x.TopP
-	}
-	return 0
-}
-
-func (x *Strategy) GetN() int32 {
-	if x != nil {
-		return x.N
-	}
-	return 0
-}
-
-func (x *Strategy) GetPresencePenalty() float32 {
-	if x != nil {
-		return x.PresencePenalty
-	}
-	return 0
-}
-
-func (x *Strategy) GetFrequencyPenalty() float32 {
-	if x != nil {
-		return x.FrequencyPenalty
-	}
-	return 0
-}
-
-func (x *Strategy) GetRoute() string {
-	if x != nil {
-		return x.Route
-	}
-	return ""
-}
-
-func (x *Strategy) GetIsEnabled() int32 {
-	if x != nil {
-		return x.IsEnabled
-	}
-	return 0
-}
-
-type ListStrategiesRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// 页码，从 1 开始
-	Page int32 `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
-	// 每页条数
-	PageSize      int32 `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ListStrategiesRequest) Reset() {
-	*x = ListStrategiesRequest{}
-	mi := &file_mint_server_agent_agent_proto_msgTypes[11]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListStrategiesRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListStrategiesRequest) ProtoMessage() {}
-
-func (x *ListStrategiesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_mint_server_agent_agent_proto_msgTypes[11]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListStrategiesRequest.ProtoReflect.Descriptor instead.
-func (*ListStrategiesRequest) Descriptor() ([]byte, []int) {
-	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{11}
-}
-
-func (x *ListStrategiesRequest) GetPage() int32 {
-	if x != nil {
-		return x.Page
-	}
-	return 0
-}
-
-func (x *ListStrategiesRequest) GetPageSize() int32 {
-	if x != nil {
-		return x.PageSize
-	}
-	return 0
-}
-
-type ListStrategiesResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// 策略规则列表
-	Strategies []*Strategy `protobuf:"bytes,1,rep,name=strategies,proto3" json:"strategies,omitempty"`
-	// 总条数
-	Total         int64 `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ListStrategiesResponse) Reset() {
-	*x = ListStrategiesResponse{}
-	mi := &file_mint_server_agent_agent_proto_msgTypes[12]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListStrategiesResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListStrategiesResponse) ProtoMessage() {}
-
-func (x *ListStrategiesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_mint_server_agent_agent_proto_msgTypes[12]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListStrategiesResponse.ProtoReflect.Descriptor instead.
-func (*ListStrategiesResponse) Descriptor() ([]byte, []int) {
-	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{12}
-}
-
-func (x *ListStrategiesResponse) GetStrategies() []*Strategy {
-	if x != nil {
-		return x.Strategies
-	}
-	return nil
-}
-
-func (x *ListStrategiesResponse) GetTotal() int64 {
-	if x != nil {
-		return x.Total
-	}
-	return 0
-}
-
-type GetStrategyRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// 策略规则ID
-	RuleId        string `protobuf:"bytes,1,opt,name=rule_id,json=ruleId,proto3" json:"rule_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetStrategyRequest) Reset() {
-	*x = GetStrategyRequest{}
-	mi := &file_mint_server_agent_agent_proto_msgTypes[13]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetStrategyRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetStrategyRequest) ProtoMessage() {}
-
-func (x *GetStrategyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_mint_server_agent_agent_proto_msgTypes[13]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetStrategyRequest.ProtoReflect.Descriptor instead.
-func (*GetStrategyRequest) Descriptor() ([]byte, []int) {
-	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{13}
-}
-
-func (x *GetStrategyRequest) GetRuleId() string {
-	if x != nil {
-		return x.RuleId
-	}
-	return ""
-}
-
-type CreateStrategyRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// API密钥
-	ApiKey string `protobuf:"bytes,1,opt,name=api_key,json=apiKey,proto3" json:"api_key,omitempty"`
-	// 模型名称
-	AgentModel string `protobuf:"bytes,2,opt,name=agent_model,json=agentModel,proto3" json:"agent_model,omitempty"`
-	// 模型厂商
-	AgentManufacturer string `protobuf:"bytes,3,opt,name=agent_manufacturer,json=agentManufacturer,proto3" json:"agent_manufacturer,omitempty"`
-	// 生成类型
-	AgentGenerateType string `protobuf:"bytes,4,opt,name=agent_generate_type,json=agentGenerateType,proto3" json:"agent_generate_type,omitempty"`
-	// API 地址
-	Url string `protobuf:"bytes,5,opt,name=url,proto3" json:"url,omitempty"`
-	// 最大 token 数
-	MaxTokens int32 `protobuf:"varint,6,opt,name=max_tokens,json=maxTokens,proto3" json:"max_tokens,omitempty"`
-	// 是否启用流式
-	Stream bool `protobuf:"varint,7,opt,name=stream,proto3" json:"stream,omitempty"`
-	// 温度参数
-	Temperature float32 `protobuf:"fixed32,8,opt,name=temperature,proto3" json:"temperature,omitempty"`
-	// Top-P 采样参数
-	TopP float32 `protobuf:"fixed32,9,opt,name=top_p,json=topP,proto3" json:"top_p,omitempty"`
-	// 生成候选数
-	N int32 `protobuf:"varint,10,opt,name=n,proto3" json:"n,omitempty"`
-	// 存在惩罚系数
-	PresencePenalty float32 `protobuf:"fixed32,11,opt,name=presence_penalty,json=presencePenalty,proto3" json:"presence_penalty,omitempty"`
-	// 频率惩罚系数
-	FrequencyPenalty float32 `protobuf:"fixed32,12,opt,name=frequency_penalty,json=frequencyPenalty,proto3" json:"frequency_penalty,omitempty"`
-	// 路由标识
-	Route         string `protobuf:"bytes,13,opt,name=route,proto3" json:"route,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CreateStrategyRequest) Reset() {
-	*x = CreateStrategyRequest{}
-	mi := &file_mint_server_agent_agent_proto_msgTypes[14]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CreateStrategyRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CreateStrategyRequest) ProtoMessage() {}
-
-func (x *CreateStrategyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_mint_server_agent_agent_proto_msgTypes[14]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CreateStrategyRequest.ProtoReflect.Descriptor instead.
-func (*CreateStrategyRequest) Descriptor() ([]byte, []int) {
-	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{14}
-}
-
-func (x *CreateStrategyRequest) GetApiKey() string {
-	if x != nil {
-		return x.ApiKey
-	}
-	return ""
-}
-
-func (x *CreateStrategyRequest) GetAgentModel() string {
-	if x != nil {
-		return x.AgentModel
-	}
-	return ""
-}
-
-func (x *CreateStrategyRequest) GetAgentManufacturer() string {
-	if x != nil {
-		return x.AgentManufacturer
-	}
-	return ""
-}
-
-func (x *CreateStrategyRequest) GetAgentGenerateType() string {
-	if x != nil {
-		return x.AgentGenerateType
-	}
-	return ""
-}
-
-func (x *CreateStrategyRequest) GetUrl() string {
-	if x != nil {
-		return x.Url
-	}
-	return ""
-}
-
-func (x *CreateStrategyRequest) GetMaxTokens() int32 {
-	if x != nil {
-		return x.MaxTokens
-	}
-	return 0
-}
-
-func (x *CreateStrategyRequest) GetStream() bool {
-	if x != nil {
-		return x.Stream
-	}
-	return false
-}
-
-func (x *CreateStrategyRequest) GetTemperature() float32 {
-	if x != nil {
-		return x.Temperature
-	}
-	return 0
-}
-
-func (x *CreateStrategyRequest) GetTopP() float32 {
-	if x != nil {
-		return x.TopP
-	}
-	return 0
-}
-
-func (x *CreateStrategyRequest) GetN() int32 {
-	if x != nil {
-		return x.N
-	}
-	return 0
-}
-
-func (x *CreateStrategyRequest) GetPresencePenalty() float32 {
-	if x != nil {
-		return x.PresencePenalty
-	}
-	return 0
-}
-
-func (x *CreateStrategyRequest) GetFrequencyPenalty() float32 {
-	if x != nil {
-		return x.FrequencyPenalty
-	}
-	return 0
-}
-
-func (x *CreateStrategyRequest) GetRoute() string {
-	if x != nil {
-		return x.Route
-	}
-	return ""
-}
-
-type UpdateStrategyRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// 策略规则ID
-	RuleId string `protobuf:"bytes,1,opt,name=rule_id,json=ruleId,proto3" json:"rule_id,omitempty"`
-	// API密钥
-	ApiKey string `protobuf:"bytes,2,opt,name=api_key,json=apiKey,proto3" json:"api_key,omitempty"`
-	// 模型名称
-	AgentModel string `protobuf:"bytes,3,opt,name=agent_model,json=agentModel,proto3" json:"agent_model,omitempty"`
-	// 模型厂商
-	AgentManufacturer string `protobuf:"bytes,4,opt,name=agent_manufacturer,json=agentManufacturer,proto3" json:"agent_manufacturer,omitempty"`
-	// 生成类型
-	AgentGenerateType string `protobuf:"bytes,5,opt,name=agent_generate_type,json=agentGenerateType,proto3" json:"agent_generate_type,omitempty"`
-	// API 地址
-	Url string `protobuf:"bytes,6,opt,name=url,proto3" json:"url,omitempty"`
-	// 最大 token 数
-	MaxTokens int32 `protobuf:"varint,7,opt,name=max_tokens,json=maxTokens,proto3" json:"max_tokens,omitempty"`
-	// 是否启用流式
-	Stream bool `protobuf:"varint,8,opt,name=stream,proto3" json:"stream,omitempty"`
-	// 温度参数
-	Temperature float32 `protobuf:"fixed32,9,opt,name=temperature,proto3" json:"temperature,omitempty"`
-	// Top-P 采样参数
-	TopP float32 `protobuf:"fixed32,10,opt,name=top_p,json=topP,proto3" json:"top_p,omitempty"`
-	// 生成候选数
-	N int32 `protobuf:"varint,11,opt,name=n,proto3" json:"n,omitempty"`
-	// 存在惩罚系数
-	PresencePenalty float32 `protobuf:"fixed32,12,opt,name=presence_penalty,json=presencePenalty,proto3" json:"presence_penalty,omitempty"`
-	// 频率惩罚系数
-	FrequencyPenalty float32 `protobuf:"fixed32,13,opt,name=frequency_penalty,json=frequencyPenalty,proto3" json:"frequency_penalty,omitempty"`
-	// 路由标识
-	Route string `protobuf:"bytes,14,opt,name=route,proto3" json:"route,omitempty"`
-	// 是否启用：0-禁用，1-启用
-	IsEnabled     int32 `protobuf:"varint,15,opt,name=is_enabled,json=isEnabled,proto3" json:"is_enabled,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UpdateStrategyRequest) Reset() {
-	*x = UpdateStrategyRequest{}
-	mi := &file_mint_server_agent_agent_proto_msgTypes[15]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UpdateStrategyRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UpdateStrategyRequest) ProtoMessage() {}
-
-func (x *UpdateStrategyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_mint_server_agent_agent_proto_msgTypes[15]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpdateStrategyRequest.ProtoReflect.Descriptor instead.
-func (*UpdateStrategyRequest) Descriptor() ([]byte, []int) {
-	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{15}
-}
-
-func (x *UpdateStrategyRequest) GetRuleId() string {
-	if x != nil {
-		return x.RuleId
-	}
-	return ""
-}
-
-func (x *UpdateStrategyRequest) GetApiKey() string {
-	if x != nil {
-		return x.ApiKey
-	}
-	return ""
-}
-
-func (x *UpdateStrategyRequest) GetAgentModel() string {
-	if x != nil {
-		return x.AgentModel
-	}
-	return ""
-}
-
-func (x *UpdateStrategyRequest) GetAgentManufacturer() string {
-	if x != nil {
-		return x.AgentManufacturer
-	}
-	return ""
-}
-
-func (x *UpdateStrategyRequest) GetAgentGenerateType() string {
-	if x != nil {
-		return x.AgentGenerateType
-	}
-	return ""
-}
-
-func (x *UpdateStrategyRequest) GetUrl() string {
-	if x != nil {
-		return x.Url
-	}
-	return ""
-}
-
-func (x *UpdateStrategyRequest) GetMaxTokens() int32 {
-	if x != nil {
-		return x.MaxTokens
-	}
-	return 0
-}
-
-func (x *UpdateStrategyRequest) GetStream() bool {
-	if x != nil {
-		return x.Stream
-	}
-	return false
-}
-
-func (x *UpdateStrategyRequest) GetTemperature() float32 {
-	if x != nil {
-		return x.Temperature
-	}
-	return 0
-}
-
-func (x *UpdateStrategyRequest) GetTopP() float32 {
-	if x != nil {
-		return x.TopP
-	}
-	return 0
-}
-
-func (x *UpdateStrategyRequest) GetN() int32 {
-	if x != nil {
-		return x.N
-	}
-	return 0
-}
-
-func (x *UpdateStrategyRequest) GetPresencePenalty() float32 {
-	if x != nil {
-		return x.PresencePenalty
-	}
-	return 0
-}
-
-func (x *UpdateStrategyRequest) GetFrequencyPenalty() float32 {
-	if x != nil {
-		return x.FrequencyPenalty
-	}
-	return 0
-}
-
-func (x *UpdateStrategyRequest) GetRoute() string {
-	if x != nil {
-		return x.Route
-	}
-	return ""
-}
-
-func (x *UpdateStrategyRequest) GetIsEnabled() int32 {
-	if x != nil {
-		return x.IsEnabled
-	}
-	return 0
-}
-
-type DeleteStrategyRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// 策略规则ID
-	RuleId        string `protobuf:"bytes,1,opt,name=rule_id,json=ruleId,proto3" json:"rule_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *DeleteStrategyRequest) Reset() {
-	*x = DeleteStrategyRequest{}
-	mi := &file_mint_server_agent_agent_proto_msgTypes[16]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *DeleteStrategyRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DeleteStrategyRequest) ProtoMessage() {}
-
-func (x *DeleteStrategyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_mint_server_agent_agent_proto_msgTypes[16]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DeleteStrategyRequest.ProtoReflect.Descriptor instead.
-func (*DeleteStrategyRequest) Descriptor() ([]byte, []int) {
-	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{16}
-}
-
-func (x *DeleteStrategyRequest) GetRuleId() string {
-	if x != nil {
-		return x.RuleId
-	}
-	return ""
-}
-
-type ModelMapping struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// 自增主键
-	Id int32 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	// 模型类型标识
-	ModelType string `protobuf:"bytes,2,opt,name=model_type,json=modelType,proto3" json:"model_type,omitempty"`
-	// 厂商名称
-	Manufacturer string `protobuf:"bytes,3,opt,name=manufacturer,proto3" json:"manufacturer,omitempty"`
-	// 模型描述
-	Description   string `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ModelMapping) Reset() {
-	*x = ModelMapping{}
-	mi := &file_mint_server_agent_agent_proto_msgTypes[17]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ModelMapping) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ModelMapping) ProtoMessage() {}
-
-func (x *ModelMapping) ProtoReflect() protoreflect.Message {
-	mi := &file_mint_server_agent_agent_proto_msgTypes[17]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ModelMapping.ProtoReflect.Descriptor instead.
-func (*ModelMapping) Descriptor() ([]byte, []int) {
-	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{17}
-}
-
-func (x *ModelMapping) GetId() int32 {
-	if x != nil {
-		return x.Id
-	}
-	return 0
-}
-
-func (x *ModelMapping) GetModelType() string {
-	if x != nil {
-		return x.ModelType
-	}
-	return ""
-}
-
-func (x *ModelMapping) GetManufacturer() string {
-	if x != nil {
-		return x.Manufacturer
-	}
-	return ""
-}
-
-func (x *ModelMapping) GetDescription() string {
-	if x != nil {
-		return x.Description
-	}
-	return ""
-}
-
-type ListMappingsRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// 厂商过滤条件，为空时返回全部
-	Manufacturer  string `protobuf:"bytes,1,opt,name=manufacturer,proto3" json:"manufacturer,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ListMappingsRequest) Reset() {
-	*x = ListMappingsRequest{}
-	mi := &file_mint_server_agent_agent_proto_msgTypes[18]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListMappingsRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListMappingsRequest) ProtoMessage() {}
-
-func (x *ListMappingsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_mint_server_agent_agent_proto_msgTypes[18]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListMappingsRequest.ProtoReflect.Descriptor instead.
-func (*ListMappingsRequest) Descriptor() ([]byte, []int) {
-	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{18}
-}
-
-func (x *ListMappingsRequest) GetManufacturer() string {
-	if x != nil {
-		return x.Manufacturer
-	}
-	return ""
-}
-
-type ListMappingsResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// 模型映射列表
-	Mappings      []*ModelMapping `protobuf:"bytes,1,rep,name=mappings,proto3" json:"mappings,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ListMappingsResponse) Reset() {
-	*x = ListMappingsResponse{}
-	mi := &file_mint_server_agent_agent_proto_msgTypes[19]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListMappingsResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListMappingsResponse) ProtoMessage() {}
-
-func (x *ListMappingsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_mint_server_agent_agent_proto_msgTypes[19]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListMappingsResponse.ProtoReflect.Descriptor instead.
-func (*ListMappingsResponse) Descriptor() ([]byte, []int) {
-	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{19}
-}
-
-func (x *ListMappingsResponse) GetMappings() []*ModelMapping {
-	if x != nil {
-		return x.Mappings
-	}
-	return nil
-}
-
-type GetMappingRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// 映射ID
-	Id            int32 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetMappingRequest) Reset() {
-	*x = GetMappingRequest{}
-	mi := &file_mint_server_agent_agent_proto_msgTypes[20]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetMappingRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetMappingRequest) ProtoMessage() {}
-
-func (x *GetMappingRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_mint_server_agent_agent_proto_msgTypes[20]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetMappingRequest.ProtoReflect.Descriptor instead.
-func (*GetMappingRequest) Descriptor() ([]byte, []int) {
-	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{20}
-}
-
-func (x *GetMappingRequest) GetId() int32 {
-	if x != nil {
-		return x.Id
-	}
-	return 0
-}
-
-type CreateMappingRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// 模型类型标识
-	ModelType string `protobuf:"bytes,1,opt,name=model_type,json=modelType,proto3" json:"model_type,omitempty"`
-	// 厂商名称
-	Manufacturer string `protobuf:"bytes,2,opt,name=manufacturer,proto3" json:"manufacturer,omitempty"`
-	// 模型描述
-	Description   string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CreateMappingRequest) Reset() {
-	*x = CreateMappingRequest{}
-	mi := &file_mint_server_agent_agent_proto_msgTypes[21]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CreateMappingRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CreateMappingRequest) ProtoMessage() {}
-
-func (x *CreateMappingRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_mint_server_agent_agent_proto_msgTypes[21]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CreateMappingRequest.ProtoReflect.Descriptor instead.
-func (*CreateMappingRequest) Descriptor() ([]byte, []int) {
-	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{21}
-}
-
-func (x *CreateMappingRequest) GetModelType() string {
-	if x != nil {
-		return x.ModelType
-	}
-	return ""
-}
-
-func (x *CreateMappingRequest) GetManufacturer() string {
-	if x != nil {
-		return x.Manufacturer
-	}
-	return ""
-}
-
-func (x *CreateMappingRequest) GetDescription() string {
-	if x != nil {
-		return x.Description
-	}
-	return ""
-}
-
-type UpdateMappingRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// 映射ID
-	Id int32 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	// 模型类型标识
-	ModelType string `protobuf:"bytes,2,opt,name=model_type,json=modelType,proto3" json:"model_type,omitempty"`
-	// 厂商名称
-	Manufacturer string `protobuf:"bytes,3,opt,name=manufacturer,proto3" json:"manufacturer,omitempty"`
-	// 模型描述
-	Description   string `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UpdateMappingRequest) Reset() {
-	*x = UpdateMappingRequest{}
-	mi := &file_mint_server_agent_agent_proto_msgTypes[22]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UpdateMappingRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UpdateMappingRequest) ProtoMessage() {}
-
-func (x *UpdateMappingRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_mint_server_agent_agent_proto_msgTypes[22]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpdateMappingRequest.ProtoReflect.Descriptor instead.
-func (*UpdateMappingRequest) Descriptor() ([]byte, []int) {
-	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{22}
-}
-
-func (x *UpdateMappingRequest) GetId() int32 {
-	if x != nil {
-		return x.Id
-	}
-	return 0
-}
-
-func (x *UpdateMappingRequest) GetModelType() string {
-	if x != nil {
-		return x.ModelType
-	}
-	return ""
-}
-
-func (x *UpdateMappingRequest) GetManufacturer() string {
-	if x != nil {
-		return x.Manufacturer
-	}
-	return ""
-}
-
-func (x *UpdateMappingRequest) GetDescription() string {
-	if x != nil {
-		return x.Description
-	}
-	return ""
-}
-
-type DeleteMappingRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// 映射ID
-	Id            int32 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *DeleteMappingRequest) Reset() {
-	*x = DeleteMappingRequest{}
-	mi := &file_mint_server_agent_agent_proto_msgTypes[23]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *DeleteMappingRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DeleteMappingRequest) ProtoMessage() {}
-
-func (x *DeleteMappingRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_mint_server_agent_agent_proto_msgTypes[23]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DeleteMappingRequest.ProtoReflect.Descriptor instead.
-func (*DeleteMappingRequest) Descriptor() ([]byte, []int) {
-	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{23}
-}
-
-func (x *DeleteMappingRequest) GetId() int32 {
-	if x != nil {
-		return x.Id
+		return x.OutputCost
 	}
 	return 0
 }
 
 type ListDialoguesRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// 用户ID，为空时返回全部
-	UserId        string `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ListDialoguesRequest) Reset() {
 	*x = ListDialoguesRequest{}
-	mi := &file_mint_server_agent_agent_proto_msgTypes[24]
+	mi := &file_mint_server_agent_agent_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1800,7 +820,7 @@ func (x *ListDialoguesRequest) String() string {
 func (*ListDialoguesRequest) ProtoMessage() {}
 
 func (x *ListDialoguesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_mint_server_agent_agent_proto_msgTypes[24]
+	mi := &file_mint_server_agent_agent_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1813,7 +833,7 @@ func (x *ListDialoguesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListDialoguesRequest.ProtoReflect.Descriptor instead.
 func (*ListDialoguesRequest) Descriptor() ([]byte, []int) {
-	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{24}
+	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *ListDialoguesRequest) GetUserId() string {
@@ -1824,22 +844,18 @@ func (x *ListDialoguesRequest) GetUserId() string {
 }
 
 type DialogueSummary struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// 对话ID
-	DialogueId string `protobuf:"bytes,1,opt,name=dialogue_id,json=dialogueId,proto3" json:"dialogue_id,omitempty"`
-	// 对话标题（首条用户消息）
-	Title string `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
-	// 消息数量
-	MessageCount int32 `protobuf:"varint,3,opt,name=message_count,json=messageCount,proto3" json:"message_count,omitempty"`
-	// 最后更新时间
-	UpdatedTime   string `protobuf:"bytes,4,opt,name=updated_time,json=updatedTime,proto3" json:"updated_time,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	DialogueId    string                 `protobuf:"bytes,1,opt,name=dialogue_id,json=dialogueId,proto3" json:"dialogue_id,omitempty"`
+	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	MessageCount  int32                  `protobuf:"varint,3,opt,name=message_count,json=messageCount,proto3" json:"message_count,omitempty"`
+	UpdatedTime   string                 `protobuf:"bytes,4,opt,name=updated_time,json=updatedTime,proto3" json:"updated_time,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *DialogueSummary) Reset() {
 	*x = DialogueSummary{}
-	mi := &file_mint_server_agent_agent_proto_msgTypes[25]
+	mi := &file_mint_server_agent_agent_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1851,7 +867,7 @@ func (x *DialogueSummary) String() string {
 func (*DialogueSummary) ProtoMessage() {}
 
 func (x *DialogueSummary) ProtoReflect() protoreflect.Message {
-	mi := &file_mint_server_agent_agent_proto_msgTypes[25]
+	mi := &file_mint_server_agent_agent_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1864,7 +880,7 @@ func (x *DialogueSummary) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DialogueSummary.ProtoReflect.Descriptor instead.
 func (*DialogueSummary) Descriptor() ([]byte, []int) {
-	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{25}
+	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *DialogueSummary) GetDialogueId() string {
@@ -1896,16 +912,17 @@ func (x *DialogueSummary) GetUpdatedTime() string {
 }
 
 type ListDialoguesResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// 对话摘要列表
-	Dialogues     []*DialogueSummary `protobuf:"bytes,1,rep,name=dialogues,proto3" json:"dialogues,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Dialogues     []*DialogueSummary     `protobuf:"bytes,3,rep,name=dialogues,proto3" json:"dialogues,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ListDialoguesResponse) Reset() {
 	*x = ListDialoguesResponse{}
-	mi := &file_mint_server_agent_agent_proto_msgTypes[26]
+	mi := &file_mint_server_agent_agent_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1917,7 +934,7 @@ func (x *ListDialoguesResponse) String() string {
 func (*ListDialoguesResponse) ProtoMessage() {}
 
 func (x *ListDialoguesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_mint_server_agent_agent_proto_msgTypes[26]
+	mi := &file_mint_server_agent_agent_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1930,7 +947,21 @@ func (x *ListDialoguesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListDialoguesResponse.ProtoReflect.Descriptor instead.
 func (*ListDialoguesResponse) Descriptor() ([]byte, []int) {
-	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{26}
+	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *ListDialoguesResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *ListDialoguesResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
 }
 
 func (x *ListDialoguesResponse) GetDialogues() []*DialogueSummary {
@@ -1940,11 +971,947 @@ func (x *ListDialoguesResponse) GetDialogues() []*DialogueSummary {
 	return nil
 }
 
+type ModelConfig struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Id                int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	ModelType         string                 `protobuf:"bytes,2,opt,name=model_type,json=modelType,proto3" json:"model_type,omitempty"`
+	Manufacturer      string                 `protobuf:"bytes,3,opt,name=manufacturer,proto3" json:"manufacturer,omitempty"`
+	Description       string                 `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
+	InputPrice        float64                `protobuf:"fixed64,5,opt,name=input_price,json=inputPrice,proto3" json:"input_price,omitempty"`
+	OutputPrice       float64                `protobuf:"fixed64,6,opt,name=output_price,json=outputPrice,proto3" json:"output_price,omitempty"`
+	ApiKey            string                 `protobuf:"bytes,7,opt,name=api_key,json=apiKey,proto3" json:"api_key,omitempty"`
+	Url               string                 `protobuf:"bytes,8,opt,name=url,proto3" json:"url,omitempty"`
+	MaxTokens         int32                  `protobuf:"varint,9,opt,name=max_tokens,json=maxTokens,proto3" json:"max_tokens,omitempty"`
+	Stream            bool                   `protobuf:"varint,10,opt,name=stream,proto3" json:"stream,omitempty"`
+	Temperature       float32                `protobuf:"fixed32,11,opt,name=temperature,proto3" json:"temperature,omitempty"`
+	TopP              float32                `protobuf:"fixed32,12,opt,name=top_p,json=topP,proto3" json:"top_p,omitempty"`
+	N                 int32                  `protobuf:"varint,13,opt,name=n,proto3" json:"n,omitempty"`
+	PresencePenalty   float32                `protobuf:"fixed32,14,opt,name=presence_penalty,json=presencePenalty,proto3" json:"presence_penalty,omitempty"`
+	FrequencyPenalty  float32                `protobuf:"fixed32,15,opt,name=frequency_penalty,json=frequencyPenalty,proto3" json:"frequency_penalty,omitempty"`
+	AgentGenerateType string                 `protobuf:"bytes,16,opt,name=agent_generate_type,json=agentGenerateType,proto3" json:"agent_generate_type,omitempty"`
+	Route             string                 `protobuf:"bytes,17,opt,name=route,proto3" json:"route,omitempty"`
+	IsEnabled         int32                  `protobuf:"varint,18,opt,name=is_enabled,json=isEnabled,proto3" json:"is_enabled,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *ModelConfig) Reset() {
+	*x = ModelConfig{}
+	mi := &file_mint_server_agent_agent_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ModelConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ModelConfig) ProtoMessage() {}
+
+func (x *ModelConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_mint_server_agent_agent_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ModelConfig.ProtoReflect.Descriptor instead.
+func (*ModelConfig) Descriptor() ([]byte, []int) {
+	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *ModelConfig) GetId() int32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *ModelConfig) GetModelType() string {
+	if x != nil {
+		return x.ModelType
+	}
+	return ""
+}
+
+func (x *ModelConfig) GetManufacturer() string {
+	if x != nil {
+		return x.Manufacturer
+	}
+	return ""
+}
+
+func (x *ModelConfig) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *ModelConfig) GetInputPrice() float64 {
+	if x != nil {
+		return x.InputPrice
+	}
+	return 0
+}
+
+func (x *ModelConfig) GetOutputPrice() float64 {
+	if x != nil {
+		return x.OutputPrice
+	}
+	return 0
+}
+
+func (x *ModelConfig) GetApiKey() string {
+	if x != nil {
+		return x.ApiKey
+	}
+	return ""
+}
+
+func (x *ModelConfig) GetUrl() string {
+	if x != nil {
+		return x.Url
+	}
+	return ""
+}
+
+func (x *ModelConfig) GetMaxTokens() int32 {
+	if x != nil {
+		return x.MaxTokens
+	}
+	return 0
+}
+
+func (x *ModelConfig) GetStream() bool {
+	if x != nil {
+		return x.Stream
+	}
+	return false
+}
+
+func (x *ModelConfig) GetTemperature() float32 {
+	if x != nil {
+		return x.Temperature
+	}
+	return 0
+}
+
+func (x *ModelConfig) GetTopP() float32 {
+	if x != nil {
+		return x.TopP
+	}
+	return 0
+}
+
+func (x *ModelConfig) GetN() int32 {
+	if x != nil {
+		return x.N
+	}
+	return 0
+}
+
+func (x *ModelConfig) GetPresencePenalty() float32 {
+	if x != nil {
+		return x.PresencePenalty
+	}
+	return 0
+}
+
+func (x *ModelConfig) GetFrequencyPenalty() float32 {
+	if x != nil {
+		return x.FrequencyPenalty
+	}
+	return 0
+}
+
+func (x *ModelConfig) GetAgentGenerateType() string {
+	if x != nil {
+		return x.AgentGenerateType
+	}
+	return ""
+}
+
+func (x *ModelConfig) GetRoute() string {
+	if x != nil {
+		return x.Route
+	}
+	return ""
+}
+
+func (x *ModelConfig) GetIsEnabled() int32 {
+	if x != nil {
+		return x.IsEnabled
+	}
+	return 0
+}
+
+type ConfigReply struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Config        *ModelConfig           `protobuf:"bytes,3,opt,name=config,proto3" json:"config,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConfigReply) Reset() {
+	*x = ConfigReply{}
+	mi := &file_mint_server_agent_agent_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConfigReply) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConfigReply) ProtoMessage() {}
+
+func (x *ConfigReply) ProtoReflect() protoreflect.Message {
+	mi := &file_mint_server_agent_agent_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConfigReply.ProtoReflect.Descriptor instead.
+func (*ConfigReply) Descriptor() ([]byte, []int) {
+	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *ConfigReply) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *ConfigReply) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *ConfigReply) GetConfig() *ModelConfig {
+	if x != nil {
+		return x.Config
+	}
+	return nil
+}
+
+type ListConfigsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Page          int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
+	PageSize      int32                  `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListConfigsRequest) Reset() {
+	*x = ListConfigsRequest{}
+	mi := &file_mint_server_agent_agent_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListConfigsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListConfigsRequest) ProtoMessage() {}
+
+func (x *ListConfigsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_mint_server_agent_agent_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListConfigsRequest.ProtoReflect.Descriptor instead.
+func (*ListConfigsRequest) Descriptor() ([]byte, []int) {
+	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *ListConfigsRequest) GetPage() int32 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *ListConfigsRequest) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+type ListConfigsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Configs       []*ModelConfig         `protobuf:"bytes,3,rep,name=configs,proto3" json:"configs,omitempty"`
+	Total         int64                  `protobuf:"varint,4,opt,name=total,proto3" json:"total,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListConfigsResponse) Reset() {
+	*x = ListConfigsResponse{}
+	mi := &file_mint_server_agent_agent_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListConfigsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListConfigsResponse) ProtoMessage() {}
+
+func (x *ListConfigsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_mint_server_agent_agent_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListConfigsResponse.ProtoReflect.Descriptor instead.
+func (*ListConfigsResponse) Descriptor() ([]byte, []int) {
+	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *ListConfigsResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *ListConfigsResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *ListConfigsResponse) GetConfigs() []*ModelConfig {
+	if x != nil {
+		return x.Configs
+	}
+	return nil
+}
+
+func (x *ListConfigsResponse) GetTotal() int64 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+type GetConfigRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetConfigRequest) Reset() {
+	*x = GetConfigRequest{}
+	mi := &file_mint_server_agent_agent_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetConfigRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetConfigRequest) ProtoMessage() {}
+
+func (x *GetConfigRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_mint_server_agent_agent_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetConfigRequest.ProtoReflect.Descriptor instead.
+func (*GetConfigRequest) Descriptor() ([]byte, []int) {
+	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *GetConfigRequest) GetId() int32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+type CreateConfigRequest struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	ModelType         string                 `protobuf:"bytes,1,opt,name=model_type,json=modelType,proto3" json:"model_type,omitempty"`
+	Manufacturer      string                 `protobuf:"bytes,2,opt,name=manufacturer,proto3" json:"manufacturer,omitempty"`
+	Description       string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	InputPrice        float64                `protobuf:"fixed64,4,opt,name=input_price,json=inputPrice,proto3" json:"input_price,omitempty"`
+	OutputPrice       float64                `protobuf:"fixed64,5,opt,name=output_price,json=outputPrice,proto3" json:"output_price,omitempty"`
+	ApiKey            string                 `protobuf:"bytes,6,opt,name=api_key,json=apiKey,proto3" json:"api_key,omitempty"`
+	Url               string                 `protobuf:"bytes,7,opt,name=url,proto3" json:"url,omitempty"`
+	MaxTokens         int32                  `protobuf:"varint,8,opt,name=max_tokens,json=maxTokens,proto3" json:"max_tokens,omitempty"`
+	Stream            bool                   `protobuf:"varint,9,opt,name=stream,proto3" json:"stream,omitempty"`
+	Temperature       float32                `protobuf:"fixed32,10,opt,name=temperature,proto3" json:"temperature,omitempty"`
+	TopP              float32                `protobuf:"fixed32,11,opt,name=top_p,json=topP,proto3" json:"top_p,omitempty"`
+	N                 int32                  `protobuf:"varint,12,opt,name=n,proto3" json:"n,omitempty"`
+	PresencePenalty   float32                `protobuf:"fixed32,13,opt,name=presence_penalty,json=presencePenalty,proto3" json:"presence_penalty,omitempty"`
+	FrequencyPenalty  float32                `protobuf:"fixed32,14,opt,name=frequency_penalty,json=frequencyPenalty,proto3" json:"frequency_penalty,omitempty"`
+	AgentGenerateType string                 `protobuf:"bytes,15,opt,name=agent_generate_type,json=agentGenerateType,proto3" json:"agent_generate_type,omitempty"`
+	Route             string                 `protobuf:"bytes,16,opt,name=route,proto3" json:"route,omitempty"`
+	IsEnabled         int32                  `protobuf:"varint,17,opt,name=is_enabled,json=isEnabled,proto3" json:"is_enabled,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *CreateConfigRequest) Reset() {
+	*x = CreateConfigRequest{}
+	mi := &file_mint_server_agent_agent_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateConfigRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateConfigRequest) ProtoMessage() {}
+
+func (x *CreateConfigRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_mint_server_agent_agent_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateConfigRequest.ProtoReflect.Descriptor instead.
+func (*CreateConfigRequest) Descriptor() ([]byte, []int) {
+	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *CreateConfigRequest) GetModelType() string {
+	if x != nil {
+		return x.ModelType
+	}
+	return ""
+}
+
+func (x *CreateConfigRequest) GetManufacturer() string {
+	if x != nil {
+		return x.Manufacturer
+	}
+	return ""
+}
+
+func (x *CreateConfigRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *CreateConfigRequest) GetInputPrice() float64 {
+	if x != nil {
+		return x.InputPrice
+	}
+	return 0
+}
+
+func (x *CreateConfigRequest) GetOutputPrice() float64 {
+	if x != nil {
+		return x.OutputPrice
+	}
+	return 0
+}
+
+func (x *CreateConfigRequest) GetApiKey() string {
+	if x != nil {
+		return x.ApiKey
+	}
+	return ""
+}
+
+func (x *CreateConfigRequest) GetUrl() string {
+	if x != nil {
+		return x.Url
+	}
+	return ""
+}
+
+func (x *CreateConfigRequest) GetMaxTokens() int32 {
+	if x != nil {
+		return x.MaxTokens
+	}
+	return 0
+}
+
+func (x *CreateConfigRequest) GetStream() bool {
+	if x != nil {
+		return x.Stream
+	}
+	return false
+}
+
+func (x *CreateConfigRequest) GetTemperature() float32 {
+	if x != nil {
+		return x.Temperature
+	}
+	return 0
+}
+
+func (x *CreateConfigRequest) GetTopP() float32 {
+	if x != nil {
+		return x.TopP
+	}
+	return 0
+}
+
+func (x *CreateConfigRequest) GetN() int32 {
+	if x != nil {
+		return x.N
+	}
+	return 0
+}
+
+func (x *CreateConfigRequest) GetPresencePenalty() float32 {
+	if x != nil {
+		return x.PresencePenalty
+	}
+	return 0
+}
+
+func (x *CreateConfigRequest) GetFrequencyPenalty() float32 {
+	if x != nil {
+		return x.FrequencyPenalty
+	}
+	return 0
+}
+
+func (x *CreateConfigRequest) GetAgentGenerateType() string {
+	if x != nil {
+		return x.AgentGenerateType
+	}
+	return ""
+}
+
+func (x *CreateConfigRequest) GetRoute() string {
+	if x != nil {
+		return x.Route
+	}
+	return ""
+}
+
+func (x *CreateConfigRequest) GetIsEnabled() int32 {
+	if x != nil {
+		return x.IsEnabled
+	}
+	return 0
+}
+
+type UpdateConfigRequest struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Id                int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	ModelType         string                 `protobuf:"bytes,2,opt,name=model_type,json=modelType,proto3" json:"model_type,omitempty"`
+	Manufacturer      string                 `protobuf:"bytes,3,opt,name=manufacturer,proto3" json:"manufacturer,omitempty"`
+	Description       string                 `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
+	InputPrice        float64                `protobuf:"fixed64,5,opt,name=input_price,json=inputPrice,proto3" json:"input_price,omitempty"`
+	OutputPrice       float64                `protobuf:"fixed64,6,opt,name=output_price,json=outputPrice,proto3" json:"output_price,omitempty"`
+	ApiKey            string                 `protobuf:"bytes,7,opt,name=api_key,json=apiKey,proto3" json:"api_key,omitempty"`
+	Url               string                 `protobuf:"bytes,8,opt,name=url,proto3" json:"url,omitempty"`
+	MaxTokens         int32                  `protobuf:"varint,9,opt,name=max_tokens,json=maxTokens,proto3" json:"max_tokens,omitempty"`
+	Stream            bool                   `protobuf:"varint,10,opt,name=stream,proto3" json:"stream,omitempty"`
+	Temperature       float32                `protobuf:"fixed32,11,opt,name=temperature,proto3" json:"temperature,omitempty"`
+	TopP              float32                `protobuf:"fixed32,12,opt,name=top_p,json=topP,proto3" json:"top_p,omitempty"`
+	N                 int32                  `protobuf:"varint,13,opt,name=n,proto3" json:"n,omitempty"`
+	PresencePenalty   float32                `protobuf:"fixed32,14,opt,name=presence_penalty,json=presencePenalty,proto3" json:"presence_penalty,omitempty"`
+	FrequencyPenalty  float32                `protobuf:"fixed32,15,opt,name=frequency_penalty,json=frequencyPenalty,proto3" json:"frequency_penalty,omitempty"`
+	AgentGenerateType string                 `protobuf:"bytes,16,opt,name=agent_generate_type,json=agentGenerateType,proto3" json:"agent_generate_type,omitempty"`
+	Route             string                 `protobuf:"bytes,17,opt,name=route,proto3" json:"route,omitempty"`
+	IsEnabled         int32                  `protobuf:"varint,18,opt,name=is_enabled,json=isEnabled,proto3" json:"is_enabled,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *UpdateConfigRequest) Reset() {
+	*x = UpdateConfigRequest{}
+	mi := &file_mint_server_agent_agent_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateConfigRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateConfigRequest) ProtoMessage() {}
+
+func (x *UpdateConfigRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_mint_server_agent_agent_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateConfigRequest.ProtoReflect.Descriptor instead.
+func (*UpdateConfigRequest) Descriptor() ([]byte, []int) {
+	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *UpdateConfigRequest) GetId() int32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *UpdateConfigRequest) GetModelType() string {
+	if x != nil {
+		return x.ModelType
+	}
+	return ""
+}
+
+func (x *UpdateConfigRequest) GetManufacturer() string {
+	if x != nil {
+		return x.Manufacturer
+	}
+	return ""
+}
+
+func (x *UpdateConfigRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *UpdateConfigRequest) GetInputPrice() float64 {
+	if x != nil {
+		return x.InputPrice
+	}
+	return 0
+}
+
+func (x *UpdateConfigRequest) GetOutputPrice() float64 {
+	if x != nil {
+		return x.OutputPrice
+	}
+	return 0
+}
+
+func (x *UpdateConfigRequest) GetApiKey() string {
+	if x != nil {
+		return x.ApiKey
+	}
+	return ""
+}
+
+func (x *UpdateConfigRequest) GetUrl() string {
+	if x != nil {
+		return x.Url
+	}
+	return ""
+}
+
+func (x *UpdateConfigRequest) GetMaxTokens() int32 {
+	if x != nil {
+		return x.MaxTokens
+	}
+	return 0
+}
+
+func (x *UpdateConfigRequest) GetStream() bool {
+	if x != nil {
+		return x.Stream
+	}
+	return false
+}
+
+func (x *UpdateConfigRequest) GetTemperature() float32 {
+	if x != nil {
+		return x.Temperature
+	}
+	return 0
+}
+
+func (x *UpdateConfigRequest) GetTopP() float32 {
+	if x != nil {
+		return x.TopP
+	}
+	return 0
+}
+
+func (x *UpdateConfigRequest) GetN() int32 {
+	if x != nil {
+		return x.N
+	}
+	return 0
+}
+
+func (x *UpdateConfigRequest) GetPresencePenalty() float32 {
+	if x != nil {
+		return x.PresencePenalty
+	}
+	return 0
+}
+
+func (x *UpdateConfigRequest) GetFrequencyPenalty() float32 {
+	if x != nil {
+		return x.FrequencyPenalty
+	}
+	return 0
+}
+
+func (x *UpdateConfigRequest) GetAgentGenerateType() string {
+	if x != nil {
+		return x.AgentGenerateType
+	}
+	return ""
+}
+
+func (x *UpdateConfigRequest) GetRoute() string {
+	if x != nil {
+		return x.Route
+	}
+	return ""
+}
+
+func (x *UpdateConfigRequest) GetIsEnabled() int32 {
+	if x != nil {
+		return x.IsEnabled
+	}
+	return 0
+}
+
+type DeleteConfigRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteConfigRequest) Reset() {
+	*x = DeleteConfigRequest{}
+	mi := &file_mint_server_agent_agent_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteConfigRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteConfigRequest) ProtoMessage() {}
+
+func (x *DeleteConfigRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_mint_server_agent_agent_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteConfigRequest.ProtoReflect.Descriptor instead.
+func (*DeleteConfigRequest) Descriptor() ([]byte, []int) {
+	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *DeleteConfigRequest) GetId() int32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+type ModelStatsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          int32                  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Stats         []*ModelStat           `protobuf:"bytes,3,rep,name=stats,proto3" json:"stats,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ModelStatsResponse) Reset() {
+	*x = ModelStatsResponse{}
+	mi := &file_mint_server_agent_agent_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ModelStatsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ModelStatsResponse) ProtoMessage() {}
+
+func (x *ModelStatsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_mint_server_agent_agent_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ModelStatsResponse.ProtoReflect.Descriptor instead.
+func (*ModelStatsResponse) Descriptor() ([]byte, []int) {
+	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *ModelStatsResponse) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *ModelStatsResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *ModelStatsResponse) GetStats() []*ModelStat {
+	if x != nil {
+		return x.Stats
+	}
+	return nil
+}
+
+type ModelStat struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Model             string                 `protobuf:"bytes,1,opt,name=model,proto3" json:"model,omitempty"`
+	TotalInputTokens  int64                  `protobuf:"varint,2,opt,name=total_input_tokens,json=totalInputTokens,proto3" json:"total_input_tokens,omitempty"`
+	TotalOutputTokens int64                  `protobuf:"varint,3,opt,name=total_output_tokens,json=totalOutputTokens,proto3" json:"total_output_tokens,omitempty"`
+	TotalInputCost    float64                `protobuf:"fixed64,4,opt,name=total_input_cost,json=totalInputCost,proto3" json:"total_input_cost,omitempty"`
+	TotalOutputCost   float64                `protobuf:"fixed64,5,opt,name=total_output_cost,json=totalOutputCost,proto3" json:"total_output_cost,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *ModelStat) Reset() {
+	*x = ModelStat{}
+	mi := &file_mint_server_agent_agent_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ModelStat) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ModelStat) ProtoMessage() {}
+
+func (x *ModelStat) ProtoReflect() protoreflect.Message {
+	mi := &file_mint_server_agent_agent_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ModelStat.ProtoReflect.Descriptor instead.
+func (*ModelStat) Descriptor() ([]byte, []int) {
+	return file_mint_server_agent_agent_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *ModelStat) GetModel() string {
+	if x != nil {
+		return x.Model
+	}
+	return ""
+}
+
+func (x *ModelStat) GetTotalInputTokens() int64 {
+	if x != nil {
+		return x.TotalInputTokens
+	}
+	return 0
+}
+
+func (x *ModelStat) GetTotalOutputTokens() int64 {
+	if x != nil {
+		return x.TotalOutputTokens
+	}
+	return 0
+}
+
+func (x *ModelStat) GetTotalInputCost() float64 {
+	if x != nil {
+		return x.TotalInputCost
+	}
+	return 0
+}
+
+func (x *ModelStat) GetTotalOutputCost() float64 {
+	if x != nil {
+		return x.TotalOutputCost
+	}
+	return 0
+}
+
 var File_mint_server_agent_agent_proto protoreflect.FileDescriptor
 
 const file_mint_server_agent_agent_proto_rawDesc = "" +
 	"\n" +
-	"\x1dmint_server/agent/agent.proto\x12\x11mint_server.agent\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\"\xd6\x01\n" +
+	"\x1dmint_server/agent/agent.proto\x12\x11mint_server.agent\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\"\xf5\x01\n" +
 	"\x11StreamChatRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1a\n" +
 	"\bquestion\x18\x02 \x01(\tR\bquestion\x12\x14\n" +
@@ -1953,14 +1920,18 @@ const file_mint_server_agent_agent_proto_rawDesc = "" +
 	"dialogueId\x12\x1b\n" +
 	"\trecord_id\x18\x05 \x01(\tR\brecordId\x12\x1b\n" +
 	"\tfile_name\x18\x06 \x01(\tR\bfileName\x12\x1b\n" +
-	"\tfile_data\x18\a \x01(\fR\bfileData\"\x96\x01\n" +
-	"\x12StreamChatResponse\x12\x18\n" +
-	"\acontent\x18\x01 \x01(\tR\acontent\x12\x1f\n" +
-	"\vdialogue_id\x18\x02 \x01(\tR\n" +
+	"\tfile_data\x18\a \x01(\fR\bfileData\x12\x1d\n" +
+	"\n" +
+	"image_urls\x18\b \x03(\tR\timageUrls\"\xc4\x01\n" +
+	"\x12StreamChatResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12\x18\n" +
+	"\acontent\x18\x03 \x01(\tR\acontent\x12\x1f\n" +
+	"\vdialogue_id\x18\x04 \x01(\tR\n" +
 	"dialogueId\x12\x1b\n" +
-	"\trecord_id\x18\x03 \x01(\tR\brecordId\x12\x12\n" +
-	"\x04done\x18\x04 \x01(\bR\x04done\x12\x14\n" +
-	"\x05error\x18\x05 \x01(\tR\x05error\"\xd8\x01\n" +
+	"\trecord_id\x18\x05 \x01(\tR\brecordId\x12\x12\n" +
+	"\x04done\x18\x06 \x01(\bR\x04done\x12\x14\n" +
+	"\x05error\x18\a \x01(\tR\x05error\"\xf7\x01\n" +
 	"\x13GenerateChatRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1a\n" +
 	"\bquestion\x18\x02 \x01(\tR\bquestion\x12\x14\n" +
@@ -1969,39 +1940,104 @@ const file_mint_server_agent_agent_proto_rawDesc = "" +
 	"dialogueId\x12\x1b\n" +
 	"\trecord_id\x18\x05 \x01(\tR\brecordId\x12\x1b\n" +
 	"\tfile_name\x18\x06 \x01(\tR\bfileName\x12\x1b\n" +
-	"\tfile_data\x18\a \x01(\fR\bfileData\"\x84\x01\n" +
-	"\x14GenerateChatResponse\x12\x18\n" +
-	"\acontent\x18\x01 \x01(\tR\acontent\x12\x1f\n" +
-	"\vdialogue_id\x18\x02 \x01(\tR\n" +
+	"\tfile_data\x18\a \x01(\fR\bfileData\x12\x1d\n" +
+	"\n" +
+	"image_urls\x18\b \x03(\tR\timageUrls\"\xb2\x01\n" +
+	"\x14GenerateChatResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12\x18\n" +
+	"\acontent\x18\x03 \x01(\tR\acontent\x12\x1f\n" +
+	"\vdialogue_id\x18\x04 \x01(\tR\n" +
 	"dialogueId\x12\x1b\n" +
-	"\trecord_id\x18\x03 \x01(\tR\brecordId\x12\x14\n" +
-	"\x05error\x18\x04 \x01(\tR\x05error\"\x13\n" +
-	"\x11ListModelsRequest\"J\n" +
-	"\x12ListModelsResponse\x124\n" +
-	"\x06models\x18\x01 \x03(\v2\x1c.mint_server.agent.ModelInfoR\x06models\"g\n" +
+	"\trecord_id\x18\x05 \x01(\tR\brecordId\x12\x14\n" +
+	"\x05error\x18\x06 \x01(\tR\x05error\"\x13\n" +
+	"\x11ListModelsRequest\"\x8e\x01\n" +
+	"\x12ListModelsResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12J\n" +
+	"\rmanufacturers\x18\x03 \x03(\v2$.mint_server.agent.ManufacturerGroupR\rmanufacturers\"m\n" +
+	"\x11ManufacturerGroup\x12\"\n" +
+	"\fmanufacturer\x18\x01 \x01(\tR\fmanufacturer\x124\n" +
+	"\x06models\x18\x02 \x03(\v2\x1c.mint_server.agent.ModelInfoR\x06models\"C\n" +
 	"\tModelInfo\x12\x14\n" +
-	"\x05model\x18\x01 \x01(\tR\x05model\x12\"\n" +
-	"\fmanufacturer\x18\x02 \x01(\tR\fmanufacturer\x12 \n" +
-	"\vdescription\x18\x03 \x01(\tR\vdescription\"4\n" +
+	"\x05model\x18\x01 \x01(\tR\x05model\x12 \n" +
+	"\vdescription\x18\x02 \x01(\tR\vdescription\"4\n" +
 	"\x11GetHistoryRequest\x12\x1f\n" +
 	"\vdialogue_id\x18\x01 \x01(\tR\n" +
-	"dialogueId\"P\n" +
-	"\x12GetHistoryResponse\x12:\n" +
-	"\arecords\x18\x01 \x03(\v2 .mint_server.agent.HistoryRecordR\arecords\"\xad\x01\n" +
+	"dialogueId\"~\n" +
+	"\x12GetHistoryResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12:\n" +
+	"\arecords\x18\x03 \x03(\v2 .mint_server.agent.HistoryRecordR\arecords\"\xed\x01\n" +
 	"\rHistoryRecord\x12\x1b\n" +
 	"\trecord_id\x18\x01 \x01(\tR\brecordId\x12!\n" +
 	"\fuser_content\x18\x02 \x01(\tR\vuserContent\x12#\n" +
 	"\ragent_content\x18\x03 \x01(\tR\fagentContent\x12\x14\n" +
 	"\x05model\x18\x04 \x01(\tR\x05model\x12!\n" +
-	"\ftotal_tokens\x18\x05 \x01(\x03R\vtotalTokens\"\xe7\x03\n" +
-	"\bStrategy\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x17\n" +
-	"\arule_id\x18\x02 \x01(\tR\x06ruleId\x12\x17\n" +
-	"\aapi_key\x18\x03 \x01(\tR\x06apiKey\x12\x1f\n" +
-	"\vagent_model\x18\x04 \x01(\tR\n" +
-	"agentModel\x12-\n" +
-	"\x12agent_manufacturer\x18\x05 \x01(\tR\x11agentManufacturer\x12.\n" +
-	"\x13agent_generate_type\x18\x06 \x01(\tR\x11agentGenerateType\x12\x10\n" +
+	"\ftotal_tokens\x18\x05 \x01(\x03R\vtotalTokens\x12\x1d\n" +
+	"\n" +
+	"input_cost\x18\x06 \x01(\x01R\tinputCost\x12\x1f\n" +
+	"\voutput_cost\x18\a \x01(\x01R\n" +
+	"outputCost\"/\n" +
+	"\x14ListDialoguesRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\"\x90\x01\n" +
+	"\x0fDialogueSummary\x12\x1f\n" +
+	"\vdialogue_id\x18\x01 \x01(\tR\n" +
+	"dialogueId\x12\x14\n" +
+	"\x05title\x18\x02 \x01(\tR\x05title\x12#\n" +
+	"\rmessage_count\x18\x03 \x01(\x05R\fmessageCount\x12!\n" +
+	"\fupdated_time\x18\x04 \x01(\tR\vupdatedTime\"\x87\x01\n" +
+	"\x15ListDialoguesResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12@\n" +
+	"\tdialogues\x18\x03 \x03(\v2\".mint_server.agent.DialogueSummaryR\tdialogues\"\xaa\x04\n" +
+	"\vModelConfig\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x1d\n" +
+	"\n" +
+	"model_type\x18\x02 \x01(\tR\tmodelType\x12\"\n" +
+	"\fmanufacturer\x18\x03 \x01(\tR\fmanufacturer\x12 \n" +
+	"\vdescription\x18\x04 \x01(\tR\vdescription\x12\x1f\n" +
+	"\vinput_price\x18\x05 \x01(\x01R\n" +
+	"inputPrice\x12!\n" +
+	"\foutput_price\x18\x06 \x01(\x01R\voutputPrice\x12\x17\n" +
+	"\aapi_key\x18\a \x01(\tR\x06apiKey\x12\x10\n" +
+	"\x03url\x18\b \x01(\tR\x03url\x12\x1d\n" +
+	"\n" +
+	"max_tokens\x18\t \x01(\x05R\tmaxTokens\x12\x16\n" +
+	"\x06stream\x18\n" +
+	" \x01(\bR\x06stream\x12 \n" +
+	"\vtemperature\x18\v \x01(\x02R\vtemperature\x12\x13\n" +
+	"\x05top_p\x18\f \x01(\x02R\x04topP\x12\f\n" +
+	"\x01n\x18\r \x01(\x05R\x01n\x12)\n" +
+	"\x10presence_penalty\x18\x0e \x01(\x02R\x0fpresencePenalty\x12+\n" +
+	"\x11frequency_penalty\x18\x0f \x01(\x02R\x10frequencyPenalty\x12.\n" +
+	"\x13agent_generate_type\x18\x10 \x01(\tR\x11agentGenerateType\x12\x14\n" +
+	"\x05route\x18\x11 \x01(\tR\x05route\x12\x1d\n" +
+	"\n" +
+	"is_enabled\x18\x12 \x01(\x05R\tisEnabled\"s\n" +
+	"\vConfigReply\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x126\n" +
+	"\x06config\x18\x03 \x01(\v2\x1e.mint_server.agent.ModelConfigR\x06config\"E\n" +
+	"\x12ListConfigsRequest\x12\x12\n" +
+	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x1b\n" +
+	"\tpage_size\x18\x02 \x01(\x05R\bpageSize\"\x93\x01\n" +
+	"\x13ListConfigsResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x128\n" +
+	"\aconfigs\x18\x03 \x03(\v2\x1e.mint_server.agent.ModelConfigR\aconfigs\x12\x14\n" +
+	"\x05total\x18\x04 \x01(\x03R\x05total\"\"\n" +
+	"\x10GetConfigRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\"\xa2\x04\n" +
+	"\x13CreateConfigRequest\x12\x1d\n" +
+	"\n" +
+	"model_type\x18\x01 \x01(\tR\tmodelType\x12\"\n" +
+	"\fmanufacturer\x18\x02 \x01(\tR\fmanufacturer\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x1f\n" +
+	"\vinput_price\x18\x04 \x01(\x01R\n" +
+	"inputPrice\x12!\n" +
+	"\foutput_price\x18\x05 \x01(\x01R\voutputPrice\x12\x17\n" +
+	"\aapi_key\x18\x06 \x01(\tR\x06apiKey\x12\x10\n" +
 	"\x03url\x18\a \x01(\tR\x03url\x12\x1d\n" +
 	"\n" +
 	"max_tokens\x18\b \x01(\x05R\tmaxTokens\x12\x16\n" +
@@ -2011,116 +2047,63 @@ const file_mint_server_agent_agent_proto_rawDesc = "" +
 	"\x05top_p\x18\v \x01(\x02R\x04topP\x12\f\n" +
 	"\x01n\x18\f \x01(\x05R\x01n\x12)\n" +
 	"\x10presence_penalty\x18\r \x01(\x02R\x0fpresencePenalty\x12+\n" +
-	"\x11frequency_penalty\x18\x0e \x01(\x02R\x10frequencyPenalty\x12\x14\n" +
-	"\x05route\x18\x0f \x01(\tR\x05route\x12\x1d\n" +
+	"\x11frequency_penalty\x18\x0e \x01(\x02R\x10frequencyPenalty\x12.\n" +
+	"\x13agent_generate_type\x18\x0f \x01(\tR\x11agentGenerateType\x12\x14\n" +
+	"\x05route\x18\x10 \x01(\tR\x05route\x12\x1d\n" +
 	"\n" +
-	"is_enabled\x18\x10 \x01(\x05R\tisEnabled\"H\n" +
-	"\x15ListStrategiesRequest\x12\x12\n" +
-	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x1b\n" +
-	"\tpage_size\x18\x02 \x01(\x05R\bpageSize\"k\n" +
-	"\x16ListStrategiesResponse\x12;\n" +
-	"\n" +
-	"strategies\x18\x01 \x03(\v2\x1b.mint_server.agent.StrategyR\n" +
-	"strategies\x12\x14\n" +
-	"\x05total\x18\x02 \x01(\x03R\x05total\"-\n" +
-	"\x12GetStrategyRequest\x12\x17\n" +
-	"\arule_id\x18\x01 \x01(\tR\x06ruleId\"\xac\x03\n" +
-	"\x15CreateStrategyRequest\x12\x17\n" +
-	"\aapi_key\x18\x01 \x01(\tR\x06apiKey\x12\x1f\n" +
-	"\vagent_model\x18\x02 \x01(\tR\n" +
-	"agentModel\x12-\n" +
-	"\x12agent_manufacturer\x18\x03 \x01(\tR\x11agentManufacturer\x12.\n" +
-	"\x13agent_generate_type\x18\x04 \x01(\tR\x11agentGenerateType\x12\x10\n" +
-	"\x03url\x18\x05 \x01(\tR\x03url\x12\x1d\n" +
-	"\n" +
-	"max_tokens\x18\x06 \x01(\x05R\tmaxTokens\x12\x16\n" +
-	"\x06stream\x18\a \x01(\bR\x06stream\x12 \n" +
-	"\vtemperature\x18\b \x01(\x02R\vtemperature\x12\x13\n" +
-	"\x05top_p\x18\t \x01(\x02R\x04topP\x12\f\n" +
-	"\x01n\x18\n" +
-	" \x01(\x05R\x01n\x12)\n" +
-	"\x10presence_penalty\x18\v \x01(\x02R\x0fpresencePenalty\x12+\n" +
-	"\x11frequency_penalty\x18\f \x01(\x02R\x10frequencyPenalty\x12\x14\n" +
-	"\x05route\x18\r \x01(\tR\x05route\"\xe4\x03\n" +
-	"\x15UpdateStrategyRequest\x12\x17\n" +
-	"\arule_id\x18\x01 \x01(\tR\x06ruleId\x12\x17\n" +
-	"\aapi_key\x18\x02 \x01(\tR\x06apiKey\x12\x1f\n" +
-	"\vagent_model\x18\x03 \x01(\tR\n" +
-	"agentModel\x12-\n" +
-	"\x12agent_manufacturer\x18\x04 \x01(\tR\x11agentManufacturer\x12.\n" +
-	"\x13agent_generate_type\x18\x05 \x01(\tR\x11agentGenerateType\x12\x10\n" +
-	"\x03url\x18\x06 \x01(\tR\x03url\x12\x1d\n" +
-	"\n" +
-	"max_tokens\x18\a \x01(\x05R\tmaxTokens\x12\x16\n" +
-	"\x06stream\x18\b \x01(\bR\x06stream\x12 \n" +
-	"\vtemperature\x18\t \x01(\x02R\vtemperature\x12\x13\n" +
-	"\x05top_p\x18\n" +
-	" \x01(\x02R\x04topP\x12\f\n" +
-	"\x01n\x18\v \x01(\x05R\x01n\x12)\n" +
-	"\x10presence_penalty\x18\f \x01(\x02R\x0fpresencePenalty\x12+\n" +
-	"\x11frequency_penalty\x18\r \x01(\x02R\x10frequencyPenalty\x12\x14\n" +
-	"\x05route\x18\x0e \x01(\tR\x05route\x12\x1d\n" +
-	"\n" +
-	"is_enabled\x18\x0f \x01(\x05R\tisEnabled\"0\n" +
-	"\x15DeleteStrategyRequest\x12\x17\n" +
-	"\arule_id\x18\x01 \x01(\tR\x06ruleId\"\x83\x01\n" +
-	"\fModelMapping\x12\x0e\n" +
+	"is_enabled\x18\x11 \x01(\x05R\tisEnabled\"\xb2\x04\n" +
+	"\x13UpdateConfigRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x1d\n" +
 	"\n" +
 	"model_type\x18\x02 \x01(\tR\tmodelType\x12\"\n" +
 	"\fmanufacturer\x18\x03 \x01(\tR\fmanufacturer\x12 \n" +
-	"\vdescription\x18\x04 \x01(\tR\vdescription\"9\n" +
-	"\x13ListMappingsRequest\x12\"\n" +
-	"\fmanufacturer\x18\x01 \x01(\tR\fmanufacturer\"S\n" +
-	"\x14ListMappingsResponse\x12;\n" +
-	"\bmappings\x18\x01 \x03(\v2\x1f.mint_server.agent.ModelMappingR\bmappings\"#\n" +
-	"\x11GetMappingRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x05R\x02id\"{\n" +
-	"\x14CreateMappingRequest\x12\x1d\n" +
+	"\vdescription\x18\x04 \x01(\tR\vdescription\x12\x1f\n" +
+	"\vinput_price\x18\x05 \x01(\x01R\n" +
+	"inputPrice\x12!\n" +
+	"\foutput_price\x18\x06 \x01(\x01R\voutputPrice\x12\x17\n" +
+	"\aapi_key\x18\a \x01(\tR\x06apiKey\x12\x10\n" +
+	"\x03url\x18\b \x01(\tR\x03url\x12\x1d\n" +
 	"\n" +
-	"model_type\x18\x01 \x01(\tR\tmodelType\x12\"\n" +
-	"\fmanufacturer\x18\x02 \x01(\tR\fmanufacturer\x12 \n" +
-	"\vdescription\x18\x03 \x01(\tR\vdescription\"\x8b\x01\n" +
-	"\x14UpdateMappingRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x1d\n" +
+	"max_tokens\x18\t \x01(\x05R\tmaxTokens\x12\x16\n" +
+	"\x06stream\x18\n" +
+	" \x01(\bR\x06stream\x12 \n" +
+	"\vtemperature\x18\v \x01(\x02R\vtemperature\x12\x13\n" +
+	"\x05top_p\x18\f \x01(\x02R\x04topP\x12\f\n" +
+	"\x01n\x18\r \x01(\x05R\x01n\x12)\n" +
+	"\x10presence_penalty\x18\x0e \x01(\x02R\x0fpresencePenalty\x12+\n" +
+	"\x11frequency_penalty\x18\x0f \x01(\x02R\x10frequencyPenalty\x12.\n" +
+	"\x13agent_generate_type\x18\x10 \x01(\tR\x11agentGenerateType\x12\x14\n" +
+	"\x05route\x18\x11 \x01(\tR\x05route\x12\x1d\n" +
 	"\n" +
-	"model_type\x18\x02 \x01(\tR\tmodelType\x12\"\n" +
-	"\fmanufacturer\x18\x03 \x01(\tR\fmanufacturer\x12 \n" +
-	"\vdescription\x18\x04 \x01(\tR\vdescription\"&\n" +
-	"\x14DeleteMappingRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x05R\x02id\"/\n" +
-	"\x14ListDialoguesRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\tR\x06userId\"\x90\x01\n" +
-	"\x0fDialogueSummary\x12\x1f\n" +
-	"\vdialogue_id\x18\x01 \x01(\tR\n" +
-	"dialogueId\x12\x14\n" +
-	"\x05title\x18\x02 \x01(\tR\x05title\x12#\n" +
-	"\rmessage_count\x18\x03 \x01(\x05R\fmessageCount\x12!\n" +
-	"\fupdated_time\x18\x04 \x01(\tR\vupdatedTime\"Y\n" +
-	"\x15ListDialoguesResponse\x12@\n" +
-	"\tdialogues\x18\x01 \x03(\v2\".mint_server.agent.DialogueSummaryR\tdialogues2\x9a\x05\n" +
-	"\fAgentService\x12\x81\x01\n" +
+	"is_enabled\x18\x12 \x01(\x05R\tisEnabled\"%\n" +
+	"\x13DeleteConfigRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\"v\n" +
+	"\x12ModelStatsResponse\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x122\n" +
+	"\x05stats\x18\x03 \x03(\v2\x1c.mint_server.agent.ModelStatR\x05stats\"\xd5\x01\n" +
+	"\tModelStat\x12\x14\n" +
+	"\x05model\x18\x01 \x01(\tR\x05model\x12,\n" +
+	"\x12total_input_tokens\x18\x02 \x01(\x03R\x10totalInputTokens\x12.\n" +
+	"\x13total_output_tokens\x18\x03 \x01(\x03R\x11totalOutputTokens\x12(\n" +
+	"\x10total_input_cost\x18\x04 \x01(\x01R\x0etotalInputCost\x12*\n" +
+	"\x11total_output_cost\x18\x05 \x01(\x01R\x0ftotalOutputCost2\x8f\x05\n" +
+	"\fAgentService\x12{\n" +
 	"\n" +
-	"StreamChat\x12$.mint_server.agent.StreamChatRequest\x1a%.mint_server.agent.StreamChatResponse\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/v1/agent/chat/stream0\x01\x12~\n" +
-	"\fGenerateChat\x12&.mint_server.agent.GenerateChatRequest\x1a'.mint_server.agent.GenerateChatResponse\"\x1d\x82\xd3\xe4\x93\x02\x17:\x01*\"\x12/api/v1/agent/chat\x12w\n" +
+	"StreamChat\x12$.mint_server.agent.StreamChatRequest\x1a%.mint_server.agent.StreamChatResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/chat/stream0\x01\x12}\n" +
+	"\fGenerateChat\x12&.mint_server.agent.GenerateChatRequest\x1a'.mint_server.agent.GenerateChatResponse\"\x1c\x82\xd3\xe4\x93\x02\x16:\x01*\"\x11/api/v1/chat/chat\x12v\n" +
 	"\n" +
-	"ListModels\x12$.mint_server.agent.ListModelsRequest\x1a%.mint_server.agent.ListModelsResponse\"\x1c\x82\xd3\xe4\x93\x02\x16\x12\x14/api/v1/agent/models\x12\x86\x01\n" +
+	"ListModels\x12$.mint_server.agent.ListModelsRequest\x1a%.mint_server.agent.ListModelsResponse\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/api/v1/chat/models\x12\x85\x01\n" +
 	"\n" +
-	"GetHistory\x12$.mint_server.agent.GetHistoryRequest\x1a%.mint_server.agent.GetHistoryResponse\"+\x82\xd3\xe4\x93\x02%\x12#/api/v1/agent/history/{dialogue_id}\x12\x83\x01\n" +
-	"\rListDialogues\x12'.mint_server.agent.ListDialoguesRequest\x1a(.mint_server.agent.ListDialoguesResponse\"\x1f\x82\xd3\xe4\x93\x02\x19\x12\x17/api/v1/agent/dialogues2\x8d\x05\n" +
-	"\x0fStrategyService\x12\x83\x01\n" +
-	"\x0eListStrategies\x12(.mint_server.agent.ListStrategiesRequest\x1a).mint_server.agent.ListStrategiesResponse\"\x1c\x82\xd3\xe4\x93\x02\x16\x12\x14/admin/v1/strategies\x12y\n" +
-	"\vGetStrategy\x12%.mint_server.agent.GetStrategyRequest\x1a\x1b.mint_server.agent.Strategy\"&\x82\xd3\xe4\x93\x02 \x12\x1e/admin/v1/strategies/{rule_id}\x12x\n" +
-	"\x0eCreateStrategy\x12(.mint_server.agent.CreateStrategyRequest\x1a\x1b.mint_server.agent.Strategy\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/admin/v1/strategies\x12\x82\x01\n" +
-	"\x0eUpdateStrategy\x12(.mint_server.agent.UpdateStrategyRequest\x1a\x1b.mint_server.agent.Strategy\")\x82\xd3\xe4\x93\x02#:\x01*\x1a\x1e/admin/v1/strategies/{rule_id}\x12z\n" +
-	"\x0eDeleteStrategy\x12(.mint_server.agent.DeleteStrategyRequest\x1a\x16.google.protobuf.Empty\"&\x82\xd3\xe4\x93\x02 *\x1e/admin/v1/strategies/{rule_id}2\xef\x04\n" +
-	"\x0eMappingService\x12{\n" +
-	"\fListMappings\x12&.mint_server.agent.ListMappingsRequest\x1a'.mint_server.agent.ListMappingsResponse\"\x1a\x82\xd3\xe4\x93\x02\x14\x12\x12/admin/v1/mappings\x12t\n" +
-	"\n" +
-	"GetMapping\x12$.mint_server.agent.GetMappingRequest\x1a\x1f.mint_server.agent.ModelMapping\"\x1f\x82\xd3\xe4\x93\x02\x19\x12\x17/admin/v1/mappings/{id}\x12x\n" +
-	"\rCreateMapping\x12'.mint_server.agent.CreateMappingRequest\x1a\x1f.mint_server.agent.ModelMapping\"\x1d\x82\xd3\xe4\x93\x02\x17:\x01*\"\x12/admin/v1/mappings\x12}\n" +
-	"\rUpdateMapping\x12'.mint_server.agent.UpdateMappingRequest\x1a\x1f.mint_server.agent.ModelMapping\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\x1a\x17/admin/v1/mappings/{id}\x12q\n" +
-	"\rDeleteMapping\x12'.mint_server.agent.DeleteMappingRequest\x1a\x16.google.protobuf.Empty\"\x1f\x82\xd3\xe4\x93\x02\x19*\x17/admin/v1/mappings/{id}BHZFgithub.com/ethereal3x/mint-server/api/gen/go/mint_server/agent;agentpbb\x06proto3"
+	"GetHistory\x12$.mint_server.agent.GetHistoryRequest\x1a%.mint_server.agent.GetHistoryResponse\"*\x82\xd3\xe4\x93\x02$\x12\"/api/v1/chat/history/{dialogue_id}\x12\x82\x01\n" +
+	"\rListDialogues\x12'.mint_server.agent.ListDialoguesRequest\x1a(.mint_server.agent.ListDialoguesResponse\"\x1e\x82\xd3\xe4\x93\x02\x18\x12\x16/api/v1/chat/dialogues2\xd0\x05\n" +
+	"\x12ModelConfigService\x12w\n" +
+	"\vListConfigs\x12%.mint_server.agent.ListConfigsRequest\x1a&.mint_server.agent.ListConfigsResponse\"\x19\x82\xd3\xe4\x93\x02\x13\x12\x11/admin/v1/configs\x12p\n" +
+	"\tGetConfig\x12#.mint_server.agent.GetConfigRequest\x1a\x1e.mint_server.agent.ConfigReply\"\x1e\x82\xd3\xe4\x93\x02\x18\x12\x16/admin/v1/configs/{id}\x12t\n" +
+	"\fCreateConfig\x12&.mint_server.agent.CreateConfigRequest\x1a\x1e.mint_server.agent.ConfigReply\"\x1c\x82\xd3\xe4\x93\x02\x16:\x01*\"\x11/admin/v1/configs\x12y\n" +
+	"\fUpdateConfig\x12&.mint_server.agent.UpdateConfigRequest\x1a\x1e.mint_server.agent.ConfigReply\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\x1a\x16/admin/v1/configs/{id}\x12n\n" +
+	"\fDeleteConfig\x12&.mint_server.agent.DeleteConfigRequest\x1a\x16.google.protobuf.Empty\"\x1e\x82\xd3\xe4\x93\x02\x18*\x16/admin/v1/configs/{id}\x12n\n" +
+	"\rGetModelStats\x12\x16.google.protobuf.Empty\x1a%.mint_server.agent.ModelStatsResponse\"\x1e\x82\xd3\xe4\x93\x02\x18\x12\x16/admin/v1/stats/modelsBHZFgithub.com/ethereal3x/mint-server/api/gen/go/mint_server/agent;agentpbb\x06proto3"
 
 var (
 	file_mint_server_agent_agent_proto_rawDescOnce sync.Once
@@ -2134,78 +2117,69 @@ func file_mint_server_agent_agent_proto_rawDescGZIP() []byte {
 	return file_mint_server_agent_agent_proto_rawDescData
 }
 
-var file_mint_server_agent_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 27)
+var file_mint_server_agent_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
 var file_mint_server_agent_agent_proto_goTypes = []any{
-	(*StreamChatRequest)(nil),      // 0: mint_server.agent.StreamChatRequest
-	(*StreamChatResponse)(nil),     // 1: mint_server.agent.StreamChatResponse
-	(*GenerateChatRequest)(nil),    // 2: mint_server.agent.GenerateChatRequest
-	(*GenerateChatResponse)(nil),   // 3: mint_server.agent.GenerateChatResponse
-	(*ListModelsRequest)(nil),      // 4: mint_server.agent.ListModelsRequest
-	(*ListModelsResponse)(nil),     // 5: mint_server.agent.ListModelsResponse
-	(*ModelInfo)(nil),              // 6: mint_server.agent.ModelInfo
-	(*GetHistoryRequest)(nil),      // 7: mint_server.agent.GetHistoryRequest
-	(*GetHistoryResponse)(nil),     // 8: mint_server.agent.GetHistoryResponse
-	(*HistoryRecord)(nil),          // 9: mint_server.agent.HistoryRecord
-	(*Strategy)(nil),               // 10: mint_server.agent.Strategy
-	(*ListStrategiesRequest)(nil),  // 11: mint_server.agent.ListStrategiesRequest
-	(*ListStrategiesResponse)(nil), // 12: mint_server.agent.ListStrategiesResponse
-	(*GetStrategyRequest)(nil),     // 13: mint_server.agent.GetStrategyRequest
-	(*CreateStrategyRequest)(nil),  // 14: mint_server.agent.CreateStrategyRequest
-	(*UpdateStrategyRequest)(nil),  // 15: mint_server.agent.UpdateStrategyRequest
-	(*DeleteStrategyRequest)(nil),  // 16: mint_server.agent.DeleteStrategyRequest
-	(*ModelMapping)(nil),           // 17: mint_server.agent.ModelMapping
-	(*ListMappingsRequest)(nil),    // 18: mint_server.agent.ListMappingsRequest
-	(*ListMappingsResponse)(nil),   // 19: mint_server.agent.ListMappingsResponse
-	(*GetMappingRequest)(nil),      // 20: mint_server.agent.GetMappingRequest
-	(*CreateMappingRequest)(nil),   // 21: mint_server.agent.CreateMappingRequest
-	(*UpdateMappingRequest)(nil),   // 22: mint_server.agent.UpdateMappingRequest
-	(*DeleteMappingRequest)(nil),   // 23: mint_server.agent.DeleteMappingRequest
-	(*ListDialoguesRequest)(nil),   // 24: mint_server.agent.ListDialoguesRequest
-	(*DialogueSummary)(nil),        // 25: mint_server.agent.DialogueSummary
-	(*ListDialoguesResponse)(nil),  // 26: mint_server.agent.ListDialoguesResponse
-	(*emptypb.Empty)(nil),          // 27: google.protobuf.Empty
+	(*StreamChatRequest)(nil),     // 0: mint_server.agent.StreamChatRequest
+	(*StreamChatResponse)(nil),    // 1: mint_server.agent.StreamChatResponse
+	(*GenerateChatRequest)(nil),   // 2: mint_server.agent.GenerateChatRequest
+	(*GenerateChatResponse)(nil),  // 3: mint_server.agent.GenerateChatResponse
+	(*ListModelsRequest)(nil),     // 4: mint_server.agent.ListModelsRequest
+	(*ListModelsResponse)(nil),    // 5: mint_server.agent.ListModelsResponse
+	(*ManufacturerGroup)(nil),     // 6: mint_server.agent.ManufacturerGroup
+	(*ModelInfo)(nil),             // 7: mint_server.agent.ModelInfo
+	(*GetHistoryRequest)(nil),     // 8: mint_server.agent.GetHistoryRequest
+	(*GetHistoryResponse)(nil),    // 9: mint_server.agent.GetHistoryResponse
+	(*HistoryRecord)(nil),         // 10: mint_server.agent.HistoryRecord
+	(*ListDialoguesRequest)(nil),  // 11: mint_server.agent.ListDialoguesRequest
+	(*DialogueSummary)(nil),       // 12: mint_server.agent.DialogueSummary
+	(*ListDialoguesResponse)(nil), // 13: mint_server.agent.ListDialoguesResponse
+	(*ModelConfig)(nil),           // 14: mint_server.agent.ModelConfig
+	(*ConfigReply)(nil),           // 15: mint_server.agent.ConfigReply
+	(*ListConfigsRequest)(nil),    // 16: mint_server.agent.ListConfigsRequest
+	(*ListConfigsResponse)(nil),   // 17: mint_server.agent.ListConfigsResponse
+	(*GetConfigRequest)(nil),      // 18: mint_server.agent.GetConfigRequest
+	(*CreateConfigRequest)(nil),   // 19: mint_server.agent.CreateConfigRequest
+	(*UpdateConfigRequest)(nil),   // 20: mint_server.agent.UpdateConfigRequest
+	(*DeleteConfigRequest)(nil),   // 21: mint_server.agent.DeleteConfigRequest
+	(*ModelStatsResponse)(nil),    // 22: mint_server.agent.ModelStatsResponse
+	(*ModelStat)(nil),             // 23: mint_server.agent.ModelStat
+	(*emptypb.Empty)(nil),         // 24: google.protobuf.Empty
 }
 var file_mint_server_agent_agent_proto_depIdxs = []int32{
-	6,  // 0: mint_server.agent.ListModelsResponse.models:type_name -> mint_server.agent.ModelInfo
-	9,  // 1: mint_server.agent.GetHistoryResponse.records:type_name -> mint_server.agent.HistoryRecord
-	10, // 2: mint_server.agent.ListStrategiesResponse.strategies:type_name -> mint_server.agent.Strategy
-	17, // 3: mint_server.agent.ListMappingsResponse.mappings:type_name -> mint_server.agent.ModelMapping
-	25, // 4: mint_server.agent.ListDialoguesResponse.dialogues:type_name -> mint_server.agent.DialogueSummary
-	0,  // 5: mint_server.agent.AgentService.StreamChat:input_type -> mint_server.agent.StreamChatRequest
-	2,  // 6: mint_server.agent.AgentService.GenerateChat:input_type -> mint_server.agent.GenerateChatRequest
-	4,  // 7: mint_server.agent.AgentService.ListModels:input_type -> mint_server.agent.ListModelsRequest
-	7,  // 8: mint_server.agent.AgentService.GetHistory:input_type -> mint_server.agent.GetHistoryRequest
-	24, // 9: mint_server.agent.AgentService.ListDialogues:input_type -> mint_server.agent.ListDialoguesRequest
-	11, // 10: mint_server.agent.StrategyService.ListStrategies:input_type -> mint_server.agent.ListStrategiesRequest
-	13, // 11: mint_server.agent.StrategyService.GetStrategy:input_type -> mint_server.agent.GetStrategyRequest
-	14, // 12: mint_server.agent.StrategyService.CreateStrategy:input_type -> mint_server.agent.CreateStrategyRequest
-	15, // 13: mint_server.agent.StrategyService.UpdateStrategy:input_type -> mint_server.agent.UpdateStrategyRequest
-	16, // 14: mint_server.agent.StrategyService.DeleteStrategy:input_type -> mint_server.agent.DeleteStrategyRequest
-	18, // 15: mint_server.agent.MappingService.ListMappings:input_type -> mint_server.agent.ListMappingsRequest
-	20, // 16: mint_server.agent.MappingService.GetMapping:input_type -> mint_server.agent.GetMappingRequest
-	21, // 17: mint_server.agent.MappingService.CreateMapping:input_type -> mint_server.agent.CreateMappingRequest
-	22, // 18: mint_server.agent.MappingService.UpdateMapping:input_type -> mint_server.agent.UpdateMappingRequest
-	23, // 19: mint_server.agent.MappingService.DeleteMapping:input_type -> mint_server.agent.DeleteMappingRequest
-	1,  // 20: mint_server.agent.AgentService.StreamChat:output_type -> mint_server.agent.StreamChatResponse
-	3,  // 21: mint_server.agent.AgentService.GenerateChat:output_type -> mint_server.agent.GenerateChatResponse
-	5,  // 22: mint_server.agent.AgentService.ListModels:output_type -> mint_server.agent.ListModelsResponse
-	8,  // 23: mint_server.agent.AgentService.GetHistory:output_type -> mint_server.agent.GetHistoryResponse
-	26, // 24: mint_server.agent.AgentService.ListDialogues:output_type -> mint_server.agent.ListDialoguesResponse
-	12, // 25: mint_server.agent.StrategyService.ListStrategies:output_type -> mint_server.agent.ListStrategiesResponse
-	10, // 26: mint_server.agent.StrategyService.GetStrategy:output_type -> mint_server.agent.Strategy
-	10, // 27: mint_server.agent.StrategyService.CreateStrategy:output_type -> mint_server.agent.Strategy
-	10, // 28: mint_server.agent.StrategyService.UpdateStrategy:output_type -> mint_server.agent.Strategy
-	27, // 29: mint_server.agent.StrategyService.DeleteStrategy:output_type -> google.protobuf.Empty
-	19, // 30: mint_server.agent.MappingService.ListMappings:output_type -> mint_server.agent.ListMappingsResponse
-	17, // 31: mint_server.agent.MappingService.GetMapping:output_type -> mint_server.agent.ModelMapping
-	17, // 32: mint_server.agent.MappingService.CreateMapping:output_type -> mint_server.agent.ModelMapping
-	17, // 33: mint_server.agent.MappingService.UpdateMapping:output_type -> mint_server.agent.ModelMapping
-	27, // 34: mint_server.agent.MappingService.DeleteMapping:output_type -> google.protobuf.Empty
-	20, // [20:35] is the sub-list for method output_type
-	5,  // [5:20] is the sub-list for method input_type
-	5,  // [5:5] is the sub-list for extension type_name
-	5,  // [5:5] is the sub-list for extension extendee
-	0,  // [0:5] is the sub-list for field type_name
+	6,  // 0: mint_server.agent.ListModelsResponse.manufacturers:type_name -> mint_server.agent.ManufacturerGroup
+	7,  // 1: mint_server.agent.ManufacturerGroup.models:type_name -> mint_server.agent.ModelInfo
+	10, // 2: mint_server.agent.GetHistoryResponse.records:type_name -> mint_server.agent.HistoryRecord
+	12, // 3: mint_server.agent.ListDialoguesResponse.dialogues:type_name -> mint_server.agent.DialogueSummary
+	14, // 4: mint_server.agent.ConfigReply.config:type_name -> mint_server.agent.ModelConfig
+	14, // 5: mint_server.agent.ListConfigsResponse.configs:type_name -> mint_server.agent.ModelConfig
+	23, // 6: mint_server.agent.ModelStatsResponse.stats:type_name -> mint_server.agent.ModelStat
+	0,  // 7: mint_server.agent.AgentService.StreamChat:input_type -> mint_server.agent.StreamChatRequest
+	2,  // 8: mint_server.agent.AgentService.GenerateChat:input_type -> mint_server.agent.GenerateChatRequest
+	4,  // 9: mint_server.agent.AgentService.ListModels:input_type -> mint_server.agent.ListModelsRequest
+	8,  // 10: mint_server.agent.AgentService.GetHistory:input_type -> mint_server.agent.GetHistoryRequest
+	11, // 11: mint_server.agent.AgentService.ListDialogues:input_type -> mint_server.agent.ListDialoguesRequest
+	16, // 12: mint_server.agent.ModelConfigService.ListConfigs:input_type -> mint_server.agent.ListConfigsRequest
+	18, // 13: mint_server.agent.ModelConfigService.GetConfig:input_type -> mint_server.agent.GetConfigRequest
+	19, // 14: mint_server.agent.ModelConfigService.CreateConfig:input_type -> mint_server.agent.CreateConfigRequest
+	20, // 15: mint_server.agent.ModelConfigService.UpdateConfig:input_type -> mint_server.agent.UpdateConfigRequest
+	21, // 16: mint_server.agent.ModelConfigService.DeleteConfig:input_type -> mint_server.agent.DeleteConfigRequest
+	24, // 17: mint_server.agent.ModelConfigService.GetModelStats:input_type -> google.protobuf.Empty
+	1,  // 18: mint_server.agent.AgentService.StreamChat:output_type -> mint_server.agent.StreamChatResponse
+	3,  // 19: mint_server.agent.AgentService.GenerateChat:output_type -> mint_server.agent.GenerateChatResponse
+	5,  // 20: mint_server.agent.AgentService.ListModels:output_type -> mint_server.agent.ListModelsResponse
+	9,  // 21: mint_server.agent.AgentService.GetHistory:output_type -> mint_server.agent.GetHistoryResponse
+	13, // 22: mint_server.agent.AgentService.ListDialogues:output_type -> mint_server.agent.ListDialoguesResponse
+	17, // 23: mint_server.agent.ModelConfigService.ListConfigs:output_type -> mint_server.agent.ListConfigsResponse
+	15, // 24: mint_server.agent.ModelConfigService.GetConfig:output_type -> mint_server.agent.ConfigReply
+	15, // 25: mint_server.agent.ModelConfigService.CreateConfig:output_type -> mint_server.agent.ConfigReply
+	15, // 26: mint_server.agent.ModelConfigService.UpdateConfig:output_type -> mint_server.agent.ConfigReply
+	24, // 27: mint_server.agent.ModelConfigService.DeleteConfig:output_type -> google.protobuf.Empty
+	22, // 28: mint_server.agent.ModelConfigService.GetModelStats:output_type -> mint_server.agent.ModelStatsResponse
+	18, // [18:29] is the sub-list for method output_type
+	7,  // [7:18] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_mint_server_agent_agent_proto_init() }
@@ -2219,9 +2193,9 @@ func file_mint_server_agent_agent_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_mint_server_agent_agent_proto_rawDesc), len(file_mint_server_agent_agent_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   27,
+			NumMessages:   24,
 			NumExtensions: 0,
-			NumServices:   3,
+			NumServices:   2,
 		},
 		GoTypes:           file_mint_server_agent_agent_proto_goTypes,
 		DependencyIndexes: file_mint_server_agent_agent_proto_depIdxs,
