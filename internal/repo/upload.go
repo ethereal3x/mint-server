@@ -22,18 +22,20 @@ func NewFileUploadRepo(db *gorm.DB) *FileUploadRepo {
 	return &FileUploadRepo{db: db}
 }
 
-func (r *FileUploadRepo) FindByID(ctx context.Context, id int32) (*model.FileUpload, error) {
+// FindByIDForUser 按文件ID和用户ID查询上传记录
+func (r *FileUploadRepo) FindByIDForUser(ctx context.Context, query *model.FileUploadQuery) (*model.FileUpload, error) {
 	var record model.FileUpload
-	if err := r.db.WithContext(ctx).First(&record, id).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("id = ? AND user_id = ?", query.ID, query.UserID).First(&record).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
-		logger.ContextError(ctx, "FileUploadRepo.FindByID", zap.Int32("id", id), zap.Error(err))
-		return nil, fmt.Errorf("find upload by id: %w", err)
+		logger.ContextError(ctx, "FileUploadRepo.FindByIDForUser", zap.Int32("id", query.ID), zap.String("user_id", query.UserID), zap.Error(err))
+		return nil, fmt.Errorf("find upload by id and user_id: %w", err)
 	}
 	return &record, nil
 }
 
+// FindByObjectName 按对象名查询上传记录
 func (r *FileUploadRepo) FindByObjectName(ctx context.Context, objectName string) (*model.FileUpload, error) {
 	var record model.FileUpload
 	if err := r.db.WithContext(ctx).Where("object_name = ?", objectName).First(&record).Error; err != nil {
@@ -46,6 +48,7 @@ func (r *FileUploadRepo) FindByObjectName(ctx context.Context, objectName string
 	return &record, nil
 }
 
+// ListByUserID 按用户ID查询上传记录
 func (r *FileUploadRepo) ListByUserID(ctx context.Context, userID string) ([]*model.FileUpload, error) {
 	var list []*model.FileUpload
 	if err := r.db.WithContext(ctx).Where("user_id = ?", userID).Order("created_time DESC").Limit(50).Find(&list).Error; err != nil {
@@ -55,6 +58,7 @@ func (r *FileUploadRepo) ListByUserID(ctx context.Context, userID string) ([]*mo
 	return list, nil
 }
 
+// Create 创建上传记录
 func (r *FileUploadRepo) Create(ctx context.Context, record *model.FileUpload) error {
 	ctx, span := tracing.Start(ctx, "repo.FileUploadRepo.Create")
 	defer span.End()
@@ -67,6 +71,7 @@ func (r *FileUploadRepo) Create(ctx context.Context, record *model.FileUpload) e
 	return nil
 }
 
+// Update 更新上传记录
 func (r *FileUploadRepo) Update(ctx context.Context, record *model.FileUpload) error {
 	ctx, span := tracing.Start(ctx, "repo.FileUploadRepo.Update")
 	defer span.End()

@@ -12,7 +12,13 @@
       "name": "ModelConfigService"
     },
     {
+      "name": "AuthService"
+    },
+    {
       "name": "HelloService"
+    },
+    {
+      "name": "UserService"
     }
   ],
   "consumes": [
@@ -210,6 +216,70 @@
         ]
       }
     },
+    "/api/v1/auth/login": {
+      "post": {
+        "operationId": "AuthService_Login",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/authLoginResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/authLoginRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
+    "/api/v1/auth/register": {
+      "post": {
+        "operationId": "AuthService_RegisterAccount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/authRegisterAccountResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/authRegisterAccountRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AuthService"
+        ]
+      }
+    },
     "/api/v1/chat/chat": {
       "post": {
         "operationId": "AgentService_GenerateChat",
@@ -362,6 +432,124 @@
         ],
         "tags": [
           "AgentService"
+        ]
+      }
+    },
+    "/api/v1/user/avatar": {
+      "put": {
+        "operationId": "UserService_UpdateAvatar",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/userUpdateAvatarResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/userUpdateAvatarRequest"
+            }
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      }
+    },
+    "/api/v1/user/me": {
+      "get": {
+        "operationId": "UserService_GetMe",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/userGetMeResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "UserService"
+        ]
+      }
+    },
+    "/api/v1/user/nickname": {
+      "put": {
+        "operationId": "UserService_UpdateNickname",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/userUpdateNicknameResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/userUpdateNicknameRequest"
+            }
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      }
+    },
+    "/api/v1/user/password": {
+      "put": {
+        "operationId": "UserService_UpdatePassword",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/userUpdatePasswordResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/userUpdatePasswordRequest"
+            }
+          }
+        ],
+        "tags": [
+          "UserService"
         ]
       }
     },
@@ -930,6 +1118,106 @@
         }
       }
     },
+    "authLoginRequest": {
+      "type": "object",
+      "properties": {
+        "provider": {
+          "type": "string",
+          "title": "登录方式，当前支持 account_password"
+        },
+        "identifier": {
+          "type": "string",
+          "title": "登录标识，账号登录时为账号名"
+        },
+        "credential": {
+          "type": "string",
+          "title": "登录凭证，账号密码登录时为明文密码"
+        }
+      }
+    },
+    "authLoginResponse": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "title": "业务状态码，0 表示成功"
+        },
+        "message": {
+          "type": "string",
+          "title": "业务响应消息"
+        },
+        "accessToken": {
+          "type": "string",
+          "title": "JWT 访问令牌"
+        },
+        "tokenType": {
+          "type": "string",
+          "title": "令牌类型，固定为 Bearer"
+        },
+        "expiresIn": {
+          "type": "string",
+          "format": "int64",
+          "title": "令牌过期秒数"
+        },
+        "user": {
+          "$ref": "#/definitions/mint_serverAuthUserInfo",
+          "title": "登录用户信息"
+        }
+      }
+    },
+    "authRegisterAccountRequest": {
+      "type": "object",
+      "properties": {
+        "account": {
+          "type": "string",
+          "title": "账号密码注册使用的唯一账号"
+        },
+        "password": {
+          "type": "string",
+          "title": "账号密码注册使用的明文密码"
+        },
+        "displayName": {
+          "type": "string",
+          "title": "用户展示名称"
+        },
+        "avatarUrl": {
+          "type": "string",
+          "title": "用户头像地址"
+        }
+      }
+    },
+    "authRegisterAccountResponse": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "title": "业务状态码，0 表示成功"
+        },
+        "message": {
+          "type": "string",
+          "title": "业务响应消息"
+        },
+        "accessToken": {
+          "type": "string",
+          "title": "JWT 访问令牌"
+        },
+        "tokenType": {
+          "type": "string",
+          "title": "令牌类型，固定为 Bearer"
+        },
+        "expiresIn": {
+          "type": "string",
+          "format": "int64",
+          "title": "令牌过期秒数"
+        },
+        "user": {
+          "$ref": "#/definitions/mint_serverAuthUserInfo",
+          "title": "注册用户信息"
+        }
+      }
+    },
     "helloHelloCheckRequest": {
       "type": "object",
       "properties": {
@@ -945,6 +1233,50 @@
         "checkDown": {
           "type": "string",
           "title": "健康检查结果"
+        }
+      }
+    },
+    "mint_serverAuthUserInfo": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "title": "用户ID"
+        },
+        "displayName": {
+          "type": "string",
+          "title": "用户展示名称"
+        },
+        "avatarUrl": {
+          "type": "string",
+          "title": "用户头像地址"
+        },
+        "status": {
+          "type": "integer",
+          "format": "int32",
+          "title": "用户状态，1 表示启用"
+        }
+      }
+    },
+    "mint_serverUserUserInfo": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "title": "用户ID"
+        },
+        "displayName": {
+          "type": "string",
+          "title": "用户展示名称"
+        },
+        "avatarUrl": {
+          "type": "string",
+          "title": "用户头像地址"
+        },
+        "status": {
+          "type": "integer",
+          "format": "int32",
+          "title": "用户状态，1 表示启用"
         }
       }
     },
@@ -973,6 +1305,105 @@
             "type": "object",
             "$ref": "#/definitions/protobufAny"
           }
+        }
+      }
+    },
+    "userGetMeResponse": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "title": "业务状态码，0 表示成功"
+        },
+        "message": {
+          "type": "string",
+          "title": "业务响应消息"
+        },
+        "user": {
+          "$ref": "#/definitions/mint_serverUserUserInfo",
+          "title": "当前登录用户信息"
+        }
+      }
+    },
+    "userUpdateAvatarRequest": {
+      "type": "object",
+      "properties": {
+        "avatarUrl": {
+          "type": "string",
+          "title": "新头像地址"
+        }
+      }
+    },
+    "userUpdateAvatarResponse": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "title": "业务状态码，0 表示成功"
+        },
+        "message": {
+          "type": "string",
+          "title": "业务响应消息"
+        },
+        "user": {
+          "$ref": "#/definitions/mint_serverUserUserInfo",
+          "title": "更新后的用户信息"
+        }
+      }
+    },
+    "userUpdateNicknameRequest": {
+      "type": "object",
+      "properties": {
+        "nickname": {
+          "type": "string",
+          "title": "新展示名称"
+        }
+      }
+    },
+    "userUpdateNicknameResponse": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "title": "业务状态码，0 表示成功"
+        },
+        "message": {
+          "type": "string",
+          "title": "业务响应消息"
+        },
+        "user": {
+          "$ref": "#/definitions/mint_serverUserUserInfo",
+          "title": "更新后的用户信息"
+        }
+      }
+    },
+    "userUpdatePasswordRequest": {
+      "type": "object",
+      "properties": {
+        "oldPassword": {
+          "type": "string",
+          "title": "当前密码"
+        },
+        "newPassword": {
+          "type": "string",
+          "title": "新密码"
+        }
+      }
+    },
+    "userUpdatePasswordResponse": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32",
+          "title": "业务状态码，0 表示成功"
+        },
+        "message": {
+          "type": "string",
+          "title": "业务响应消息"
         }
       }
     }

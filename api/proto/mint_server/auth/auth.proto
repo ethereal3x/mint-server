@@ -1,0 +1,85 @@
+syntax = "proto3";
+
+package mint_server.auth;
+
+option go_package = "github.com/ethereal3x/mint-server/api/gen/go/mint_server/auth;authpb";
+
+import "google/api/annotations.proto";
+
+service AuthService {
+    rpc RegisterAccount(RegisterAccountRequest) returns (RegisterAccountResponse) {
+        option (google.api.http) = {
+            post: "/api/v1/auth/register"
+            body: "*"
+        };
+    }
+
+    rpc Login(LoginRequest) returns (LoginResponse) {
+        option (google.api.http) = {
+            post: "/api/v1/auth/login"
+            body: "*"
+        };
+    }
+
+}
+
+message UserInfo {
+    // 用户ID
+    string user_id = 1;
+    // 用户展示名称
+    string display_name = 2;
+    // 用户头像地址
+    string avatar_url = 3;
+    // 用户状态，1 表示启用
+    int32 status = 4;
+}
+
+message RegisterAccountRequest {
+    // 账号密码注册使用的唯一账号
+    string account = 1;
+    // 账号密码注册使用的明文密码
+    string password = 2;
+    // 用户展示名称
+    string display_name = 3;
+    // 用户头像地址
+    string avatar_url = 4;
+}
+
+message RegisterAccountResponse {
+    // 业务状态码，0 表示成功
+    int32 code = 1;
+    // 业务响应消息
+    string message = 2;
+    // JWT 访问令牌
+    string access_token = 3;
+    // 令牌类型，固定为 Bearer
+    string token_type = 4;
+    // 令牌过期秒数
+    int64 expires_in = 5;
+    // 注册用户信息
+    UserInfo user = 6;
+}
+
+message LoginRequest {
+    // 登录方式，当前支持 account_password
+    string provider = 1;
+    // 登录标识，账号登录时为账号名
+    string identifier = 2;
+    // 登录凭证，账号密码登录时为明文密码
+    string credential = 3;
+}
+
+message LoginResponse {
+    // 业务状态码，0 表示成功
+    int32 code = 1;
+    // 业务响应消息
+    string message = 2;
+    // JWT 访问令牌
+    string access_token = 3;
+    // 令牌类型，固定为 Bearer
+    string token_type = 4;
+    // 令牌过期秒数
+    int64 expires_in = 5;
+    // 登录用户信息
+    UserInfo user = 6;
+}

@@ -3,36 +3,18 @@ package logic
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/cloudwego/eino-ext/components/model/openai"
 	"github.com/cloudwego/eino/schema"
 	"github.com/ethereal3x/mint-server/internal/model"
 )
 
-// errMsgUnsupportedImage 模型不支持多模态图片输入时的提示
-const errMsgUnsupportedImage = "当前模型不支持图片识别，请使用支持多模态的模型"
-
-// isMultimodalNotSupported 判断 LLM 返回的错误是否为不支持多模态
-func isMultimodalNotSupported(err error) bool {
-	if err == nil {
-		return false
-	}
-	msg := err.Error()
-	return strings.Contains(msg, "unknown variant `image_url`") ||
-		strings.Contains(msg, "expected `text`") ||
-		(strings.Contains(msg, "status code: 400") && strings.Contains(msg, "messages[0]"))
-}
-
-// wrapLLMError 包装 LLM 调用错误，对已知错误给出友好提示
+// wrapLLMError 包装 LLM 调用错误
 func wrapLLMError(err error) error {
 	if err == nil {
 		return nil
 	}
-	if isMultimodalNotSupported(err) {
-		return fmt.Errorf("%s: %w", errMsgUnsupportedImage, err)
-	}
-	return fmt.Errorf("generate: %w", err)
+	return fmt.Errorf("模型调用异常: %w", err)
 }
 
 // LLMAdapter 模型调用抽象接口，后续新增模型只需实现此接口
@@ -49,6 +31,7 @@ func NewEinoAdapter() *EinoAdapter {
 	return &EinoAdapter{}
 }
 
+// createModel 根据模型配置创建 Eino ChatModel
 func (a *EinoAdapter) createModel(ctx context.Context, config *model.ChatModelConfig) (*openai.ChatModel, error) {
 	return openai.NewChatModel(ctx, &openai.ChatModelConfig{
 		APIKey:  config.APIKey,

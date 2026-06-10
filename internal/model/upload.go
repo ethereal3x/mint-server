@@ -11,6 +11,12 @@ const (
 	UPLOAD_STATUS_FAILED    = "failed"
 )
 
+// FileUploadQuery 文件上传查询条件
+type FileUploadQuery struct {
+	ID     int32
+	UserID string
+}
+
 // FileUpload 对应 tb_file_uploads 表
 type FileUpload struct {
 	ID           int32     `gorm:"column:id;primaryKey;autoIncrement"`

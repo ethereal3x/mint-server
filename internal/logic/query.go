@@ -10,11 +10,11 @@ import (
 	"go.uber.org/zap"
 )
 
-// GetHistory 获取对话历史记录
-func (s *Chat) GetHistory(ctx context.Context, dialogueID string) ([]*model.DialogueRecord, error) {
-	records, err := s.recordRepo.ListByDialogueID(ctx, dialogueID)
+// GetHistory 获取当前用户的对话历史记录
+func (s *Chat) GetHistory(ctx context.Context, query *model.DialogueQuery) ([]*model.DialogueRecord, error) {
+	records, err := s.recordRepo.ListByDialogue(ctx, query)
 	if err != nil {
-		logger.ContextError(ctx, "Chat.GetHistory", zap.String("dialogue_id", dialogueID), zap.Error(err))
+		logger.ContextError(ctx, "Chat.GetHistory", zap.String("dialogue_id", query.DialogueID), zap.String("user_id", query.UserID), zap.Error(err))
 		return nil, mint_err.ErrGetHistory
 	}
 	return records, nil
@@ -34,11 +34,11 @@ func (s *Chat) ListDialogues(ctx context.Context, userID string) ([]*model.Dialo
 	return summaries, nil
 }
 
-// AggregateByModel 按模型聚合 token 消耗和费用
-func (s *Chat) AggregateByModel(ctx context.Context) ([]*model.ModelStat, error) {
-	stats, err := s.recordRepo.AggregateByModel(ctx)
+// AggregateByModel 按用户和模型聚合 token 消耗和费用
+func (s *Chat) AggregateByModel(ctx context.Context, userID string) ([]*model.ModelStat, error) {
+	stats, err := s.recordRepo.AggregateByModelForUser(ctx, userID)
 	if err != nil {
-		logger.ContextError(ctx, "Chat.AggregateByModel", zap.Error(err))
+		logger.ContextError(ctx, "Chat.AggregateByModel", zap.String("user_id", userID), zap.Error(err))
 		return nil, mint_err.ErrModelStats
 	}
 	return stats, nil

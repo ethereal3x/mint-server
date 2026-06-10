@@ -1,0 +1,99 @@
+syntax = "proto3";
+
+package mint_server.user;
+
+option go_package = "github.com/ethereal3x/mint-server/api/gen/go/mint_server/user;userpb";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+service UserService {
+    rpc GetMe(google.protobuf.Empty) returns (GetMeResponse) {
+        option (google.api.http) = {
+            get: "/api/v1/user/me"
+        };
+    }
+
+    rpc UpdateAvatar(UpdateAvatarRequest) returns (UpdateAvatarResponse) {
+        option (google.api.http) = {
+            put: "/api/v1/user/avatar"
+            body: "*"
+        };
+    }
+
+    rpc UpdatePassword(UpdatePasswordRequest) returns (UpdatePasswordResponse) {
+        option (google.api.http) = {
+            put: "/api/v1/user/password"
+            body: "*"
+        };
+    }
+
+    rpc UpdateNickname(UpdateNicknameRequest) returns (UpdateNicknameResponse) {
+        option (google.api.http) = {
+            put: "/api/v1/user/nickname"
+            body: "*"
+        };
+    }
+}
+
+message UserInfo {
+    // 用户ID
+    string user_id = 1;
+    // 用户展示名称
+    string display_name = 2;
+    // 用户头像地址
+    string avatar_url = 3;
+    // 用户状态，1 表示启用
+    int32 status = 4;
+}
+
+message GetMeResponse {
+    // 业务状态码，0 表示成功
+    int32 code = 1;
+    // 业务响应消息
+    string message = 2;
+    // 当前登录用户信息
+    UserInfo user = 3;
+}
+
+message UpdateAvatarRequest {
+    // 新头像地址
+    string avatar_url = 1;
+}
+
+message UpdateAvatarResponse {
+    // 业务状态码，0 表示成功
+    int32 code = 1;
+    // 业务响应消息
+    string message = 2;
+    // 更新后的用户信息
+    UserInfo user = 3;
+}
+
+message UpdatePasswordRequest {
+    // 当前密码
+    string old_password = 1;
+    // 新密码
+    string new_password = 2;
+}
+
+message UpdatePasswordResponse {
+    // 业务状态码，0 表示成功
+    int32 code = 1;
+    // 业务响应消息
+    string message = 2;
+}
+
+message UpdateNicknameRequest {
+    // 新展示名称
+    string nickname = 1;
+}
+
+message UpdateNicknameResponse {
+    // 业务状态码，0 表示成功
+    int32 code = 1;
+    // 业务响应消息
+    string message = 2;
+    // 更新后的用户信息
+    UserInfo user = 3;
+}

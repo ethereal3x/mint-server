@@ -5,6 +5,7 @@ import (
 
 	"github.com/ethereal3x/apc/errs"
 	agentpb "github.com/ethereal3x/mint-server/api/gen/go/mint_server/agent"
+	"github.com/ethereal3x/mint-server/internal/auth"
 	mint_err "github.com/ethereal3x/mint-server/internal/errs"
 	"github.com/ethereal3x/mint-server/internal/logic"
 	"github.com/ethereal3x/mint-server/internal/model"
@@ -25,6 +26,10 @@ func NewConfigServer(configLogic *logic.Config, chat *logic.Chat) *ConfigServer 
 
 func (s *ConfigServer) ListConfigs(ctx context.Context, req *agentpb.ListConfigsRequest) (*agentpb.ListConfigsResponse, error) {
 	rsp := &agentpb.ListConfigsResponse{}
+	userID, err := auth.RequireUserID(ctx)
+	if err != nil {
+		return errs.GenProtoReply(rsp, mint_err.ErrUnauthorized)
+	}
 	page := req.Page
 	if page <= 0 {
 		page = 1
@@ -33,7 +38,7 @@ func (s *ConfigServer) ListConfigs(ctx context.Context, req *agentpb.ListConfigs
 	if pageSize <= 0 || pageSize > 100 {
 		pageSize = 20
 	}
-	list, total, err := s.logic.List(ctx, page, pageSize)
+	list, total, err := s.logic.List(ctx, page, pageSize, userID)
 	if err != nil {
 		return errs.GenProtoReply(rsp, err)
 	}
@@ -48,10 +53,14 @@ func (s *ConfigServer) ListConfigs(ctx context.Context, req *agentpb.ListConfigs
 
 func (s *ConfigServer) GetConfig(ctx context.Context, req *agentpb.GetConfigRequest) (*agentpb.ConfigReply, error) {
 	rsp := &agentpb.ConfigReply{}
+	userID, err := auth.RequireUserID(ctx)
+	if err != nil {
+		return errs.GenProtoReply(rsp, mint_err.ErrUnauthorized)
+	}
 	if req.Id <= 0 {
 		return errs.GenProtoReply(rsp, mint_err.ErrParam)
 	}
-	config, err := s.logic.GetByID(ctx, req.Id)
+	config, err := s.logic.GetByID(ctx, req.Id, userID)
 	if err != nil {
 		return errs.GenProtoReply(rsp, err)
 	}
@@ -64,10 +73,15 @@ func (s *ConfigServer) GetConfig(ctx context.Context, req *agentpb.GetConfigRequ
 
 func (s *ConfigServer) CreateConfig(ctx context.Context, req *agentpb.CreateConfigRequest) (*agentpb.ConfigReply, error) {
 	rsp := &agentpb.ConfigReply{}
+	userID, err := auth.RequireUserID(ctx)
+	if err != nil {
+		return errs.GenProtoReply(rsp, mint_err.ErrUnauthorized)
+	}
 	if req.ModelType == "" || req.ApiKey == "" {
 		return errs.GenProtoReply(rsp, mint_err.ErrParam)
 	}
 	config := createReqToModel(req)
+	config.UserID = userID
 	if err := s.logic.Create(ctx, config); err != nil {
 		return errs.GenProtoReply(rsp, err)
 	}
@@ -77,14 +91,18 @@ func (s *ConfigServer) CreateConfig(ctx context.Context, req *agentpb.CreateConf
 
 func (s *ConfigServer) UpdateConfig(ctx context.Context, req *agentpb.UpdateConfigRequest) (*agentpb.ConfigReply, error) {
 	rsp := &agentpb.ConfigReply{}
+	userID, err := auth.RequireUserID(ctx)
+	if err != nil {
+		return errs.GenProtoReply(rsp, mint_err.ErrUnauthorized)
+	}
 	if req.Id <= 0 {
 		return errs.GenProtoReply(rsp, mint_err.ErrParam)
 	}
 	config := updateReqToModel(req)
-	if err := s.logic.Update(ctx, config); err != nil {
+	if err := s.logic.Update(ctx, config, userID); err != nil {
 		return errs.GenProtoReply(rsp, err)
 	}
-	updated, err := s.logic.GetByID(ctx, req.Id)
+	updated, err := s.logic.GetByID(ctx, req.Id, userID)
 	if err != nil {
 		return errs.GenProtoReply(rsp, err)
 	}
@@ -93,33 +111,17 @@ func (s *ConfigServer) UpdateConfig(ctx context.Context, req *agentpb.UpdateConf
 }
 
 func (s *ConfigServer) DeleteConfig(ctx context.Context, req *agentpb.DeleteConfigRequest) (*emptypb.Empty, error) {
+	userID, err := auth.RequireUserID(ctx)
+	if err != nil {
+		return nil, nil
+	}
 	if req.Id <= 0 {
 		return nil, nil
 	}
-	if err := s.logic.Delete(ctx, req.Id); err != nil {
+	if err := s.logic.Delete(ctx, req.Id, userID); err != nil {
 		return nil, nil
 	}
 	return &emptypb.Empty{}, nil
-}
-
-func (s *ConfigServer) GetModelStats(ctx context.Context, _ *emptypb.Empty) (*agentpb.ModelStatsResponse, error) {
-	rsp := &agentpb.ModelStatsResponse{}
-	stats, err := s.chat.AggregateByModel(ctx)
-	if err != nil {
-		return errs.GenProtoReply(rsp, err)
-	}
-	pbStats := make([]*agentpb.ModelStat, 0, len(stats))
-	for _, st := range stats {
-		pbStats = append(pbStats, &agentpb.ModelStat{
-			Model:            st.Model,
-			TotalInputTokens:  st.TotalInputTokens,
-			TotalOutputTokens: st.TotalOutputTokens,
-			TotalInputCost:    st.TotalInputCost,
-			TotalOutputCost:   st.TotalOutputCost,
-		})
-	}
-	rsp.Stats = pbStats
-	return rsp, nil
 }
 
 func configToProto(c *model.ChatModelConfig) *agentpb.ModelConfig {
@@ -168,6 +170,30 @@ func createReqToModel(req *agentpb.CreateConfigRequest) *model.ChatModelConfig {
 		Route:             req.Route,
 		IsEnabled:         req.IsEnabled,
 	}
+}
+
+func (s *ConfigServer) GetModelStats(ctx context.Context, _ *emptypb.Empty) (*agentpb.ModelStatsResponse, error) {
+	rsp := &agentpb.ModelStatsResponse{}
+	userID, err := auth.RequireUserID(ctx)
+	if err != nil {
+		return errs.GenProtoReply(rsp, mint_err.ErrUnauthorized)
+	}
+	stats, err := s.chat.AggregateByModel(ctx, userID)
+	if err != nil {
+		return errs.GenProtoReply(rsp, err)
+	}
+	pbStats := make([]*agentpb.ModelStat, 0, len(stats))
+	for _, st := range stats {
+		pbStats = append(pbStats, &agentpb.ModelStat{
+			Model:             st.Model,
+			TotalInputTokens:  st.TotalInputTokens,
+			TotalOutputTokens: st.TotalOutputTokens,
+			TotalInputCost:    st.TotalInputCost,
+			TotalOutputCost:   st.TotalOutputCost,
+		})
+	}
+	rsp.Stats = pbStats
+	return rsp, nil
 }
 
 func updateReqToModel(req *agentpb.UpdateConfigRequest) *model.ChatModelConfig {

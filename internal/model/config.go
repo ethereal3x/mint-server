@@ -5,7 +5,8 @@ import "time"
 // ChatModelConfig 对应 tb_model_config 表，合并策略规则与模型映射
 type ChatModelConfig struct {
 	ID                int32     `gorm:"column:id;primaryKey;autoIncrement"`
-	ModelType         string    `gorm:"column:model_type;uniqueIndex;size:50;not null"`
+	ModelType         string    `gorm:"column:model_type;uniqueIndex:idx_model_type_user;size:50;not null"`
+	UserID            string    `gorm:"column:user_id;uniqueIndex:idx_model_type_user;size:255;not null"`
 	Manufacturer      string    `gorm:"column:manufacturer;size:50;not null"`
 	Description       string    `gorm:"column:description;type:text"`
 	InputPrice        float64   `gorm:"column:input_price;type:decimal(10,8);default:0"`

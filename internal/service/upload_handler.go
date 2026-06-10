@@ -1,13 +1,16 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"strconv"
 
 	"github.com/ethereal3x/apc/logger"
+	"github.com/ethereal3x/mint-server/internal/auth"
 	mint_err "github.com/ethereal3x/mint-server/internal/errs"
 	"github.com/ethereal3x/mint-server/internal/logic"
+	"github.com/ethereal3x/mint-server/internal/model"
 	"go.uber.org/zap"
 )
 
@@ -15,18 +18,20 @@ const httpMaxUploadSize = 50 << 20 // 50MB
 
 // UploadHandler 文件上传 HTTP 处理器
 type UploadHandler struct {
-	logic *logic.UploadLogic
+	logic        *logic.UploadLogic
+	tokenManager *auth.TokenManager
 }
 
 // NewUploadHandler 创建上传 HTTP 处理器
-func NewUploadHandler(logic *logic.UploadLogic) *UploadHandler {
-	return &UploadHandler{logic: logic}
+func NewUploadHandler(logic *logic.UploadLogic, tokenManager *auth.TokenManager) *UploadHandler {
+	return &UploadHandler{logic: logic, tokenManager: tokenManager}
 }
 
+// HandleUpload 处理文件上传请求
 func (h *UploadHandler) HandleUpload(w http.ResponseWriter, r *http.Request) {
-	userID := r.URL.Query().Get("user_id")
-	if userID == "" {
-		userID = "admin"
+	userID, ok := h.authUserID(w, r)
+	if !ok {
+		return
 	}
 
 	if err := r.ParseMultipartForm(httpMaxUploadSize); err != nil {
@@ -46,7 +51,13 @@ func (h *UploadHandler) HandleUpload(w http.ResponseWriter, r *http.Request) {
 		contentType = "application/octet-stream"
 	}
 
-	result, err := h.logic.Upload(r.Context(), userID, header.Filename, file, header.Size, contentType)
+	result, err := h.logic.Upload(r.Context(), &logic.UploadRequest{
+		UserID:      userID,
+		FileName:    header.Filename,
+		Reader:      file,
+		Size:        header.Size,
+		ContentType: contentType,
+	})
 	if err != nil {
 		logger.ContextError(r.Context(), "UploadHandler.HandleUpload", zap.String("filename", header.Filename), zap.Error(err))
 		writeJSON(w, http.StatusInternalServerError, map[string]any{"code": mint_err.ERR_CODE_INTERNAL, "message": err.Error()})
@@ -56,7 +67,12 @@ func (h *UploadHandler) HandleUpload(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]any{"code": 0, "message": "ok", "data": result})
 }
 
+// HandleGetFile 处理文件详情查询请求
 func (h *UploadHandler) HandleGetFile(w http.ResponseWriter, r *http.Request) {
+	userID, ok := h.authUserID(w, r)
+	if !ok {
+		return
+	}
 	idStr := r.PathValue("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -64,7 +80,7 @@ func (h *UploadHandler) HandleGetFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	record, err := h.logic.GetUpload(r.Context(), int32(id))
+	record, err := h.logic.GetUpload(r.Context(), &model.FileUploadQuery{ID: int32(id), UserID: userID})
 	if err != nil {
 		writeJSON(w, http.StatusInternalServerError, map[string]any{"code": mint_err.ERR_CODE_DB_QUERY, "message": err.Error()})
 		return
@@ -77,10 +93,11 @@ func (h *UploadHandler) HandleGetFile(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]any{"code": 0, "message": "ok", "data": record})
 }
 
+// HandleListFiles 处理文件列表查询请求
 func (h *UploadHandler) HandleListFiles(w http.ResponseWriter, r *http.Request) {
-	userID := r.URL.Query().Get("user_id")
-	if userID == "" {
-		userID = "admin"
+	userID, ok := h.authUserID(w, r)
+	if !ok {
+		return
 	}
 
 	list, err := h.logic.ListUploads(r.Context(), userID)
@@ -92,8 +109,21 @@ func (h *UploadHandler) HandleListFiles(w http.ResponseWriter, r *http.Request) 
 	writeJSON(w, http.StatusOK, map[string]any{"code": 0, "message": "ok", "data": list})
 }
 
+// authUserID 从 HTTP 请求中解析当前用户ID
+func (h *UploadHandler) authUserID(w http.ResponseWriter, r *http.Request) (string, bool) {
+	principal, err := auth.PrincipalFromRequest(r.Context(), h.tokenManager, r)
+	if err != nil || principal.UserID == "" {
+		writeJSON(w, http.StatusUnauthorized, map[string]any{"code": mint_err.ERR_CODE_UNAUTHORIZED, "message": mint_err.ErrUnauthorized.Error()})
+		return "", false
+	}
+	return principal.UserID, true
+}
+
+// writeJSON 写入 JSON 响应
 func writeJSON(w http.ResponseWriter, status int, data any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
-	json.NewEncoder(w).Encode(data)
+	if err := json.NewEncoder(w).Encode(data); err != nil {
+		logger.ContextError(context.Background(), "writeJSON", zap.Error(err))
+	}
 }

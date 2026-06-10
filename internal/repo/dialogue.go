@@ -22,6 +22,7 @@ func NewDialogueRepo(db *gorm.DB) *DialogueRepo {
 	return &DialogueRepo{db: db}
 }
 
+// FindByRecordID 按记录ID查询对话记录
 func (r *DialogueRepo) FindByRecordID(ctx context.Context, recordID string) (*model.DialogueRecord, error) {
 	var record model.DialogueRecord
 	if err := r.db.WithContext(ctx).First(&record, "record_id = ?", recordID).Error; err != nil {
@@ -34,18 +35,20 @@ func (r *DialogueRepo) FindByRecordID(ctx context.Context, recordID string) (*mo
 	return &record, nil
 }
 
-func (r *DialogueRepo) ListByDialogueID(ctx context.Context, dialogueID string) ([]*model.DialogueRecord, error) {
+// ListByDialogue 按对话ID和用户ID查询对话记录
+func (r *DialogueRepo) ListByDialogue(ctx context.Context, query *model.DialogueQuery) ([]*model.DialogueRecord, error) {
 	var list []*model.DialogueRecord
 	if err := r.db.WithContext(ctx).
-		Where("dialogue_id = ?", dialogueID).
+		Where("dialogue_id = ? AND user_id = ?", query.DialogueID, query.UserID).
 		Order("created_time ASC").
 		Find(&list).Error; err != nil {
-		logger.ContextError(ctx, "DialogueRepo.ListByDialogueID", zap.String("dialogue_id", dialogueID), zap.Error(err))
-		return nil, fmt.Errorf("list dialogue by dialogue_id: %w", err)
+		logger.ContextError(ctx, "DialogueRepo.ListByDialogue", zap.String("dialogue_id", query.DialogueID), zap.String("user_id", query.UserID), zap.Error(err))
+		return nil, fmt.Errorf("list dialogue by dialogue_id and user_id: %w", err)
 	}
 	return list, nil
 }
 
+// ListByUserID 按用户ID分页查询对话记录
 func (r *DialogueRepo) ListByUserID(ctx context.Context, userID string, offset, limit int) ([]*model.DialogueRecord, int64, error) {
 	ctx, span := tracing.Start(ctx, "repo.DialogueRepo.ListByUserID")
 	defer span.End()
@@ -66,6 +69,7 @@ func (r *DialogueRepo) ListByUserID(ctx context.Context, userID string, offset, 
 	return list, total, nil
 }
 
+// Create 创建对话记录
 func (r *DialogueRepo) Create(ctx context.Context, record *model.DialogueRecord) error {
 	ctx, span := tracing.Start(ctx, "repo.DialogueRepo.Create")
 	defer span.End()
@@ -83,28 +87,23 @@ func (r *DialogueRepo) ListDialogues(ctx context.Context, userID string) ([]*mod
 	ctx, span := tracing.Start(ctx, "repo.DialogueRepo.ListDialogues")
 	defer span.End()
 
-	query := r.db.WithContext(ctx).Model(&model.DialogueRecord{})
-	if userID != "" {
-		query = query.Where("user_id = ?", userID)
+	if userID == "" {
+		return []*model.DialogueSummary{}, nil
 	}
 
 	var summaries []*model.DialogueSummary
 	sql := `SELECT
 		dialogue_id,
 		(SELECT user_content FROM tb_user_agent_dialogues d2
-		 WHERE d2.dialogue_id = d1.dialogue_id ORDER BY created_time ASC LIMIT 1) AS title,
+		 WHERE d2.dialogue_id = d1.dialogue_id AND d2.user_id = ? ORDER BY created_time ASC LIMIT 1) AS title,
 		COUNT(*) AS message_count,
 		MAX(created_time) AS updated_time
 	FROM tb_user_agent_dialogues d1`
 
-	args := make([]interface{}, 0)
-	if userID != "" {
-		sql += " WHERE d1.user_id = ?"
-		args = append(args, userID)
-	}
-	sql += " GROUP BY dialogue_id ORDER BY updated_time DESC"
+	args := []interface{}{userID, userID}
+	sql += " WHERE d1.user_id = ? GROUP BY dialogue_id ORDER BY updated_time DESC"
 
-	if err := query.Select("").Raw(sql, args...).Scan(&summaries).Error; err != nil {
+	if err := r.db.WithContext(ctx).Raw(sql, args...).Scan(&summaries).Error; err != nil {
 		tracing.RecordError(ctx, err)
 		logger.ContextError(ctx, "DialogueRepo.ListDialogues", zap.String("user_id", userID), zap.Error(err))
 		return nil, fmt.Errorf("list dialogues: %w", err)
@@ -112,9 +111,9 @@ func (r *DialogueRepo) ListDialogues(ctx context.Context, userID string) ([]*mod
 	return summaries, nil
 }
 
-// AggregateByModel 按模型聚合 token 消耗和费用
-func (r *DialogueRepo) AggregateByModel(ctx context.Context) ([]*model.ModelStat, error) {
-	ctx, span := tracing.Start(ctx, "repo.DialogueRepo.AggregateByModel")
+// AggregateByModelForUser 按用户和模型聚合 token 消耗和费用
+func (r *DialogueRepo) AggregateByModelForUser(ctx context.Context, userID string) ([]*model.ModelStat, error) {
+	ctx, span := tracing.Start(ctx, "repo.DialogueRepo.AggregateByModelForUser")
 	defer span.End()
 
 	var stats []*model.ModelStat
@@ -125,12 +124,13 @@ func (r *DialogueRepo) AggregateByModel(ctx context.Context) ([]*model.ModelStat
 		SUM(input_cost) AS total_input_cost,
 		SUM(output_cost) AS total_output_cost
 	FROM tb_user_agent_dialogues
+	WHERE user_id = ?
 	GROUP BY model
 	ORDER BY total_input_tokens + total_output_tokens DESC`
 
-	if err := r.db.WithContext(ctx).Raw(sql).Scan(&stats).Error; err != nil {
+	if err := r.db.WithContext(ctx).Raw(sql, userID).Scan(&stats).Error; err != nil {
 		tracing.RecordError(ctx, err)
-		logger.ContextError(ctx, "DialogueRepo.AggregateByModel", zap.Error(err))
+		logger.ContextError(ctx, "DialogueRepo.AggregateByModelForUser", zap.String("user_id", userID), zap.Error(err))
 		return nil, fmt.Errorf("aggregate by model: %w", err)
 	}
 	return stats, nil

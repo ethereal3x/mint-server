@@ -1,8 +1,8 @@
 package logic
 
 import (
-	"github.com/ethereal3x/mint-server/internal/model"
 	"github.com/cloudwego/eino/schema"
+	"github.com/ethereal3x/mint-server/internal/model"
 )
 
 const (
@@ -104,13 +104,9 @@ func buildUserMessage(text string, imageURLs []string) *schema.Message {
 		parts = append(parts, schema.MessageInputPart{
 			Type: schema.ChatMessagePartTypeImageURL,
 			Image: &schema.MessageInputImage{
-				MessagePartCommon: schema.MessagePartCommon{URL: strPtr(url)},
+				MessagePartCommon: schema.MessagePartCommon{URL: &url},
 			},
 		})
 	}
 	return &schema.Message{Role: schema.User, UserInputMultiContent: parts}
-}
-
-func strPtr(s string) *string {
-	return &s
 }

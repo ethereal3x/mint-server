@@ -6,7 +6,7 @@ import (
 
 func main() {
 	initApp()
-	rs := newGrpcServer()
+	rs := newGrpcServer(globalTokenManager)
 	hs := newGatewayServer()
 	server.RunGrpcGatewayService(rs, hs)
 }

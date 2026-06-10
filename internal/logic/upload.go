@@ -22,7 +22,7 @@ const maxUploadSize = 50 << 20 // 50MB
 type UploadRepo interface {
 	Create(ctx context.Context, record *model.FileUpload) error
 	Update(ctx context.Context, record *model.FileUpload) error
-	FindByID(ctx context.Context, id int32) (*model.FileUpload, error)
+	FindByIDForUser(ctx context.Context, query *model.FileUploadQuery) (*model.FileUpload, error)
 	ListByUserID(ctx context.Context, userID string) ([]*model.FileUpload, error)
 }
 
@@ -30,6 +30,15 @@ type UploadRepo interface {
 type UploadLogic struct {
 	storage storage.ObjectStorage
 	repo    UploadRepo
+}
+
+// UploadRequest 文件上传请求参数
+type UploadRequest struct {
+	UserID      string
+	FileName    string
+	Reader      io.Reader
+	Size        int64
+	ContentType string
 }
 
 // UploadResult 上传结果
@@ -45,50 +54,55 @@ func NewUploadLogic(store storage.ObjectStorage, repo UploadRepo) *UploadLogic {
 	return &UploadLogic{storage: store, repo: repo}
 }
 
-// Upload 简单文件上传：接收文件流 → 上传 rustfs → 记录 DB → 返回 URL
-func (l *UploadLogic) Upload(ctx context.Context, userID string, fileName string, reader io.Reader, size int64, contentType string) (*UploadResult, error) {
+// Upload 简单文件上传：接收文件流、上传对象存储、记录 DB 并返回 URL
+func (l *UploadLogic) Upload(ctx context.Context, req *UploadRequest) (*UploadResult, error) {
 	ctx, span := tracing.Start(ctx, "logic.UploadLogic.Upload")
 	defer span.End()
 
-	if size > maxUploadSize {
-		return nil, fmt.Errorf("file size %d exceeds max %d", size, maxUploadSize)
+	if req.Size > maxUploadSize {
+		return nil, fmt.Errorf("file size %d exceeds max %d", req.Size, maxUploadSize)
 	}
 
-	objectName := generateObjectName(userID, fileName)
+	objectName := generateObjectName(req.UserID, req.FileName)
 	record := &model.FileUpload{
 		ObjectName:   objectName,
-		OriginalName: fileName,
-		FileSize:     size,
-		ContentType:  contentType,
+		OriginalName: req.FileName,
+		FileSize:     req.Size,
+		ContentType:  req.ContentType,
 		Status:       model.UPLOAD_STATUS_UPLOADING,
-		UserID:       userID,
+		UserID:       req.UserID,
 	}
 	if err := l.repo.Create(ctx, record); err != nil {
 		logger.ContextError(ctx, "UploadLogic.Upload", zap.String("object_name", objectName), zap.Error(err))
 		return nil, mint_err.ErrDBCreate
 	}
 
-	opts := storage.UploadOptions{ContentType: contentType}
-	if err := l.storage.Upload(ctx, objectName, reader, size, opts); err != nil {
+	opts := storage.UploadOptions{ContentType: req.ContentType}
+	if err := l.storage.Upload(ctx, objectName, req.Reader, req.Size, opts); err != nil {
 		record.Status = model.UPLOAD_STATUS_FAILED
-		_ = l.repo.Update(ctx, record)
+		if updateErr := l.repo.Update(ctx, record); updateErr != nil {
+			logger.ContextError(ctx, "UploadLogic.Upload", zap.String("object_name", objectName), zap.Error(updateErr))
+		}
 		logger.ContextError(ctx, "UploadLogic.Upload", zap.String("object_name", objectName), zap.Error(err))
 		return nil, fmt.Errorf("storage upload: %w", err)
 	}
 
 	record.Status = model.UPLOAD_STATUS_COMPLETED
 	record.URL = l.storage.PublicURL(objectName)
-	record.UploadedSize = size
-	_ = l.repo.Update(ctx, record)
+	record.UploadedSize = req.Size
+	if err := l.repo.Update(ctx, record); err != nil {
+		logger.ContextError(ctx, "UploadLogic.Upload", zap.String("object_name", objectName), zap.Error(err))
+		return nil, mint_err.ErrDBUpdate
+	}
 
-	return &UploadResult{ID: record.ID, URL: record.URL, FileName: fileName, FileSize: size}, nil
+	return &UploadResult{ID: record.ID, URL: record.URL, FileName: req.FileName, FileSize: req.Size}, nil
 }
 
-// GetUpload 查询上传记录
-func (l *UploadLogic) GetUpload(ctx context.Context, id int32) (*model.FileUpload, error) {
-	record, err := l.repo.FindByID(ctx, id)
+// GetUpload 查询当前用户的上传记录
+func (l *UploadLogic) GetUpload(ctx context.Context, query *model.FileUploadQuery) (*model.FileUpload, error) {
+	record, err := l.repo.FindByIDForUser(ctx, query)
 	if err != nil {
-		logger.ContextError(ctx, "UploadLogic.GetUpload", zap.Int32("id", id), zap.Error(err))
+		logger.ContextError(ctx, "UploadLogic.GetUpload", zap.Int32("id", query.ID), zap.String("user_id", query.UserID), zap.Error(err))
 		return nil, mint_err.ErrDBQuery
 	}
 	return record, nil

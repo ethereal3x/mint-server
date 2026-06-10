@@ -25,29 +25,45 @@ const (
 	ERR_CODE_DB_UPDATE          errs.ErrorCode = -1018
 	ERR_CODE_DB_DELETE          errs.ErrorCode = -1019
 	ERR_CODE_INTERNAL           errs.ErrorCode = -1020
+	ERR_CODE_UNAUTHORIZED       errs.ErrorCode = -1021
+	ERR_CODE_FORBIDDEN          errs.ErrorCode = -1022
+	ERR_CODE_USER_EXISTS        errs.ErrorCode = -1023
+	ERR_CODE_USER_NOT_FOUND     errs.ErrorCode = -1024
+	ERR_CODE_INVALID_CREDENTIAL errs.ErrorCode = -1025
+	ERR_CODE_TOKEN_INVALID      errs.ErrorCode = -1026
+	ERR_CODE_TOKEN_EXPIRED      errs.ErrorCode = -1027
+	ERR_CODE_PASSWORD_WEAK      errs.ErrorCode = -1028
 )
 
 // 预定义业务错误实例
 var (
-	ErrParam           = errs.New(ERR_CODE_PARAM, "参数错误")
-	ErrModelNotFound   = errs.New(ERR_CODE_MODEL_NOT_FOUND, "模型配置不存在")
-	ErrConfigNotFound  = errs.New(ERR_CODE_CONFIG_NOT_FOUND, "配置不存在")
-	ErrChatStream      = errs.New(ERR_CODE_CHAT_STREAM, "流式对话失败")
-	ErrChatGenerate    = errs.New(ERR_CODE_CHAT_GENERATE, "对话生成失败")
-	ErrSaveRecord      = errs.New(ERR_CODE_SAVE_RECORD, "保存记录失败")
-	ErrListDialogues   = errs.New(ERR_CODE_LIST_DIALOGUES, "获取对话列表失败")
-	ErrGetHistory      = errs.New(ERR_CODE_GET_HISTORY, "获取历史记录失败")
-	ErrListModels      = errs.New(ERR_CODE_LIST_MODELS, "获取模型列表失败")
-	ErrListConfigs     = errs.New(ERR_CODE_LIST_CONFIGS, "获取配置列表失败")
-	ErrCreateConfig    = errs.New(ERR_CODE_CREATE_CONFIG, "创建配置失败")
-	ErrUpdateConfig    = errs.New(ERR_CODE_UPDATE_CONFIG, "更新配置失败")
-	ErrDeleteConfig    = errs.New(ERR_CODE_DELETE_CONFIG, "删除配置失败")
-	ErrModelStats      = errs.New(ERR_CODE_MODEL_STATS, "获取模型统计失败")
-	ErrEncryptAPIKey   = errs.New(ERR_CODE_ENCRYPT_API_KEY, "加密API密钥失败")
-	ErrDecryptAPIKey   = errs.New(ERR_CODE_DECRYPT_API_KEY, "解密API密钥失败")
-	ErrDBQuery         = errs.New(ERR_CODE_DB_QUERY, "数据库查询失败")
-	ErrDBCreate        = errs.New(ERR_CODE_DB_CREATE, "数据库创建失败")
-	ErrDBUpdate        = errs.New(ERR_CODE_DB_UPDATE, "数据库更新失败")
-	ErrDBDelete        = errs.New(ERR_CODE_DB_DELETE, "数据库删除失败")
-	ErrInternal        = errs.New(ERR_CODE_INTERNAL, "内部服务错误")
+	ErrParam             = errs.New(ERR_CODE_PARAM, "参数错误")
+	ErrModelNotFound     = errs.New(ERR_CODE_MODEL_NOT_FOUND, "模型配置不存在")
+	ErrConfigNotFound    = errs.New(ERR_CODE_CONFIG_NOT_FOUND, "配置不存在")
+	ErrChatStream        = errs.New(ERR_CODE_CHAT_STREAM, "流式对话失败")
+	ErrChatGenerate      = errs.New(ERR_CODE_CHAT_GENERATE, "对话生成失败")
+	ErrSaveRecord        = errs.New(ERR_CODE_SAVE_RECORD, "保存记录失败")
+	ErrListDialogues     = errs.New(ERR_CODE_LIST_DIALOGUES, "获取对话列表失败")
+	ErrGetHistory        = errs.New(ERR_CODE_GET_HISTORY, "获取历史记录失败")
+	ErrListModels        = errs.New(ERR_CODE_LIST_MODELS, "获取模型列表失败")
+	ErrListConfigs       = errs.New(ERR_CODE_LIST_CONFIGS, "获取配置列表失败")
+	ErrCreateConfig      = errs.New(ERR_CODE_CREATE_CONFIG, "创建配置失败")
+	ErrUpdateConfig      = errs.New(ERR_CODE_UPDATE_CONFIG, "更新配置失败")
+	ErrDeleteConfig      = errs.New(ERR_CODE_DELETE_CONFIG, "删除配置失败")
+	ErrModelStats        = errs.New(ERR_CODE_MODEL_STATS, "获取模型统计失败")
+	ErrEncryptAPIKey     = errs.New(ERR_CODE_ENCRYPT_API_KEY, "加密API密钥失败")
+	ErrDecryptAPIKey     = errs.New(ERR_CODE_DECRYPT_API_KEY, "解密API密钥失败")
+	ErrDBQuery           = errs.New(ERR_CODE_DB_QUERY, "数据库查询失败")
+	ErrDBCreate          = errs.New(ERR_CODE_DB_CREATE, "数据库创建失败")
+	ErrDBUpdate          = errs.New(ERR_CODE_DB_UPDATE, "数据库更新失败")
+	ErrDBDelete          = errs.New(ERR_CODE_DB_DELETE, "数据库删除失败")
+	ErrInternal          = errs.New(ERR_CODE_INTERNAL, "内部服务错误")
+	ErrUnauthorized      = errs.New(ERR_CODE_UNAUTHORIZED, "未登录或登录已失效")
+	ErrForbidden         = errs.New(ERR_CODE_FORBIDDEN, "无权限访问")
+	ErrUserExists        = errs.New(ERR_CODE_USER_EXISTS, "账号已存在")
+	ErrUserNotFound      = errs.New(ERR_CODE_USER_NOT_FOUND, "用户不存在")
+	ErrInvalidCredential = errs.New(ERR_CODE_INVALID_CREDENTIAL, "账号或密码错误")
+	ErrTokenInvalid      = errs.New(ERR_CODE_TOKEN_INVALID, "登录令牌无效")
+	ErrTokenExpired      = errs.New(ERR_CODE_TOKEN_EXPIRED, "登录已过期")
+	ErrPasswordWeak      = errs.New(ERR_CODE_PASSWORD_WEAK, "密码强度不足")
 )

@@ -10,9 +10,9 @@ type DialogueRecord struct {
 	Model        string    `gorm:"column:model;size:255;not null"`
 	UserContent  string    `gorm:"column:user_content;type:text"`
 	AgentContent string    `gorm:"column:agent_content;type:text"`
-	TotalTokens   int64     `gorm:"column:total_tokens;default:0"`
-	UserTokens    int64     `gorm:"column:user_tokens;default:0"`
-	AgentTokens   int64     `gorm:"column:agent_tokens;default:0"`
+	TotalTokens  int64     `gorm:"column:total_tokens;default:0"`
+	UserTokens   int64     `gorm:"column:user_tokens;default:0"`
+	AgentTokens  int64     `gorm:"column:agent_tokens;default:0"`
 	InputCost    float64   `gorm:"column:input_cost;type:decimal(12,8);default:0"`
 	OutputCost   float64   `gorm:"column:output_cost;type:decimal(12,8);default:0"`
 	CreatedTime  time.Time `gorm:"column:created_time;autoCreateTime"`
@@ -24,9 +24,15 @@ func (DialogueRecord) TableName() string {
 	return "tb_user_agent_dialogues"
 }
 
+// DialogueQuery 对话记录查询条件
+type DialogueQuery struct {
+	DialogueID string
+	UserID     string
+}
+
 // ModelStat 模型维度统计
 type ModelStat struct {
-	Model            string
+	Model             string
 	TotalInputTokens  int64
 	TotalOutputTokens int64
 	TotalInputCost    float64
