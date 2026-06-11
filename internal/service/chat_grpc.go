@@ -11,8 +11,6 @@ import (
 	"github.com/ethereal3x/mint-server/internal/model"
 	"github.com/google/uuid"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 // AgentServer AgentService gRPC 处理器
@@ -27,25 +25,49 @@ func NewAgentServer(chat AgentChatLogic, config AgentConfigLogic) *AgentServer {
 	return &AgentServer{chat: chat, config: config}
 }
 
+// chatPrepareParams 聊天请求准备参数
+type chatPrepareParams struct {
+	question   string
+	model      string
+	dialogueID string
+	recordID   string
+	fileData   []byte
+	fileName   string
+	imageURLs  []string
+}
+
+// buildChatRequest 鉴权、生成 IDs 并构建 ChatRequest
+func (s *AgentServer) buildChatRequest(ctx context.Context, params *chatPrepareParams) (string, string, *dto.ChatRequest, error) {
+	userID, err := auth.RequireUserID(ctx)
+	if err != nil {
+		return "", "", nil, mint_err.ErrUnauthorized
+	}
+	dialogueID, recordID := resolveIDs(params.dialogueID, params.recordID)
+	chatReq := &dto.ChatRequest{
+		UserID:     userID,
+		Question:   params.question,
+		Model:      params.model,
+		DialogueID: dialogueID,
+		RecordID:   recordID,
+		FileData:   params.fileData,
+		FileName:   params.fileName,
+		ImageURLs:  params.imageURLs,
+	}
+	return dialogueID, recordID, chatReq, nil
+}
+
 // StreamChat 流式聊天
 func (s *AgentServer) StreamChat(req *agentpb.StreamChatRequest, stream grpc.ServerStreamingServer[agentpb.StreamChatResponse]) error {
 	if req.Question == "" || req.Model == "" {
-		return status.Errorf(codes.InvalidArgument, "chat stream: missing question or model")
+		return sendStreamError(stream, mint_err.ErrParam)
 	}
-	userID, err := auth.RequireUserID(stream.Context())
+	dialogueID, recordID, chatReq, err := s.buildChatRequest(stream.Context(), &chatPrepareParams{
+		question: req.Question, model: req.Model,
+		dialogueID: req.DialogueId, recordID: req.RecordId,
+		fileData: req.FileData, fileName: req.FileName, imageURLs: req.ImageUrls,
+	})
 	if err != nil {
-		return sendStreamError(stream, mint_err.ErrUnauthorized)
-	}
-	dialogueID, recordID := resolveIDs(req.DialogueId, req.RecordId)
-	chatReq := &dto.ChatRequest{
-		UserID:     userID,
-		Question:   req.Question,
-		Model:      req.Model,
-		DialogueID: dialogueID,
-		RecordID:   recordID,
-		FileData:   req.FileData,
-		FileName:   req.FileName,
-		ImageURLs:  req.ImageUrls,
+		return sendStreamError(stream, err)
 	}
 
 	contentChan := make(chan string)
@@ -98,20 +120,13 @@ func (s *AgentServer) GenerateChat(ctx context.Context, req *agentpb.GenerateCha
 	if req.Question == "" || req.Model == "" {
 		return errs.GenProtoReply(rsp, mint_err.ErrParam)
 	}
-	userID, err := auth.RequireUserID(ctx)
+	dialogueID, recordID, chatReq, err := s.buildChatRequest(ctx, &chatPrepareParams{
+		question: req.Question, model: req.Model,
+		dialogueID: req.DialogueId, recordID: req.RecordId,
+		fileData: req.FileData, fileName: req.FileName, imageURLs: req.ImageUrls,
+	})
 	if err != nil {
-		return errs.GenProtoReply(rsp, mint_err.ErrUnauthorized)
-	}
-	dialogueID, recordID := resolveIDs(req.DialogueId, req.RecordId)
-	chatReq := &dto.ChatRequest{
-		UserID:     userID,
-		Question:   req.Question,
-		Model:      req.Model,
-		DialogueID: dialogueID,
-		RecordID:   recordID,
-		FileData:   req.FileData,
-		FileName:   req.FileName,
-		ImageURLs:  req.ImageUrls,
+		return errs.GenProtoReply(rsp, err)
 	}
 
 	result, err := s.chat.GenerateChat(ctx, chatReq)

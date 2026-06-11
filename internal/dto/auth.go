@@ -5,8 +5,8 @@ import (
 
 	authpb "github.com/ethereal3x/mint-server/api/gen/go/mint_server/auth"
 	userpb "github.com/ethereal3x/mint-server/api/gen/go/mint_server/user"
-	"github.com/ethereal3x/mint-server/internal/auth"
 	"github.com/ethereal3x/mint-server/internal/model"
+	"github.com/ethereal3x/mint-server/internal/util"
 )
 
 // RegisterAccountRequest 账号密码注册参数
@@ -27,7 +27,7 @@ type LoginRequest struct {
 // AuthResult 登录态结果
 type AuthResult struct {
 	User  *model.BaseUser
-	Token *auth.TokenResult
+	Token *util.TokenResult
 }
 
 // UserToAuthProto 转换用户模型为 authpb.UserInfo

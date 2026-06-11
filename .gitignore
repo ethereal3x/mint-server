@@ -7,5 +7,7 @@ config.yaml
 AGENT.md
 CLAUDE.md
 configs/dev/config.yaml
+deploy/compose/config-docker.yaml
+deploy/compose/init.sql
 github.com/
 docs

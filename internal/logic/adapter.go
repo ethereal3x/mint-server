@@ -31,8 +31,8 @@ func NewEinoAdapter() *EinoAdapter {
 	return &EinoAdapter{}
 }
 
-// createModel 根据模型配置创建 Eino ChatModel
-func (a *EinoAdapter) createModel(ctx context.Context, config *model.ChatModelConfig) (*openai.ChatModel, error) {
+// createChatModel 根据 Provider 创建对应的 ChatModel，后续新增厂商只需扩展此方法
+func (a *EinoAdapter) createChatModel(ctx context.Context, config *model.ChatModelConfig) (*openai.ChatModel, error) {
 	return openai.NewChatModel(ctx, &openai.ChatModelConfig{
 		APIKey:  config.APIKey,
 		Model:   config.ModelType,
@@ -42,7 +42,7 @@ func (a *EinoAdapter) createModel(ctx context.Context, config *model.ChatModelCo
 
 // Generate 非流式生成
 func (a *EinoAdapter) Generate(ctx context.Context, config *model.ChatModelConfig, messages []*schema.Message) (string, *schema.TokenUsage, error) {
-	cm, err := a.createModel(ctx, config)
+	cm, err := a.createChatModel(ctx, config)
 	if err != nil {
 		return "", nil, fmt.Errorf("create model: %w", err)
 	}
@@ -56,7 +56,7 @@ func (a *EinoAdapter) Generate(ctx context.Context, config *model.ChatModelConfi
 
 // Stream 流式生成，增量内容通过 contentChan 返回
 func (a *EinoAdapter) Stream(ctx context.Context, config *model.ChatModelConfig, messages []*schema.Message, contentChan chan<- string) (*schema.TokenUsage, error) {
-	cm, err := a.createModel(ctx, config)
+	cm, err := a.createChatModel(ctx, config)
 	if err != nil {
 		return nil, fmt.Errorf("create model: %w", err)
 	}

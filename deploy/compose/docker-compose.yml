@@ -1,0 +1,57 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mint-mysql
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: mint_server
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 15s
+    restart: unless-stopped
+
+  mint-server:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    container_name: mint-server
+    volumes:
+      - ./config-docker.yaml:/etc/mint-server/config.yaml
+      - mint_logs:/data/logs/app/mint-server
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+
+  mint-admin:
+    build:
+      context: ../../../mint-admin
+      dockerfile: Dockerfile
+    container_name: mint-admin
+    depends_on:
+      - mint-server
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    container_name: mint-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - mint-server
+      - mint-admin
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+  mint_logs:

@@ -8,13 +8,44 @@ import (
 	"time"
 
 	"github.com/ethereal3x/apc/logger"
-	"github.com/ethereal3x/mint-server/internal/auth"
 	"github.com/ethereal3x/mint-server/internal/dto"
 	mint_err "github.com/ethereal3x/mint-server/internal/errs"
-	"github.com/ethereal3x/mint-server/internal/idgen"
 	"github.com/ethereal3x/mint-server/internal/model"
+	"github.com/ethereal3x/mint-server/internal/util"
 	"go.uber.org/zap"
 )
+
+// AuthProvider 认证提供者接口，每种认证方式实现此接口
+type AuthProvider interface {
+	Authenticate(ctx context.Context, identifier, credential string) (*model.BaseUser, error)
+}
+
+// passwordAuthProvider 账号密码认证提供者
+type passwordAuthProvider struct {
+	repo UserStore
+}
+
+// Authenticate 通过用户名查找用户并校验密码
+func (p *passwordAuthProvider) Authenticate(ctx context.Context, identifier, credential string) (*model.BaseUser, error) {
+	user, err := p.repo.FindBaseUserByUsername(ctx, &model.BaseUserQuery{Username: identifier})
+	if err != nil {
+		return nil, mint_err.ErrDBQuery
+	}
+	if user == nil || !util.ComparePassword(user.Password, credential) {
+		return nil, mint_err.ErrInvalidCredential
+	}
+	return user, nil
+}
+
+// newAuthProvider 根据 provider 类型创建对应的认证提供者
+func newAuthProvider(provider string, repo UserStore) (AuthProvider, error) {
+	switch provider {
+	case model.AUTH_PROVIDER_ACCOUNT_PASSWORD:
+		return &passwordAuthProvider{repo: repo}, nil
+	default:
+		return nil, mint_err.ErrParam
+	}
+}
 
 // UserStore 用户认证场景需要的数据访问接口
 type UserStore interface {
@@ -27,7 +58,7 @@ type UserStore interface {
 // Auth 认证业务逻辑
 type Auth struct {
 	repo         UserStore
-	tokenManager *auth.TokenManager
+	tokenManager *util.TokenManager
 }
 
 // issueTokenRequest 签发登录态参数
@@ -38,7 +69,7 @@ type issueTokenRequest struct {
 }
 
 // NewAuth 创建认证业务逻辑
-func NewAuth(repo UserStore, tokenManager *auth.TokenManager) *Auth {
+func NewAuth(repo UserStore, tokenManager *util.TokenManager) *Auth {
 	return &Auth{repo: repo, tokenManager: tokenManager}
 }
 
@@ -48,9 +79,9 @@ func (s *Auth) RegisterAccount(ctx context.Context, req *dto.RegisterAccountRequ
 	if account == "" {
 		return nil, mint_err.ErrParam
 	}
-	credentialHash, err := auth.HashPassword(req.Password)
+	credentialHash, err := util.HashPassword(req.Password)
 	if err != nil {
-		if errors.Is(err, auth.ErrPasswordTooShort) {
+		if errors.Is(err, util.ErrPasswordTooShort) {
 			return nil, mint_err.ErrPasswordWeak
 		}
 		logger.ContextError(ctx, "Auth.RegisterAccount", zap.Error(err))
@@ -63,7 +94,7 @@ func (s *Auth) RegisterAccount(ctx context.Context, req *dto.RegisterAccountRequ
 	}
 	now := time.Now().Unix()
 	user := &model.BaseUser{
-		UserID:    idgen.GenIntUUID(),
+		UserID:    util.GenIntUUID(),
 		Username:  account,
 		Nickname:  nickname,
 		AvatarURL: strings.TrimSpace(req.AvatarURL),
@@ -87,16 +118,17 @@ func (s *Auth) Login(ctx context.Context, req *dto.LoginRequest) (*dto.AuthResul
 		provider = model.AUTH_PROVIDER_ACCOUNT_PASSWORD
 	}
 	identifier := normalizeIdentifier(req.Identifier)
-	if provider != model.AUTH_PROVIDER_ACCOUNT_PASSWORD || identifier == "" || req.Credential == "" {
+	if identifier == "" || req.Credential == "" {
 		return nil, mint_err.ErrParam
 	}
-	user, err := s.repo.FindBaseUserByUsername(ctx, &model.BaseUserQuery{Username: identifier})
+	authProvider, err := newAuthProvider(provider, s.repo)
+	if err != nil {
+		return nil, err
+	}
+	user, err := authProvider.Authenticate(ctx, identifier, req.Credential)
 	if err != nil {
 		logger.ContextError(ctx, "Auth.Login", zap.String("provider", provider), zap.String("identifier", identifier), zap.Error(err))
-		return nil, mint_err.ErrDBQuery
-	}
-	if user == nil || !auth.ComparePassword(user.Password, req.Credential) {
-		return nil, mint_err.ErrInvalidCredential
+		return nil, err
 	}
 	return s.issueToken(ctx, &issueTokenRequest{User: user, Provider: provider, Identifier: identifier})
 }
@@ -129,12 +161,12 @@ func (s *Auth) UpdatePassword(ctx context.Context, userID string, oldPassword st
 	if err != nil {
 		return err
 	}
-	if !auth.ComparePassword(user.Password, oldPassword) {
+	if !util.ComparePassword(user.Password, oldPassword) {
 		return mint_err.ErrInvalidCredential
 	}
-	credentialHash, err := auth.HashPassword(newPassword)
+	credentialHash, err := util.HashPassword(newPassword)
 	if err != nil {
-		if errors.Is(err, auth.ErrPasswordTooShort) {
+		if errors.Is(err, util.ErrPasswordTooShort) {
 			return mint_err.ErrPasswordWeak
 		}
 		logger.ContextError(ctx, "Auth.UpdatePassword", zap.Error(err))
@@ -195,7 +227,7 @@ func (s *Auth) updateAndRefetch(ctx context.Context, userID int64, updates map[s
 
 // issueToken 为用户签发访问令牌
 func (s *Auth) issueToken(ctx context.Context, req *issueTokenRequest) (*dto.AuthResult, error) {
-	token, err := s.tokenManager.IssueAccessToken(ctx, &auth.TokenInput{UserID: strconv.FormatInt(req.User.UserID, 10), Provider: req.Provider, Identifier: req.Identifier})
+	token, err := s.tokenManager.IssueAccessToken(ctx, &util.TokenInput{UserID: strconv.FormatInt(req.User.UserID, 10), Provider: req.Provider, Identifier: req.Identifier})
 	if err != nil {
 		logger.ContextError(ctx, "Auth.issueToken", zap.Int64("user_id", req.User.UserID), zap.Error(err))
 		return nil, mint_err.ErrInternal

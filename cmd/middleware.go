@@ -1,9 +1,11 @@
-package auth
+package main
 
 import (
 	"context"
 	"errors"
 
+	"github.com/ethereal3x/mint-server/internal/auth"
+	"github.com/ethereal3x/mint-server/internal/util"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -11,13 +13,13 @@ import (
 
 // Middleware JWT 认证拦截器
 type Middleware struct {
-	manager       *TokenManager
+	manager       *util.TokenManager
 	publicMethods map[string]struct{}
 }
 
 // MiddlewareConfig JWT 认证拦截器配置
 type MiddlewareConfig struct {
-	Manager       *TokenManager
+	Manager       *util.TokenManager
 	PublicMethods []string
 }
 
@@ -35,7 +37,7 @@ func (m *Middleware) UnaryInterceptor(ctx context.Context, req interface{}, info
 	if m.isPublicMethod(info.FullMethod) {
 		return handler(ctx, req)
 	}
-	authCtx, err := ContextWithMetadataPrincipal(ctx, m.manager)
+	authCtx, err := auth.ContextWithMetadataPrincipal(ctx, m.manager)
 	if err != nil {
 		return nil, authStatusError(err)
 	}
@@ -47,7 +49,7 @@ func (m *Middleware) StreamInterceptor(srv interface{}, stream grpc.ServerStream
 	if m.isPublicMethod(info.FullMethod) {
 		return handler(srv, stream)
 	}
-	authCtx, err := ContextWithMetadataPrincipal(stream.Context(), m.manager)
+	authCtx, err := auth.ContextWithMetadataPrincipal(stream.Context(), m.manager)
 	if err != nil {
 		return authStatusError(err)
 	}
@@ -73,10 +75,10 @@ func (s *principalServerStream) Context() context.Context {
 
 // authStatusError 转换认证错误为 gRPC status error
 func authStatusError(err error) error {
-	if errors.Is(err, ErrExpiredToken) {
+	if errors.Is(err, util.ErrExpiredToken) {
 		return status.Error(codes.Unauthenticated, "登录已过期")
 	}
-	if errors.Is(err, ErrInvalidToken) {
+	if errors.Is(err, util.ErrInvalidToken) {
 		return status.Error(codes.Unauthenticated, "登录令牌无效")
 	}
 	return status.Error(codes.Unauthenticated, "未登录或登录已失效")

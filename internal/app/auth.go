@@ -1,8 +1,8 @@
 package app
 
 import (
-	"github.com/ethereal3x/mint-server/internal/auth"
 	"github.com/ethereal3x/mint-server/internal/decorator"
+	"github.com/ethereal3x/mint-server/internal/util"
 	"github.com/ethereal3x/mint-server/internal/logic"
 	"github.com/ethereal3x/mint-server/internal/repo"
 	"github.com/ethereal3x/mint-server/internal/service"
@@ -16,7 +16,7 @@ type AuthModule struct {
 }
 
 // newAuthModule 装配 Auth 领域全部依赖，通过 decorator 注入 tracing/logging
-func newAuthModule(db *gorm.DB, tokenManager *auth.TokenManager) *AuthModule {
+func newAuthModule(db *gorm.DB, tokenManager *util.TokenManager) *AuthModule {
 	userRepo := repo.NewUserRepo(db)
 	authLogic := logic.NewAuth(userRepo, tokenManager)
 	authDecorated := decorator.NewAuthDecorator(authLogic)

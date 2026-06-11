@@ -1,4 +1,4 @@
-package auth
+package util
 
 import (
 	"context"
@@ -6,13 +6,14 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/ethereal3x/mint-server/internal/model"
 	"github.com/golang-jwt/jwt/v5"
 )
 
 const (
 	defaultIssuer          = "mint-server"
 	defaultAccessTokenTTL  = 24 * time.Hour
-	bearerTokenType        = "Bearer"
+	BearerTokenType        = "Bearer"
 	accessTokenSigningName = "access_token"
 )
 
@@ -94,7 +95,7 @@ func (m *TokenManager) IssueAccessToken(ctx context.Context, input *TokenInput) 
 	if err != nil {
 		return nil, fmt.Errorf("sign access token: %w", err)
 	}
-	return &TokenResult{AccessToken: accessToken, TokenType: bearerTokenType, ExpiresAt: expiresAt, ExpiresIn: int64(m.ttl.Seconds())}, nil
+	return &TokenResult{AccessToken: accessToken, TokenType: BearerTokenType, ExpiresAt: expiresAt, ExpiresIn: int64(m.ttl.Seconds())}, nil
 }
 
 // ParseAccessToken 解析并校验访问令牌
@@ -119,6 +120,6 @@ func (m *TokenManager) ParseAccessToken(ctx context.Context, tokenText string) (
 }
 
 // PrincipalFromClaims 根据 JWT 声明构建认证主体
-func PrincipalFromClaims(claims *Claims) *Principal {
-	return &Principal{UserID: claims.Subject, Provider: claims.Provider, Identifier: claims.Identifier}
+func PrincipalFromClaims(claims *Claims) *model.Principal {
+	return &model.Principal{UserID: claims.Subject, Provider: claims.Provider, Identifier: claims.Identifier}
 }

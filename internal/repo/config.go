@@ -7,7 +7,7 @@ import (
 
 	"github.com/ethereal3x/apc/logger"
 	"github.com/ethereal3x/apc/tracing"
-	"github.com/ethereal3x/mint-server/internal/crypto"
+	"github.com/ethereal3x/mint-server/internal/util"
 	"github.com/ethereal3x/mint-server/internal/model"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -34,7 +34,7 @@ func (r *ModelConfigRepo) FindByModelTypeForUser(ctx context.Context, modelType 
 		logger.ContextError(ctx, "ModelConfigRepo.FindByModelTypeForUser", zap.String("model_type", modelType), zap.String("user_id", userID), zap.Error(err))
 		return nil, fmt.Errorf("find config by model_type: %w", err)
 	}
-	decrypted, err := crypto.DecryptAPIKey(config.APIKey, r.secretKey)
+	decrypted, err := util.DecryptAPIKey(config.APIKey, r.secretKey)
 	if err != nil {
 		logger.ContextError(ctx, "ModelConfigRepo.FindByModelTypeForUser", zap.String("model_type", modelType), zap.Error(err))
 		return nil, fmt.Errorf("decrypt api key: %w", err)
@@ -84,7 +84,7 @@ func (r *ModelConfigRepo) FindByIDForUser(ctx context.Context, id int32, userID 
 		logger.ContextError(ctx, "ModelConfigRepo.FindByIDForUser", zap.Int32("id", id), zap.String("user_id", userID), zap.Error(err))
 		return nil, fmt.Errorf("find config by id: %w", err)
 	}
-	decrypted, err := crypto.DecryptAPIKey(config.APIKey, r.secretKey)
+	decrypted, err := util.DecryptAPIKey(config.APIKey, r.secretKey)
 	if err != nil {
 		logger.ContextError(ctx, "ModelConfigRepo.FindByIDForUser", zap.Int32("id", id), zap.Error(err))
 		return nil, fmt.Errorf("decrypt api key: %w", err)
@@ -98,7 +98,7 @@ func (r *ModelConfigRepo) Create(ctx context.Context, config *model.ChatModelCon
 	ctx, span := tracing.Start(ctx, "repo.ModelConfigRepo.Create")
 	defer span.End()
 
-	encrypted, err := crypto.EncryptAPIKey(config.APIKey, r.secretKey)
+	encrypted, err := util.EncryptAPIKey(config.APIKey, r.secretKey)
 	if err != nil {
 		tracing.RecordError(ctx, err)
 		return fmt.Errorf("encrypt api key: %w", err)
@@ -123,7 +123,7 @@ func (r *ModelConfigRepo) UpdateForUser(ctx context.Context, config *model.ChatM
 		omitFields = append(omitFields, "api_key")
 	} else {
 		var err error
-		config.APIKey, err = crypto.EncryptAPIKey(config.APIKey, r.secretKey)
+		config.APIKey, err = util.EncryptAPIKey(config.APIKey, r.secretKey)
 		if err != nil {
 			tracing.RecordError(ctx, err)
 			return fmt.Errorf("encrypt api key: %w", err)

@@ -9,6 +9,7 @@ import (
 	"github.com/ethereal3x/apc/logger"
 	"github.com/ethereal3x/mint-server/internal/auth"
 	"github.com/ethereal3x/mint-server/internal/dto"
+	"github.com/ethereal3x/mint-server/internal/util"
 	mint_err "github.com/ethereal3x/mint-server/internal/errs"
 	"github.com/ethereal3x/mint-server/internal/model"
 	"go.uber.org/zap"
@@ -19,11 +20,11 @@ const httpMaxUploadSize = 50 << 20 // 50MB
 // UploadHandler 文件上传 HTTP 处理器
 type UploadHandler struct {
 	logic        UploadServiceLogic
-	tokenManager *auth.TokenManager
+	tokenManager *util.TokenManager
 }
 
 // NewUploadHandler 创建上传 HTTP 处理器
-func NewUploadHandler(uploadLogic UploadServiceLogic, tokenManager *auth.TokenManager) *UploadHandler {
+func NewUploadHandler(uploadLogic UploadServiceLogic, tokenManager *util.TokenManager) *UploadHandler {
 	return &UploadHandler{logic: uploadLogic, tokenManager: tokenManager}
 }
 

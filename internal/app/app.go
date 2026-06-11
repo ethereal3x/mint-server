@@ -8,8 +8,8 @@ import (
 	"github.com/ethereal3x/apc/logger"
 	"github.com/ethereal3x/apc/orm"
 	"github.com/ethereal3x/apc/storage"
-	"github.com/ethereal3x/mint-server/internal/auth"
 	"github.com/ethereal3x/mint-server/internal/config"
+	"github.com/ethereal3x/mint-server/internal/util"
 	"gorm.io/gorm"
 )
 
@@ -17,7 +17,7 @@ import (
 type App struct {
 	DB           *gorm.DB
 	Storage      storage.ObjectStorage
-	TokenManager *auth.TokenManager
+	TokenManager *util.TokenManager
 	BizConfig    config.BusinessConfig
 
 	Agent  *AgentModule
@@ -49,7 +49,7 @@ func New(cfgPath string) (*App, error) {
 		return nil, fmt.Errorf("init storage: %w", err)
 	}
 
-	tokenManager := auth.NewTokenManager(auth.TokenManagerConfig{
+	tokenManager := util.NewTokenManager(util.TokenManagerConfig{
 		Secret: bizCfg.JWT.Secret,
 	})
 	secretKey := []byte(bizCfg.SecretKey.Encryption)

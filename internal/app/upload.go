@@ -2,8 +2,8 @@ package app
 
 import (
 	"github.com/ethereal3x/apc/storage"
-	"github.com/ethereal3x/mint-server/internal/auth"
 	"github.com/ethereal3x/mint-server/internal/decorator"
+	"github.com/ethereal3x/mint-server/internal/util"
 	"github.com/ethereal3x/mint-server/internal/logic"
 	"github.com/ethereal3x/mint-server/internal/repo"
 	"github.com/ethereal3x/mint-server/internal/service"
@@ -16,7 +16,7 @@ type UploadModule struct {
 }
 
 // newUploadModule 装配 Upload 领域全部依赖，通过 decorator 注入 tracing/logging
-func newUploadModule(db *gorm.DB, store storage.ObjectStorage, tokenManager *auth.TokenManager) *UploadModule {
+func newUploadModule(db *gorm.DB, store storage.ObjectStorage, tokenManager *util.TokenManager) *UploadModule {
 	uploadRepo := repo.NewFileUploadRepo(db)
 	uploadLogic := logic.NewUploadLogic(store, uploadRepo)
 	uploadDecorated := decorator.NewUploadDecorator(uploadLogic)
