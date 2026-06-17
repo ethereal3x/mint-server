@@ -157,9 +157,11 @@ func (s *AgentServer) ListModels(ctx context.Context, _ *agentpb.ListModelsReque
 	}
 	groupMap := make(map[string][]*agentpb.ModelInfo)
 	for _, config := range configs {
+		pbConfig := dto.ConfigToProto(config)
 		groupMap[config.Manufacturer] = append(groupMap[config.Manufacturer], &agentpb.ModelInfo{
 			Model:              config.ModelType,
 			Description:        config.Description,
+			ModelCapabilities:  pbConfig.ModelCapabilities,
 			SupportsMultimodal: config.SupportsMultimodal,
 		})
 	}

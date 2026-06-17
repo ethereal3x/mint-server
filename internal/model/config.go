@@ -2,6 +2,14 @@ package model
 
 import "time"
 
+const (
+	MODEL_CAPABILITY_TEXT_CHAT           = "MODEL_CAPABILITY_TEXT_CHAT"
+	MODEL_CAPABILITY_IMAGE_UNDERSTANDING = "MODEL_CAPABILITY_IMAGE_UNDERSTANDING"
+	MODEL_CAPABILITY_TEXT_TO_IMAGE       = "MODEL_CAPABILITY_TEXT_TO_IMAGE"
+	MODEL_CAPABILITY_TEXT_TO_VIDEO       = "MODEL_CAPABILITY_TEXT_TO_VIDEO"
+	MODEL_CAPABILITY_VIDEO_UNDERSTANDING = "MODEL_CAPABILITY_VIDEO_UNDERSTANDING"
+)
+
 // ChatModelConfig 对应 tb_model_config 表，合并策略规则与模型映射
 type ChatModelConfig struct {
 	ID                 int32     `gorm:"column:id;primaryKey;autoIncrement"`
@@ -9,8 +17,9 @@ type ChatModelConfig struct {
 	UserID             string    `gorm:"column:user_id;uniqueIndex:idx_model_type_user;size:255;not null"`
 	Manufacturer       string    `gorm:"column:manufacturer;size:50;not null"`
 	Description        string    `gorm:"column:description;type:text"`
-	InputPrice         float64   `gorm:"column:input_price;type:decimal(10,8);default:0"`
-	OutputPrice        float64   `gorm:"column:output_price;type:decimal(10,8);default:0"`
+	ModelCapabilities  string    `gorm:"column:model_capabilities;size:512;not null;default:''"`
+	InputPrice         float64   `gorm:"column:input_price;type:decimal(14,8);default:0"`
+	OutputPrice        float64   `gorm:"column:output_price;type:decimal(14,8);default:0"`
 	APIKey             string    `gorm:"column:api_key;size:512;not null"`
 	URL                string    `gorm:"column:url;size:128"`
 	MaxTokens          int32     `gorm:"column:max_tokens;default:0"`

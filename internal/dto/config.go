@@ -1,6 +1,8 @@
 package dto
 
 import (
+	"strings"
+
 	agentpb "github.com/ethereal3x/mint-server/api/gen/go/mint_server/agent"
 	"github.com/ethereal3x/mint-server/internal/model"
 )
@@ -10,6 +12,7 @@ type configProtoMessage interface {
 	GetModelType() string
 	GetManufacturer() string
 	GetDescription() string
+	GetModelCapabilities() []string
 	GetInputPrice() float64
 	GetOutputPrice() float64
 	GetApiKey() string
@@ -33,6 +36,7 @@ func baseConfigFromProto(src configProtoMessage) *model.ChatModelConfig {
 		ModelType:          src.GetModelType(),
 		Manufacturer:       src.GetManufacturer(),
 		Description:        src.GetDescription(),
+		ModelCapabilities:  formatModelCapabilities(src.GetModelCapabilities(), src.GetSupportsMultimodal()),
 		InputPrice:         src.GetInputPrice(),
 		OutputPrice:        src.GetOutputPrice(),
 		APIKey:             src.GetApiKey(),
@@ -61,6 +65,7 @@ func ConfigToProto(c *model.ChatModelConfig) *agentpb.ModelConfig {
 		ModelType:          c.ModelType,
 		Manufacturer:       c.Manufacturer,
 		Description:        c.Description,
+		ModelCapabilities:  parseModelCapabilities(c.ModelCapabilities, c.SupportsMultimodal),
 		InputPrice:         c.InputPrice,
 		OutputPrice:        c.OutputPrice,
 		ApiKey:             c.APIKey,
@@ -77,6 +82,58 @@ func ConfigToProto(c *model.ChatModelConfig) *agentpb.ModelConfig {
 		IsEnabled:          c.IsEnabled,
 		SupportsMultimodal: c.SupportsMultimodal,
 	}
+}
+
+// parseModelCapabilities 将数据库能力列表转换为接口能力枚举
+func parseModelCapabilities(rawCapabilities string, supportsMultimodal bool) []string {
+	capabilities := splitModelCapabilities(rawCapabilities)
+	if len(capabilities) > 0 {
+		return capabilities
+	}
+	return defaultModelCapabilities(supportsMultimodal)
+}
+
+// formatModelCapabilities 将接口能力枚举标准化为数据库存储格式
+func formatModelCapabilities(capabilities []string, supportsMultimodal bool) string {
+	normalized := make([]string, 0, len(capabilities))
+	seen := make(map[string]struct{}, len(capabilities))
+	for _, capability := range capabilities {
+		capability = strings.TrimSpace(capability)
+		if capability == "" {
+			continue
+		}
+		if _, exists := seen[capability]; exists {
+			continue
+		}
+		seen[capability] = struct{}{}
+		normalized = append(normalized, capability)
+	}
+	if len(normalized) == 0 {
+		normalized = defaultModelCapabilities(supportsMultimodal)
+	}
+	return strings.Join(normalized, ",")
+}
+
+// splitModelCapabilities 拆分数据库中的模型能力列表
+func splitModelCapabilities(rawCapabilities string) []string {
+	parts := strings.Split(rawCapabilities, ",")
+	capabilities := make([]string, 0, len(parts))
+	for _, part := range parts {
+		capability := strings.TrimSpace(part)
+		if capability != "" {
+			capabilities = append(capabilities, capability)
+		}
+	}
+	return capabilities
+}
+
+// defaultModelCapabilities 为旧数据和空请求补齐默认模型能力
+func defaultModelCapabilities(supportsMultimodal bool) []string {
+	capabilities := []string{model.MODEL_CAPABILITY_TEXT_CHAT}
+	if supportsMultimodal {
+		capabilities = append(capabilities, model.MODEL_CAPABILITY_IMAGE_UNDERSTANDING)
+	}
+	return capabilities
 }
 
 // CreateReqToModel 转换创建请求 proto 为模型

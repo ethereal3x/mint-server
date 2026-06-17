@@ -557,8 +557,10 @@ type ModelInfo struct {
 	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
 	// 是否支持多模态（图片输入）
 	SupportsMultimodal bool `protobuf:"varint,3,opt,name=supports_multimodal,json=supportsMultimodal,proto3" json:"supports_multimodal,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	// 模型能力枚举列表
+	ModelCapabilities []string `protobuf:"bytes,4,rep,name=model_capabilities,json=modelCapabilities,proto3" json:"model_capabilities,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *ModelInfo) Reset() {
@@ -610,6 +612,13 @@ func (x *ModelInfo) GetSupportsMultimodal() bool {
 		return x.SupportsMultimodal
 	}
 	return false
+}
+
+func (x *ModelInfo) GetModelCapabilities() []string {
+	if x != nil {
+		return x.ModelCapabilities
+	}
+	return nil
 }
 
 type GetHistoryRequest struct {
@@ -1002,8 +1011,10 @@ type ModelConfig struct {
 	IsEnabled         int32                  `protobuf:"varint,18,opt,name=is_enabled,json=isEnabled,proto3" json:"is_enabled,omitempty"`
 	// 是否支持多模态（图片输入）
 	SupportsMultimodal bool `protobuf:"varint,19,opt,name=supports_multimodal,json=supportsMultimodal,proto3" json:"supports_multimodal,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	// 模型能力枚举列表
+	ModelCapabilities []string `protobuf:"bytes,20,rep,name=model_capabilities,json=modelCapabilities,proto3" json:"model_capabilities,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *ModelConfig) Reset() {
@@ -1167,6 +1178,13 @@ func (x *ModelConfig) GetSupportsMultimodal() bool {
 		return x.SupportsMultimodal
 	}
 	return false
+}
+
+func (x *ModelConfig) GetModelCapabilities() []string {
+	if x != nil {
+		return x.ModelCapabilities
+	}
+	return nil
 }
 
 type ConfigReply struct {
@@ -1414,8 +1432,10 @@ type CreateConfigRequest struct {
 	IsEnabled         int32                  `protobuf:"varint,17,opt,name=is_enabled,json=isEnabled,proto3" json:"is_enabled,omitempty"`
 	// 是否支持多模态（图片输入）
 	SupportsMultimodal bool `protobuf:"varint,18,opt,name=supports_multimodal,json=supportsMultimodal,proto3" json:"supports_multimodal,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	// 模型能力枚举列表
+	ModelCapabilities []string `protobuf:"bytes,19,rep,name=model_capabilities,json=modelCapabilities,proto3" json:"model_capabilities,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *CreateConfigRequest) Reset() {
@@ -1574,6 +1594,13 @@ func (x *CreateConfigRequest) GetSupportsMultimodal() bool {
 	return false
 }
 
+func (x *CreateConfigRequest) GetModelCapabilities() []string {
+	if x != nil {
+		return x.ModelCapabilities
+	}
+	return nil
+}
+
 type UpdateConfigRequest struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
 	Id                int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -1596,8 +1623,10 @@ type UpdateConfigRequest struct {
 	IsEnabled         int32                  `protobuf:"varint,18,opt,name=is_enabled,json=isEnabled,proto3" json:"is_enabled,omitempty"`
 	// 是否支持多模态（图片输入）
 	SupportsMultimodal bool `protobuf:"varint,19,opt,name=supports_multimodal,json=supportsMultimodal,proto3" json:"supports_multimodal,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	// 模型能力枚举列表
+	ModelCapabilities []string `protobuf:"bytes,20,rep,name=model_capabilities,json=modelCapabilities,proto3" json:"model_capabilities,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *UpdateConfigRequest) Reset() {
@@ -1761,6 +1790,13 @@ func (x *UpdateConfigRequest) GetSupportsMultimodal() bool {
 		return x.SupportsMultimodal
 	}
 	return false
+}
+
+func (x *UpdateConfigRequest) GetModelCapabilities() []string {
+	if x != nil {
+		return x.ModelCapabilities
+	}
+	return nil
 }
 
 type DeleteConfigRequest struct {
@@ -1994,11 +2030,12 @@ const file_mint_server_agent_agent_proto_rawDesc = "" +
 	"\rmanufacturers\x18\x03 \x03(\v2$.mint_server.agent.ManufacturerGroupR\rmanufacturers\"m\n" +
 	"\x11ManufacturerGroup\x12\"\n" +
 	"\fmanufacturer\x18\x01 \x01(\tR\fmanufacturer\x124\n" +
-	"\x06models\x18\x02 \x03(\v2\x1c.mint_server.agent.ModelInfoR\x06models\"t\n" +
+	"\x06models\x18\x02 \x03(\v2\x1c.mint_server.agent.ModelInfoR\x06models\"\xa3\x01\n" +
 	"\tModelInfo\x12\x14\n" +
 	"\x05model\x18\x01 \x01(\tR\x05model\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12/\n" +
-	"\x13supports_multimodal\x18\x03 \x01(\bR\x12supportsMultimodal\"4\n" +
+	"\x13supports_multimodal\x18\x03 \x01(\bR\x12supportsMultimodal\x12-\n" +
+	"\x12model_capabilities\x18\x04 \x03(\tR\x11modelCapabilities\"4\n" +
 	"\x11GetHistoryRequest\x12\x1f\n" +
 	"\vdialogue_id\x18\x01 \x01(\tR\n" +
 	"dialogueId\"~\n" +
@@ -2027,7 +2064,7 @@ const file_mint_server_agent_agent_proto_rawDesc = "" +
 	"\x15ListDialoguesResponse\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12@\n" +
-	"\tdialogues\x18\x03 \x03(\v2\".mint_server.agent.DialogueSummaryR\tdialogues\"\xdb\x04\n" +
+	"\tdialogues\x18\x03 \x03(\v2\".mint_server.agent.DialogueSummaryR\tdialogues\"\x8a\x05\n" +
 	"\vModelConfig\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x1d\n" +
 	"\n" +
@@ -2052,7 +2089,8 @@ const file_mint_server_agent_agent_proto_rawDesc = "" +
 	"\x05route\x18\x11 \x01(\tR\x05route\x12\x1d\n" +
 	"\n" +
 	"is_enabled\x18\x12 \x01(\x05R\tisEnabled\x12/\n" +
-	"\x13supports_multimodal\x18\x13 \x01(\bR\x12supportsMultimodal\"s\n" +
+	"\x13supports_multimodal\x18\x13 \x01(\bR\x12supportsMultimodal\x12-\n" +
+	"\x12model_capabilities\x18\x14 \x03(\tR\x11modelCapabilities\"s\n" +
 	"\vConfigReply\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x126\n" +
@@ -2066,7 +2104,7 @@ const file_mint_server_agent_agent_proto_rawDesc = "" +
 	"\aconfigs\x18\x03 \x03(\v2\x1e.mint_server.agent.ModelConfigR\aconfigs\x12\x14\n" +
 	"\x05total\x18\x04 \x01(\x03R\x05total\"\"\n" +
 	"\x10GetConfigRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x05R\x02id\"\xd3\x04\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\"\x82\x05\n" +
 	"\x13CreateConfigRequest\x12\x1d\n" +
 	"\n" +
 	"model_type\x18\x01 \x01(\tR\tmodelType\x12\"\n" +
@@ -2090,7 +2128,8 @@ const file_mint_server_agent_agent_proto_rawDesc = "" +
 	"\x05route\x18\x10 \x01(\tR\x05route\x12\x1d\n" +
 	"\n" +
 	"is_enabled\x18\x11 \x01(\x05R\tisEnabled\x12/\n" +
-	"\x13supports_multimodal\x18\x12 \x01(\bR\x12supportsMultimodal\"\xe3\x04\n" +
+	"\x13supports_multimodal\x18\x12 \x01(\bR\x12supportsMultimodal\x12-\n" +
+	"\x12model_capabilities\x18\x13 \x03(\tR\x11modelCapabilities\"\x92\x05\n" +
 	"\x13UpdateConfigRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x1d\n" +
 	"\n" +
@@ -2115,7 +2154,8 @@ const file_mint_server_agent_agent_proto_rawDesc = "" +
 	"\x05route\x18\x11 \x01(\tR\x05route\x12\x1d\n" +
 	"\n" +
 	"is_enabled\x18\x12 \x01(\x05R\tisEnabled\x12/\n" +
-	"\x13supports_multimodal\x18\x13 \x01(\bR\x12supportsMultimodal\"%\n" +
+	"\x13supports_multimodal\x18\x13 \x01(\bR\x12supportsMultimodal\x12-\n" +
+	"\x12model_capabilities\x18\x14 \x03(\tR\x11modelCapabilities\"%\n" +
 	"\x13DeleteConfigRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\"v\n" +
 	"\x12ModelStatsResponse\x12\x12\n" +

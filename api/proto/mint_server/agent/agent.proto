@@ -146,6 +146,8 @@ message ModelInfo {
     string description = 2;
     // 是否支持多模态（图片输入）
     bool supports_multimodal = 3;
+    // 模型能力枚举列表
+    repeated string model_capabilities = 4;
 }
 
 message GetHistoryRequest {
@@ -208,6 +210,8 @@ message ModelConfig {
     int32 is_enabled = 18;
     // 是否支持多模态（图片输入）
     bool supports_multimodal = 19;
+    // 模型能力枚举列表
+    repeated string model_capabilities = 20;
 }
 
 message ConfigReply {
@@ -252,6 +256,8 @@ message CreateConfigRequest {
     int32 is_enabled = 17;
     // 是否支持多模态（图片输入）
     bool supports_multimodal = 18;
+    // 模型能力枚举列表
+    repeated string model_capabilities = 19;
 }
 
 message UpdateConfigRequest {
@@ -275,6 +281,8 @@ message UpdateConfigRequest {
     int32 is_enabled = 18;
     // 是否支持多模态（图片输入）
     bool supports_multimodal = 19;
+    // 模型能力枚举列表
+    repeated string model_capabilities = 20;
 }
 
 message DeleteConfigRequest {

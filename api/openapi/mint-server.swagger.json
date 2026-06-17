@@ -653,6 +653,13 @@
         "supportsMultimodal": {
           "type": "boolean",
           "title": "是否支持多模态（图片输入）"
+        },
+        "modelCapabilities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "模型能力枚举列表"
         }
       }
     },
@@ -737,6 +744,13 @@
         "supportsMultimodal": {
           "type": "boolean",
           "title": "是否支持多模态（图片输入）"
+        },
+        "modelCapabilities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "模型能力枚举列表"
         }
       }
     },
@@ -1011,6 +1025,13 @@
         "supportsMultimodal": {
           "type": "boolean",
           "title": "是否支持多模态（图片输入）"
+        },
+        "modelCapabilities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "模型能力枚举列表"
         }
       }
     },
@@ -1028,6 +1049,13 @@
         "supportsMultimodal": {
           "type": "boolean",
           "title": "是否支持多模态（图片输入）"
+        },
+        "modelCapabilities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "模型能力枚举列表"
         }
       }
     },
