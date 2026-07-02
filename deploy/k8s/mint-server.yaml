@@ -1,5 +1,5 @@
 ---
-# mint-server Deployment（配置从 Consul KV 拉取，不进 Git）
+# mint-server Deployment（init container 从 Consul 拉配置，ArgoCD 控制发布节奏）
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -29,8 +29,8 @@ spec:
             - { name: config, mountPath: /etc/mint-server }
       containers:
         - name: mint-server
-          image: mint-server:latest
-          imagePullPolicy: IfNotPresent
+          image: register.l3xx.cc/mint-server:latest
+          imagePullPolicy: Always
           ports:
             - { containerPort: 8888, name: grpc }
             - { containerPort: 9999, name: gateway }
