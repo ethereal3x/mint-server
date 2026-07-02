@@ -9,7 +9,7 @@ RUN CGO_ENABLED=0 go build -o mint-server ./cmd/
 FROM alpine:3.21
 RUN apk add --no-cache ca-certificates tzdata
 COPY --from=builder /app/mint-server /usr/local/bin/
-COPY --from=builder /app/config.yaml /etc/mint-server/
+# config.yaml 从 Consul KV 拉取，不进镜像
 WORKDIR /etc/mint-server
 EXPOSE 8888 9999
 CMD ["mint-server"]
