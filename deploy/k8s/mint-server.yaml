@@ -29,7 +29,7 @@ spec:
             - { name: config, mountPath: /etc/mint-server }
       containers:
         - name: mint-server
-          image: register.register:5000/mint-server:latest
+          image: register.l3xx.cc/mint-server:latest
           imagePullPolicy: Always
           ports:
             - { containerPort: 8888, name: grpc }
