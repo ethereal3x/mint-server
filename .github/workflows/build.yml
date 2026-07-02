@@ -18,15 +18,17 @@ jobs:
       - name: Build & Push
         run: |
           SHORT_SHA=$(git rev-parse --short HEAD)
-          docker build -t register.l3xx.cc/mint-server:${SHORT_SHA} .
-          docker tag register.l3xx.cc/mint-server:${SHORT_SHA} register.l3xx.cc/mint-server:latest
-          docker push register.l3xx.cc/mint-server:${SHORT_SHA}
-          docker push register.l3xx.cc/mint-server:latest
+          # 推到集群内部地址，绕过 Traefik 超时
+          docker build -t 10.43.32.25:5000/mint-server:${SHORT_SHA} .
+          docker tag 10.43.32.25:5000/mint-server:${SHORT_SHA} 10.43.32.25:5000/mint-server:latest
+          docker push 10.43.32.25:5000/mint-server:${SHORT_SHA}
+          docker push 10.43.32.25:5000/mint-server:latest
 
       - name: Update image tag in manifests
         run: |
           SHORT_SHA=$(git rev-parse --short HEAD)
-          sed -i "s|image: register.l3xx.cc/mint-server:.*|image: register.l3xx.cc/mint-server:${SHORT_SHA}|" deploy/k8s/mint-server.yaml
+          # 部署清单用集群内地址拉镜像
+          sed -i "s|image: register.l3xx.cc/mint-server:.*|image: register.register:5000/mint-server:${SHORT_SHA}|" deploy/k8s/mint-server.yaml
           git config user.name "CI Bot"
           git config user.email "ci@l3xx.cc"
           git add deploy/k8s/mint-server.yaml
