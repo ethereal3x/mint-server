@@ -1,0 +1,61 @@
+---
+# mint-server Deployment（配置从 Consul KV 拉取，不进 Git）
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mint-server
+  namespace: mint
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: mint-server }
+  template:
+    metadata:
+      labels: { app: mint-server }
+    spec:
+      initContainers:
+        - name: consul-config
+          image: busybox:latest
+          command:
+            - sh
+            - -c
+            - |
+              echo "Fetching config from Consul KV..."
+              wget -q -O /etc/mint-server/config.yaml \
+                http://consul-server.consul.svc.cluster.local:8500/v1/kv/mint-server/config.yaml?raw
+              echo "Config fetched successfully:"
+              head -5 /etc/mint-server/config.yaml
+          volumeMounts:
+            - { name: config, mountPath: /etc/mint-server }
+      containers:
+        - name: mint-server
+          image: mint-server:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - { containerPort: 8888, name: grpc }
+            - { containerPort: 9999, name: gateway }
+          env: [{ name: TZ, value: Asia/Shanghai }]
+          resources:
+            requests: { memory: "64Mi", cpu: "50m" }
+            limits: { memory: "256Mi", cpu: "500m" }
+          readinessProbe:
+            tcpSocket: { port: 9999 }
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          volumeMounts:
+            - { name: config, mountPath: /etc/mint-server }
+      volumes:
+        - name: config
+          emptyDir: {}
+---
+# mint-server Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: mint-server
+  namespace: mint
+spec:
+  selector: { app: mint-server }
+  ports:
+    - { name: gateway, port: 9999 }
+    - { name: grpc, port: 8888 }

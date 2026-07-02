@@ -1,0 +1,17 @@
+---
+# IngressRoute: mint-api.l3xx.cc → mint-server:9999
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: mint-api-websecure
+  namespace: mint
+spec:
+  entryPoints: [websecure]
+  routes:
+    - kind: Rule
+      match: Host(`mint-api.l3xx.cc`)
+      services:
+        - name: mint-server
+          port: 9999
+  tls:
+    certResolver: letsencrypt
