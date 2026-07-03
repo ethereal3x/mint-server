@@ -3,9 +3,49 @@ name: Build & Deploy
 on:
   push:
     branches: [master]
+  pull_request:
+    branches: [master]
 
 jobs:
+  verify:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Build
+        run: go build ./...
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Test
+        run: go test ./...
+
+      - name: Buf lint
+        run: |
+          if command -v buf >/dev/null 2>&1; then
+            buf lint
+          else
+            echo "buf not installed, skipping buf lint"
+          fi
+
+      - name: Golangci-lint
+        run: |
+          if command -v golangci-lint >/dev/null 2>&1; then
+            golangci-lint run ./...
+          else
+            echo "golangci-lint not installed, skipping"
+          fi
+
   build-and-push:
+    needs: verify
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: self-hosted
     steps:
       - name: Checkout
@@ -19,9 +59,7 @@ jobs:
         run: |
           SHORT_SHA=$(git rev-parse --short HEAD)
           docker build -t register.l3xx.cc/mint-server:${SHORT_SHA} .
-          docker tag register.l3xx.cc/mint-server:${SHORT_SHA} register.l3xx.cc/mint-server:latest
           docker push register.l3xx.cc/mint-server:${SHORT_SHA}
-          docker push register.l3xx.cc/mint-server:latest
 
       - name: Update image tag in manifests
         run: |

@@ -5,11 +5,10 @@ import (
 
 	"github.com/ethereal3x/apc/errs"
 	agentpb "github.com/ethereal3x/mint-server/api/gen/go/mint_server/agent"
-	"github.com/ethereal3x/mint-server/internal/auth"
 	"github.com/ethereal3x/mint-server/internal/dto"
 	mint_err "github.com/ethereal3x/mint-server/internal/errs"
+	"github.com/ethereal3x/mint-server/internal/logic"
 	"github.com/ethereal3x/mint-server/internal/model"
-	"github.com/google/uuid"
 	"google.golang.org/grpc"
 )
 
@@ -37,12 +36,12 @@ type chatPrepareParams struct {
 }
 
 // buildChatRequest 鉴权、生成 IDs 并构建 ChatRequest
-func (s *AgentServer) buildChatRequest(ctx context.Context, params *chatPrepareParams) (string, string, *dto.ChatRequest, error) {
-	userID, err := auth.RequireUserID(ctx)
+func (server *AgentServer) buildChatRequest(ctx context.Context, params *chatPrepareParams) (string, string, *dto.ChatRequest, error) {
+	userID, err := requireUserID(ctx)
 	if err != nil {
-		return "", "", nil, mint_err.ErrUnauthorized
+		return "", "", nil, err
 	}
-	dialogueID, recordID := resolveIDs(params.dialogueID, params.recordID)
+	dialogueID, recordID := logic.ResolveChatIDs(params.dialogueID, params.recordID)
 	chatReq := &dto.ChatRequest{
 		UserID:     userID,
 		Question:   params.question,
@@ -57,11 +56,11 @@ func (s *AgentServer) buildChatRequest(ctx context.Context, params *chatPrepareP
 }
 
 // StreamChat 流式聊天
-func (s *AgentServer) StreamChat(req *agentpb.StreamChatRequest, stream grpc.ServerStreamingServer[agentpb.StreamChatResponse]) error {
+func (server *AgentServer) StreamChat(req *agentpb.StreamChatRequest, stream grpc.ServerStreamingServer[agentpb.StreamChatResponse]) error {
 	if req.Question == "" || req.Model == "" {
 		return sendStreamError(stream, mint_err.ErrParam)
 	}
-	dialogueID, recordID, chatReq, err := s.buildChatRequest(stream.Context(), &chatPrepareParams{
+	dialogueID, recordID, chatReq, err := server.buildChatRequest(stream.Context(), &chatPrepareParams{
 		question: req.Question, model: req.Model,
 		dialogueID: req.DialogueId, recordID: req.RecordId,
 		fileData: req.FileData, fileName: req.FileName, imageURLs: req.ImageUrls,
@@ -80,12 +79,12 @@ func (s *AgentServer) StreamChat(req *agentpb.StreamChatRequest, stream grpc.Ser
 	defer cancel()
 
 	go func() {
-		result, err := s.chat.StreamChat(ctx, chatReq, contentChan)
+		result, streamErr := server.chat.StreamChat(ctx, chatReq, contentChan)
 		select {
 		case resultChan <- struct {
 			result *dto.ChatResult
 			err    error
-		}{result, err}:
+		}{result, streamErr}:
 		case <-ctx.Done():
 		}
 	}()
@@ -99,7 +98,7 @@ func (s *AgentServer) StreamChat(req *agentpb.StreamChatRequest, stream grpc.Ser
 				if res.err != nil {
 					return sendStreamError(stream, res.err)
 				}
-				if saveErr := s.chat.SaveRecord(ctx, &dto.SaveRecordRequest{ChatRequest: chatReq, Answer: fullAnswer, Config: res.result.Config, Usage: res.result.Usage}); saveErr != nil {
+				if saveErr := server.chat.SaveRecord(ctx, &dto.SaveRecordRequest{ChatRequest: chatReq, Answer: fullAnswer, Config: res.result.Config, Usage: res.result.Usage}); saveErr != nil {
 					return sendStreamError(stream, saveErr)
 				}
 				return stream.Send(&agentpb.StreamChatResponse{Done: true, DialogueId: dialogueID, RecordId: recordID})
@@ -115,130 +114,103 @@ func (s *AgentServer) StreamChat(req *agentpb.StreamChatRequest, stream grpc.Ser
 }
 
 // GenerateChat 非流式聊天
-func (s *AgentServer) GenerateChat(ctx context.Context, req *agentpb.GenerateChatRequest) (*agentpb.GenerateChatResponse, error) {
-	rsp := &agentpb.GenerateChatResponse{}
-	if req.Question == "" || req.Model == "" {
-		return errs.GenProtoReply(rsp, mint_err.ErrParam)
-	}
-	dialogueID, recordID, chatReq, err := s.buildChatRequest(ctx, &chatPrepareParams{
-		question: req.Question, model: req.Model,
-		dialogueID: req.DialogueId, recordID: req.RecordId,
-		fileData: req.FileData, fileName: req.FileName, imageURLs: req.ImageUrls,
+func (server *AgentServer) GenerateChat(ctx context.Context, req *agentpb.GenerateChatRequest) (*agentpb.GenerateChatResponse, error) {
+	return errs.Handle(&agentpb.GenerateChatResponse{}, func(rsp *agentpb.GenerateChatResponse) error {
+		if req.Question == "" || req.Model == "" {
+			return mint_err.ErrParam
+		}
+		dialogueID, recordID, chatReq, err := server.buildChatRequest(ctx, &chatPrepareParams{
+			question: req.Question, model: req.Model,
+			dialogueID: req.DialogueId, recordID: req.RecordId,
+			fileData: req.FileData, fileName: req.FileName, imageURLs: req.ImageUrls,
+		})
+		if err != nil {
+			return err
+		}
+		result, err := server.chat.GenerateChat(ctx, chatReq)
+		if err != nil {
+			return err
+		}
+		if saveErr := server.chat.SaveRecord(ctx, &dto.SaveRecordRequest{ChatRequest: chatReq, Answer: result.Content, Config: result.Config, Usage: result.Usage}); saveErr != nil {
+			return saveErr
+		}
+		rsp.Content = result.Content
+		rsp.DialogueId = dialogueID
+		rsp.RecordId = recordID
+		return nil
 	})
-	if err != nil {
-		return errs.GenProtoReply(rsp, err)
-	}
-
-	result, err := s.chat.GenerateChat(ctx, chatReq)
-	if err != nil {
-		return errs.GenProtoReply(rsp, err)
-	}
-
-	if saveErr := s.chat.SaveRecord(ctx, &dto.SaveRecordRequest{ChatRequest: chatReq, Answer: result.Content, Config: result.Config, Usage: result.Usage}); saveErr != nil {
-		return errs.GenProtoReply(rsp, saveErr)
-	}
-
-	rsp.Content = result.Content
-	rsp.DialogueId = dialogueID
-	rsp.RecordId = recordID
-	return rsp, nil
 }
 
 // ListModels 获取可用模型列表，按厂商分组
-func (s *AgentServer) ListModels(ctx context.Context, _ *agentpb.ListModelsRequest) (*agentpb.ListModelsResponse, error) {
-	rsp := &agentpb.ListModelsResponse{}
-	userID, err := auth.RequireUserID(ctx)
-	if err != nil {
-		return errs.GenProtoReply(rsp, mint_err.ErrUnauthorized)
-	}
-	configs, err := s.config.ListAll(ctx, userID)
-	if err != nil {
-		return errs.GenProtoReply(rsp, err)
-	}
-	groupMap := make(map[string][]*agentpb.ModelInfo)
-	for _, config := range configs {
-		pbConfig := dto.ConfigToProto(config)
-		groupMap[config.Manufacturer] = append(groupMap[config.Manufacturer], &agentpb.ModelInfo{
-			Model:              config.ModelType,
-			Description:        config.Description,
-			ModelCapabilities:  pbConfig.ModelCapabilities,
-			SupportsMultimodal: config.SupportsMultimodal,
-		})
-	}
-	manufacturers := make([]*agentpb.ManufacturerGroup, 0, len(groupMap))
-	for name, models := range groupMap {
-		manufacturers = append(manufacturers, &agentpb.ManufacturerGroup{
-			Manufacturer: name,
-			Models:       models,
-		})
-	}
-	rsp.Manufacturers = manufacturers
-	return rsp, nil
+func (server *AgentServer) ListModels(ctx context.Context, _ *agentpb.ListModelsRequest) (*agentpb.ListModelsResponse, error) {
+	return errs.Handle(&agentpb.ListModelsResponse{}, func(rsp *agentpb.ListModelsResponse) error {
+		userID, err := requireUserID(ctx)
+		if err != nil {
+			return err
+		}
+		configs, err := server.config.ListAll(ctx, userID)
+		if err != nil {
+			return err
+		}
+		rsp.Manufacturers = logic.GroupModelsByManufacturer(configs)
+		return nil
+	})
 }
 
 // GetHistory 获取对话历史
-func (s *AgentServer) GetHistory(ctx context.Context, req *agentpb.GetHistoryRequest) (*agentpb.GetHistoryResponse, error) {
-	rsp := &agentpb.GetHistoryResponse{}
-	if req.DialogueId == "" {
-		return errs.GenProtoReply(rsp, mint_err.ErrParam)
-	}
-	userID, err := auth.RequireUserID(ctx)
-	if err != nil {
-		return errs.GenProtoReply(rsp, mint_err.ErrUnauthorized)
-	}
-	records, err := s.chat.GetHistory(ctx, &model.DialogueQuery{DialogueID: req.DialogueId, UserID: userID})
-	if err != nil {
-		return errs.GenProtoReply(rsp, err)
-	}
-	pbRecords := make([]*agentpb.HistoryRecord, 0, len(records))
-	for _, record := range records {
-		pbRecords = append(pbRecords, &agentpb.HistoryRecord{
-			RecordId:     record.RecordID,
-			UserContent:  record.UserContent,
-			AgentContent: record.AgentContent,
-			Model:        record.Model,
-			TotalTokens:  record.TotalTokens,
-			InputCost:    record.InputCost,
-			OutputCost:   record.OutputCost,
-		})
-	}
-	rsp.Records = pbRecords
-	return rsp, nil
+func (server *AgentServer) GetHistory(ctx context.Context, req *agentpb.GetHistoryRequest) (*agentpb.GetHistoryResponse, error) {
+	return errs.Handle(&agentpb.GetHistoryResponse{}, func(rsp *agentpb.GetHistoryResponse) error {
+		if req.DialogueId == "" {
+			return mint_err.ErrParam
+		}
+		userID, err := requireUserID(ctx)
+		if err != nil {
+			return err
+		}
+		records, err := server.chat.GetHistory(ctx, &model.DialogueQuery{DialogueID: req.DialogueId, UserID: userID})
+		if err != nil {
+			return err
+		}
+		pbRecords := make([]*agentpb.HistoryRecord, 0, len(records))
+		for _, record := range records {
+			pbRecords = append(pbRecords, &agentpb.HistoryRecord{
+				RecordId:     record.RecordID,
+				UserContent:  record.UserContent,
+				AgentContent: record.AgentContent,
+				Model:        record.Model,
+				TotalTokens:  record.TotalTokens,
+				InputCost:    record.InputCost,
+				OutputCost:   record.OutputCost,
+			})
+		}
+		rsp.Records = pbRecords
+		return nil
+	})
 }
 
 // ListDialogues 获取对话摘要列表
-func (s *AgentServer) ListDialogues(ctx context.Context, _ *agentpb.ListDialoguesRequest) (*agentpb.ListDialoguesResponse, error) {
-	rsp := &agentpb.ListDialoguesResponse{}
-	userID, err := auth.RequireUserID(ctx)
-	if err != nil {
-		return errs.GenProtoReply(rsp, mint_err.ErrUnauthorized)
-	}
-	summaries, err := s.chat.ListDialogues(ctx, userID)
-	if err != nil {
-		return errs.GenProtoReply(rsp, err)
-	}
-	pbDialogues := make([]*agentpb.DialogueSummary, 0, len(summaries))
-	for _, d := range summaries {
-		pbDialogues = append(pbDialogues, &agentpb.DialogueSummary{
-			DialogueId:   d.DialogueID,
-			Title:        d.Title,
-			MessageCount: d.MessageCount,
-			UpdatedTime:  d.UpdatedTime,
-		})
-	}
-	rsp.Dialogues = pbDialogues
-	return rsp, nil
-}
-
-// resolveIDs 生成缺失的对话ID和记录ID
-func resolveIDs(dialogueID, recordID string) (string, string) {
-	if dialogueID == "" {
-		dialogueID = uuid.NewString()
-	}
-	if recordID == "" {
-		recordID = uuid.NewString()
-	}
-	return dialogueID, recordID
+func (server *AgentServer) ListDialogues(ctx context.Context, _ *agentpb.ListDialoguesRequest) (*agentpb.ListDialoguesResponse, error) {
+	return errs.Handle(&agentpb.ListDialoguesResponse{}, func(rsp *agentpb.ListDialoguesResponse) error {
+		userID, err := requireUserID(ctx)
+		if err != nil {
+			return err
+		}
+		summaries, err := server.chat.ListDialogues(ctx, userID)
+		if err != nil {
+			return err
+		}
+		pbDialogues := make([]*agentpb.DialogueSummary, 0, len(summaries))
+		for _, summary := range summaries {
+			pbDialogues = append(pbDialogues, &agentpb.DialogueSummary{
+				DialogueId:   summary.DialogueID,
+				Title:        summary.Title,
+				MessageCount: summary.MessageCount,
+				UpdatedTime:  summary.UpdatedTime,
+			})
+		}
+		rsp.Dialogues = pbDialogues
+		return nil
+	})
 }
 
 // sendStreamError 将 error 写入流式响应并发送，标记流结束

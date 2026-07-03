@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	application, err := app.New("config.yaml")
+	application, err := app.New("")
 	if err != nil {
 		log.Fatalf("init app: %v", err)
 	}

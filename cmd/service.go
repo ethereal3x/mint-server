@@ -12,6 +12,7 @@ import (
 	hellopb "github.com/ethereal3x/mint-server/api/gen/go/mint_server/hello"
 	userpb "github.com/ethereal3x/mint-server/api/gen/go/mint_server/user"
 	"github.com/ethereal3x/mint-server/internal/app"
+	"github.com/ethereal3x/mint-server/internal/middleware"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -20,13 +21,19 @@ import (
 // newGrpcServer 创建 gRPC 服务器并注册所有服务
 func newGrpcServer(app *app.App) *server.GrpcServer {
 	rs := server.NewRpcServer()
-	authMiddleware := NewMiddleware(&MiddlewareConfig{
+	authMiddleware := middleware.NewAuthMiddleware(middleware.AuthMiddlewareConfig{
 		Manager:       app.TokenManager,
 		PublicMethods: publicMethods(),
 	})
 	rs.SetInterceptors(
-		[]grpc.StreamServerInterceptor{authMiddleware.StreamInterceptor},
-		[]grpc.UnaryServerInterceptor{authMiddleware.UnaryInterceptor},
+		[]grpc.StreamServerInterceptor{
+			middleware.StreamObservabilityInterceptor,
+			authMiddleware.StreamInterceptor,
+		},
+		[]grpc.UnaryServerInterceptor{
+			middleware.UnaryObservabilityInterceptor,
+			authMiddleware.UnaryInterceptor,
+		},
 	)
 	rs.SetRegisterFunc(func(s *grpc.Server) {
 		hellopb.RegisterHelloServiceServer(s, app.Hello.HelloServer)

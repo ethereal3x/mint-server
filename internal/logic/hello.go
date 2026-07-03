@@ -2,9 +2,12 @@ package logic
 
 import (
 	"context"
-
-	hellopb "github.com/ethereal3x/mint-server/api/gen/go/mint_server/hello"
 )
+
+// HelloResult 健康检查结果
+type HelloResult struct {
+	Message string
+}
 
 // Hello 基础健康检查业务逻辑
 type Hello struct{}
@@ -15,8 +18,6 @@ func NewHello() *Hello {
 }
 
 // Check 执行健康检查
-func (s *Hello) Check(ctx context.Context, req *hellopb.HelloCheckRequest) (*hellopb.HelloCheckResponse, error) {
-	return &hellopb.HelloCheckResponse{
-		CheckDown: "ok: " + req.Check,
-	}, nil
+func (hello *Hello) Check(ctx context.Context, input string) (*HelloResult, error) {
+	return &HelloResult{Message: "ok: " + input}, nil
 }

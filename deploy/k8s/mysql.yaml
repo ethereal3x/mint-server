@@ -28,8 +28,11 @@ spec:
         - name: mysql
           image: mysql:8.0
           env:
-            - name: MYSQL_ALLOW_EMPTY_PASSWORD
-              value: "yes"
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mint-mysql-secret
+                  key: mysql-root-password
             - name: MYSQL_DATABASE
               value: mint_server
           ports: [{ containerPort: 3306 }]

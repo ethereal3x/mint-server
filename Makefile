@@ -51,5 +51,5 @@ compose-up: ## start local dependencies
 compose-down: ## stop local dependencies
 	docker compose -f deploy/compose/docker-compose.yml down
 
-migrate: ## run database migrations
-	flyway -configFiles=deploy/flyway/flyway.conf migrate
+migrate: ## run database migrations manually (apply SQL files in order)
+	@echo "Apply migrations/mysql/*.sql to your MySQL instance in numeric order"

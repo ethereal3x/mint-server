@@ -22,43 +22,45 @@ func NewAuthServer(authLogic AuthServiceLogic) *AuthServer {
 
 // RegisterAccount 处理账号密码注册请求
 func (s *AuthServer) RegisterAccount(ctx context.Context, req *authpb.RegisterAccountRequest) (*authpb.RegisterAccountResponse, error) {
-	rsp := &authpb.RegisterAccountResponse{}
-	if req.Account == "" || req.Password == "" {
-		return errs.GenProtoReply(rsp, mint_err.ErrParam)
-	}
-	result, err := s.logic.RegisterAccount(ctx, &dto.RegisterAccountRequest{
-		Account:     req.Account,
-		Password:    req.Password,
-		DisplayName: req.DisplayName,
-		AvatarURL:   req.AvatarUrl,
+	return errs.Handle(&authpb.RegisterAccountResponse{}, func(rsp *authpb.RegisterAccountResponse) error {
+		if req.Account == "" || req.Password == "" {
+			return mint_err.ErrParam
+		}
+		result, err := s.logic.RegisterAccount(ctx, &dto.RegisterAccountRequest{
+			Account:     req.Account,
+			Password:    req.Password,
+			DisplayName: req.DisplayName,
+			AvatarURL:   req.AvatarUrl,
+		})
+		if err != nil {
+			return err
+		}
+		rsp.AccessToken = result.Token.AccessToken
+		rsp.TokenType = result.Token.TokenType
+		rsp.ExpiresIn = result.Token.ExpiresIn
+		rsp.User = dto.UserToAuthProto(result.User)
+		return nil
 	})
-	if err != nil {
-		return errs.GenProtoReply(rsp, err)
-	}
-	rsp.AccessToken = result.Token.AccessToken
-	rsp.TokenType = result.Token.TokenType
-	rsp.ExpiresIn = result.Token.ExpiresIn
-	rsp.User = dto.UserToAuthProto(result.User)
-	return rsp, nil
 }
 
 // Login 处理登录请求
 func (s *AuthServer) Login(ctx context.Context, req *authpb.LoginRequest) (*authpb.LoginResponse, error) {
-	rsp := &authpb.LoginResponse{}
-	if req.Identifier == "" || req.Credential == "" {
-		return errs.GenProtoReply(rsp, mint_err.ErrParam)
-	}
-	result, err := s.logic.Login(ctx, &dto.LoginRequest{
-		Provider:   req.Provider,
-		Identifier: req.Identifier,
-		Credential: req.Credential,
+	return errs.Handle(&authpb.LoginResponse{}, func(rsp *authpb.LoginResponse) error {
+		if req.Identifier == "" || req.Credential == "" {
+			return mint_err.ErrParam
+		}
+		result, err := s.logic.Login(ctx, &dto.LoginRequest{
+			Provider:   req.Provider,
+			Identifier: req.Identifier,
+			Credential: req.Credential,
+		})
+		if err != nil {
+			return err
+		}
+		rsp.AccessToken = result.Token.AccessToken
+		rsp.TokenType = result.Token.TokenType
+		rsp.ExpiresIn = result.Token.ExpiresIn
+		rsp.User = dto.UserToAuthProto(result.User)
+		return nil
 	})
-	if err != nil {
-		return errs.GenProtoReply(rsp, err)
-	}
-	rsp.AccessToken = result.Token.AccessToken
-	rsp.TokenType = result.Token.TokenType
-	rsp.ExpiresIn = result.Token.ExpiresIn
-	rsp.User = dto.UserToAuthProto(result.User)
-	return rsp, nil
 }
