@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	apccfg "github.com/ethereal3x/apc/config"
 	"github.com/ethereal3x/apc/logger"
@@ -13,7 +14,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// App 持有应用全部基础设施和领域模块，替代旧的 globalDB、globalServices 等全局变量。
+// App 持有应用全部基础设施和领域模块
 type App struct {
 	DB           *gorm.DB
 	Storage      storage.ObjectStorage
@@ -26,22 +27,29 @@ type App struct {
 	Upload *UploadModule
 }
 
-// New 初始化全部依赖并返回装配好的 App。调用方通过此入口替代旧的 initApp。
+// New 初始化全部依赖并返回装配好的 App
 func New(cfgPath string) (*App, error) {
-	if err := config.InitBusinessConfig(cfgPath); err != nil {
+	if err := apccfg.Load(apccfg.LoadOptions{Path: cfgPath}); err != nil {
+		return nil, fmt.Errorf("load apc config: %w", err)
+	}
+	if err := config.Load(config.LoadOptions{Path: cfgPath}); err != nil {
 		return nil, fmt.Errorf("load business config: %w", err)
 	}
 	bizCfg := config.GetBusinessConfig()
+	if err := config.Validate(bizCfg); err != nil {
+		return nil, fmt.Errorf("validate business config: %w", err)
+	}
 
 	apcConf := apccfg.GetConf()
+	if err := validateInfraConfig(apcConf); err != nil {
+		return nil, fmt.Errorf("validate infra config: %w", err)
+	}
+
 	logger.SetLogger(logger.NewLogger(&apcConf.Plugin.Log))
 
 	db, err := initDB()
 	if err != nil {
 		return nil, fmt.Errorf("init db: %w", err)
-	}
-	if db == nil {
-		return nil, fmt.Errorf("init db: db is nil")
 	}
 
 	store, err := initStorage()
@@ -54,26 +62,50 @@ func New(cfgPath string) (*App, error) {
 	})
 	secretKey := []byte(bizCfg.SecretKey.Encryption)
 
-	app := &App{
+	application := &App{
 		DB:           db,
 		Storage:      store,
 		TokenManager: tokenManager,
 		BizConfig:    bizCfg,
 	}
-	app.Agent = newAgentModule(db, secretKey)
-	app.Authx = newAuthModule(db, tokenManager)
-	app.Hello = newHelloModule()
-	app.Upload = newUploadModule(db, store, tokenManager)
+	application.Agent = newAgentModule(db, secretKey)
+	application.Authx = newAuthModule(db, tokenManager)
+	application.Hello = newHelloModule()
+	application.Upload = newUploadModule(db, store, tokenManager)
 
-	return app, nil
+	return application, nil
+}
+
+// validateInfraConfig 校验基础设施配置必填项
+func validateInfraConfig(cfg *apccfg.Config) error {
+	if cfg == nil {
+		return fmt.Errorf("apc config is nil")
+	}
+	if strings.TrimSpace(cfg.Server.GrpcAddr) == "" {
+		return fmt.Errorf("server.grpc_addr is required")
+	}
+	if strings.TrimSpace(cfg.Server.GatewayAddr) == "" {
+		return fmt.Errorf("server.gateway_addr is required")
+	}
+	if apccfg.GetClientConf("mysql") == nil {
+		return fmt.Errorf("client mysql config not found")
+	}
+	rustfs := cfg.Plugin.RustFS
+	if strings.TrimSpace(rustfs.Endpoint) == "" {
+		return fmt.Errorf("plugin.rustfs.endpoint is required")
+	}
+	if strings.TrimSpace(rustfs.AccessKey) == "" || strings.TrimSpace(rustfs.SecretKey) == "" {
+		return fmt.Errorf("plugin.rustfs access_key and secret_key are required")
+	}
+	if strings.TrimSpace(rustfs.BucketName) == "" {
+		return fmt.Errorf("plugin.rustfs.bucket_name is required")
+	}
+	return nil
 }
 
 // initDB 根据配置初始化 GORM 数据库连接
 func initDB() (*gorm.DB, error) {
 	clientConf := apccfg.GetClientConf("mysql")
-	if clientConf == nil {
-		return nil, fmt.Errorf("mysql client config not found")
-	}
 	gormCfg := apccfg.GenGormConfig(clientConf)
 	db, err := orm.NewGormInstance(gormCfg)
 	if err != nil {

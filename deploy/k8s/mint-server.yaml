@@ -23,8 +23,7 @@ spec:
               echo "Fetching config from Consul KV..."
               wget -q -O /etc/mint-server/config.yaml \
                 http://consul-server.consul.svc.cluster.local:8500/v1/kv/mint-server/config.yaml?raw
-              echo "Config fetched successfully:"
-              head -5 /etc/mint-server/config.yaml
+              echo "Config fetched successfully"
           volumeMounts:
             - { name: config, mountPath: /etc/mint-server }
       containers:
@@ -34,7 +33,11 @@ spec:
           ports:
             - { containerPort: 8888, name: grpc }
             - { containerPort: 9999, name: gateway }
-          env: [{ name: TZ, value: Asia/Shanghai }]
+          env:
+            - name: TZ
+              value: Asia/Shanghai
+            - name: APC_CONFIG_PATH
+              value: /etc/mint-server/config.yaml
           resources:
             requests: { memory: "64Mi", cpu: "50m" }
             limits: { memory: "256Mi", cpu: "500m" }
@@ -42,6 +45,10 @@ spec:
             tcpSocket: { port: 9999 }
             initialDelaySeconds: 10
             periodSeconds: 10
+          livenessProbe:
+            tcpSocket: { port: 9999 }
+            initialDelaySeconds: 30
+            periodSeconds: 15
           volumeMounts:
             - { name: config, mountPath: /etc/mint-server }
       volumes:

@@ -6,7 +6,7 @@ require (
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/cloudwego/eino v0.9.4
 	github.com/cloudwego/eino-ext/components/model/openai v0.1.13
-	github.com/ethereal3x/apc v1.2.4
+	github.com/ethereal3x/apc v1.2.5
 	github.com/go-sql-driver/mysql v1.10.0
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/google/uuid v1.6.0

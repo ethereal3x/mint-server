@@ -1,17 +1,15 @@
 package service
 
 import (
-	"context"
-	"encoding/json"
 	"net/http"
 	"strconv"
 
 	"github.com/ethereal3x/apc/logger"
-	"github.com/ethereal3x/mint-server/internal/auth"
 	"github.com/ethereal3x/mint-server/internal/dto"
-	"github.com/ethereal3x/mint-server/internal/util"
 	mint_err "github.com/ethereal3x/mint-server/internal/errs"
+	"github.com/ethereal3x/mint-server/internal/middleware"
 	"github.com/ethereal3x/mint-server/internal/model"
+	"github.com/ethereal3x/mint-server/internal/util"
 	"go.uber.org/zap"
 )
 
@@ -29,20 +27,20 @@ func NewUploadHandler(uploadLogic UploadServiceLogic, tokenManager *util.TokenMa
 }
 
 // HandleUpload 处理文件上传请求
-func (h *UploadHandler) HandleUpload(w http.ResponseWriter, r *http.Request) {
-	userID, ok := h.authUserID(w, r)
+func (handler *UploadHandler) HandleUpload(w http.ResponseWriter, request *http.Request) {
+	userID, ok := handler.requireUserID(w, request)
 	if !ok {
 		return
 	}
 
-	if err := r.ParseMultipartForm(httpMaxUploadSize); err != nil {
-		writeJSON(w, http.StatusBadRequest, map[string]any{"code": mint_err.ERR_CODE_PARAM, "message": "文件过大或格式错误"})
+	if err := request.ParseMultipartForm(httpMaxUploadSize); err != nil {
+		writeHTTPError(w, http.StatusBadRequest, mint_err.ErrParam)
 		return
 	}
 
-	file, header, err := r.FormFile("file")
+	file, header, err := request.FormFile("file")
 	if err != nil {
-		writeJSON(w, http.StatusBadRequest, map[string]any{"code": mint_err.ERR_CODE_PARAM, "message": "未找到上传文件"})
+		writeHTTPError(w, http.StatusBadRequest, mint_err.ErrParam)
 		return
 	}
 	defer file.Close()
@@ -52,7 +50,7 @@ func (h *UploadHandler) HandleUpload(w http.ResponseWriter, r *http.Request) {
 		contentType = "application/octet-stream"
 	}
 
-	result, err := h.logic.Upload(r.Context(), &dto.UploadRequest{
+	result, err := handler.logic.Upload(request.Context(), &dto.UploadRequest{
 		UserID:      userID,
 		FileName:    header.Filename,
 		Reader:      file,
@@ -60,71 +58,62 @@ func (h *UploadHandler) HandleUpload(w http.ResponseWriter, r *http.Request) {
 		ContentType: contentType,
 	})
 	if err != nil {
-		logger.ContextError(r.Context(), "UploadHandler.HandleUpload", zap.String("filename", header.Filename), zap.Error(err))
-		writeJSON(w, http.StatusInternalServerError, map[string]any{"code": mint_err.ERR_CODE_INTERNAL, "message": err.Error()})
+		logger.ContextError(request.Context(), "UploadHandler.HandleUpload", zap.String("filename", header.Filename), zap.Error(err))
+		writeHTTPError(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	writeJSON(w, http.StatusOK, map[string]any{"code": 0, "message": "ok", "data": result})
+	writeHTTPSuccess(w, result)
 }
 
 // HandleGetFile 处理文件详情查询请求
-func (h *UploadHandler) HandleGetFile(w http.ResponseWriter, r *http.Request) {
-	userID, ok := h.authUserID(w, r)
+func (handler *UploadHandler) HandleGetFile(w http.ResponseWriter, request *http.Request) {
+	userID, ok := handler.requireUserID(w, request)
 	if !ok {
 		return
 	}
-	idStr := r.PathValue("id")
+	idStr := request.PathValue("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		writeJSON(w, http.StatusBadRequest, map[string]any{"code": mint_err.ERR_CODE_PARAM, "message": "无效的文件 ID"})
+		writeHTTPError(w, http.StatusBadRequest, mint_err.ErrParam)
 		return
 	}
 
-	record, err := h.logic.GetUpload(r.Context(), &model.FileUploadQuery{ID: int32(id), UserID: userID})
+	record, err := handler.logic.GetUpload(request.Context(), &model.FileUploadQuery{ID: int32(id), UserID: userID})
 	if err != nil {
-		writeJSON(w, http.StatusInternalServerError, map[string]any{"code": mint_err.ERR_CODE_DB_QUERY, "message": err.Error()})
+		writeHTTPError(w, http.StatusInternalServerError, err)
 		return
 	}
 	if record == nil {
-		writeJSON(w, http.StatusNotFound, map[string]any{"code": -1, "message": "文件不存在"})
+		writeHTTPJSON(w, http.StatusNotFound, HTTPResponse{Code: -1, Message: "文件不存在"})
 		return
 	}
 
-	writeJSON(w, http.StatusOK, map[string]any{"code": 0, "message": "ok", "data": record})
+	writeHTTPSuccess(w, record)
 }
 
 // HandleListFiles 处理文件列表查询请求
-func (h *UploadHandler) HandleListFiles(w http.ResponseWriter, r *http.Request) {
-	userID, ok := h.authUserID(w, r)
+func (handler *UploadHandler) HandleListFiles(w http.ResponseWriter, request *http.Request) {
+	userID, ok := handler.requireUserID(w, request)
 	if !ok {
 		return
 	}
 
-	list, err := h.logic.ListUploads(r.Context(), userID)
+	list, err := handler.logic.ListUploads(request.Context(), userID)
 	if err != nil {
-		writeJSON(w, http.StatusInternalServerError, map[string]any{"code": mint_err.ERR_CODE_DB_QUERY, "message": err.Error()})
+		writeHTTPError(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	writeJSON(w, http.StatusOK, map[string]any{"code": 0, "message": "ok", "data": list})
+	writeHTTPSuccess(w, list)
 }
 
-// authUserID 从 HTTP 请求中解析当前用户ID
-func (h *UploadHandler) authUserID(w http.ResponseWriter, r *http.Request) (string, bool) {
-	principal, err := auth.PrincipalFromRequest(r.Context(), h.tokenManager, r)
-	if err != nil || principal.UserID == "" {
-		writeJSON(w, http.StatusUnauthorized, map[string]any{"code": mint_err.ERR_CODE_UNAUTHORIZED, "message": mint_err.ErrUnauthorized.Error()})
+// requireUserID 从 HTTP 请求中解析当前用户 ID
+func (handler *UploadHandler) requireUserID(w http.ResponseWriter, request *http.Request) (string, bool) {
+	userID, err := middleware.RequireUserIDFromRequest(request, handler.tokenManager)
+	if err != nil {
+		writeHTTPError(w, http.StatusUnauthorized, err)
 		return "", false
 	}
-	return principal.UserID, true
-}
-
-// writeJSON 写入 JSON 响应
-func writeJSON(w http.ResponseWriter, status int, data any) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
-	if err := json.NewEncoder(w).Encode(data); err != nil {
-		logger.ContextError(context.Background(), "writeJSON", zap.Error(err))
-	}
+	return userID, true
 }

@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 
+	"github.com/ethereal3x/apc/errs"
 	hellopb "github.com/ethereal3x/mint-server/api/gen/go/mint_server/hello"
 	"github.com/ethereal3x/mint-server/internal/logic"
 )
@@ -18,6 +19,14 @@ func NewHelloServer(helloLogic *logic.Hello) *HelloServer {
 	return &HelloServer{logic: helloLogic}
 }
 
-func (s *HelloServer) HelloCheck(ctx context.Context, req *hellopb.HelloCheckRequest) (*hellopb.HelloCheckResponse, error) {
-	return s.logic.Check(ctx, req)
+// HelloCheck 健康检查
+func (server *HelloServer) HelloCheck(ctx context.Context, req *hellopb.HelloCheckRequest) (*hellopb.HelloCheckResponse, error) {
+	return errs.Handle(&hellopb.HelloCheckResponse{}, func(rsp *hellopb.HelloCheckResponse) error {
+		result, err := server.logic.Check(ctx, req.Check)
+		if err != nil {
+			return err
+		}
+		rsp.CheckDown = result.Message
+		return nil
+	})
 }
