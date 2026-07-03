@@ -45,7 +45,7 @@ spec:
             - { name: config, mountPath: /etc/mint-server }
       containers:
         - name: mint-server
-          image: register.l3xx.cc/mint-server:402b57c
+          image: register.l3xx.cc/mint-server:b65e3c2
           imagePullPolicy: Always
           ports:
             - { containerPort: 8888, name: grpc }
