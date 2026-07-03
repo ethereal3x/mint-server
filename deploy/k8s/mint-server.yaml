@@ -20,10 +20,27 @@ spec:
             - sh
             - -c
             - |
+              CONSUL_URL="http://consul-server.consul.svc.cluster.local:8500/v1/kv/mint-server/config.yaml?raw"
+              CONSUL_IP="http://10.43.118.18:8500/v1/kv/mint-server/config.yaml?raw"
               echo "Fetching config from Consul KV..."
-              wget -q -O /etc/mint-server/config.yaml \
-                http://consul-server.consul.svc.cluster.local:8500/v1/kv/mint-server/config.yaml?raw
-              echo "Config fetched successfully"
+              for i in $(seq 1 5); do
+                if wget -q -O /etc/mint-server/config.yaml "$CONSUL_URL" 2>/dev/null; then
+                  echo "Config fetched via DNS (attempt $i)"
+                  break
+                fi
+                if wget -q -O /etc/mint-server/config.yaml "$CONSUL_IP" 2>/dev/null; then
+                  echo "Config fetched via ClusterIP (attempt $i)"
+                  break
+                fi
+                echo "Retry $i/5..."
+                sleep 2
+              done
+              if [ -s /etc/mint-server/config.yaml ]; then
+                echo "Config ready"
+              else
+                echo "ERROR: failed to fetch config"
+                exit 1
+              fi
           volumeMounts:
             - { name: config, mountPath: /etc/mint-server }
       containers:
