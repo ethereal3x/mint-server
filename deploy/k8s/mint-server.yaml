@@ -38,6 +38,13 @@ spec:
               value: Asia/Shanghai
             - name: APC_CONFIG_PATH
               value: /etc/mint-server/config.yaml
+            - name: OTEL_AUTH_USERNAME
+              value: otel
+            - name: OTEL_AUTH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mint-server-secret
+                  key: otel-auth-password
           resources:
             requests: { memory: "64Mi", cpu: "50m" }
             limits: { memory: "256Mi", cpu: "500m" }
