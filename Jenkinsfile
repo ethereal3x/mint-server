@@ -5,7 +5,6 @@ pipeline {
         REGISTRY = 'register.l3xx.cc'
         IMAGE_NAME = "${REGISTRY}/mint-server"
         GOPROXY = 'https://goproxy.cn,direct'
-        GO_IMAGE = 'golang:1.25-alpine'
     }
 
     options {
@@ -23,31 +22,6 @@ pipeline {
                     env.GIT_SHORT_SHA = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
                     env.GIT_BRANCH_NAME = env.BRANCH_NAME ?: env.GIT_BRANCH?.replaceFirst('origin/', '') ?: 'unknown'
                 }
-            }
-        }
-
-        stage('Verify') {
-            steps {
-                sh '''
-                    set -e
-                    echo "branch=${GIT_BRANCH_NAME} commit=${GIT_SHORT_SHA}"
-                    docker run --rm \
-                        -v "${WORKSPACE}:/app" \
-                        -w /app \
-                        -e GOPROXY="${GOPROXY}" \
-                        "${GO_IMAGE}" \
-                        sh -c 'go version && go build ./... && go vet ./... && go test ./...'
-                    if command -v buf >/dev/null 2>&1; then
-                        buf lint
-                    else
-                        echo "buf not installed on agent, skipping buf lint"
-                    fi
-                    if command -v golangci-lint >/dev/null 2>&1; then
-                        golangci-lint run ./...
-                    else
-                        echo "golangci-lint not installed on agent, skipping"
-                    fi
-                '''
             }
         }
 

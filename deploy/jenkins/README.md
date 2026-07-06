@@ -10,8 +10,7 @@ Jenkins 地址：https://jenkins.l3xx.cc
 | 阶段 | 触发条件 | 说明 |
 |------|----------|------|
 | Checkout | 所有分支 | 拉代码，计算 `GIT_SHORT_SHA` |
-| Verify | 所有分支 | `go build/vet/test`，可选 `buf lint`、`golangci-lint` |
-| Build & Push | 仅 `master` | 构建并推送镜像到 `register.l3xx.cc` |
+| Build & Push | 仅 `master` | 构建并推送镜像到 `register.l3xx.cc`（编译在 Dockerfile 内完成） |
 | Update Manifest | 仅 `master` | 更新 `deploy/k8s/mint-server.yaml` 镜像 tag 并 push |
 
 提交信息含 `[skip ci]` 时跳过 Build & Push / Update Manifest，避免 manifest 回写触发循环构建。
@@ -20,9 +19,10 @@ Jenkins 地址：https://jenkins.l3xx.cc
 
 Agent 节点需安装：
 
-- Docker（Verify 阶段通过 `golang:1.25-alpine` 容器执行 `go build/vet/test`，无需本机安装 Go）
+- Docker，且 **jenkins 用户有权限访问** `/var/run/docker.sock`（见下方权限说明）
 - Git
-- 可选：`buf`、`golangci-lint`（装在本机 agent 上，未安装则跳过）
+
+Go 编译在 `docker build` 阶段由 `Dockerfile` 内的 `golang:1.25-alpine` 完成，agent 无需单独安装 Go。
 
 ## 1. 创建 Credentials
 
@@ -77,5 +77,12 @@ Jenkins 任务页 → **Build Now**（master 分支会完整走 verify + 镜像�
 **git push 403**  
 检查 PAT 权限，或 Jenkins 使用的 GitHub 账号是否有 master 写权限。
 
-**Verify 阶段 go: not found**  
-Verify 已改为 Docker 内执行 Go 命令，确认 agent 可运行 `docker run golang:1.25-alpine go version`。
+**docker: permission denied**  
+将 jenkins 用户加入 docker 组后重启 Jenkins：
+
+```bash
+sudo usermod -aG docker jenkins
+sudo systemctl restart jenkins
+```
+
+验证：`sudo -u jenkins docker ps`
