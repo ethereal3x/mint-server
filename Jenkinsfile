@@ -51,36 +51,6 @@ pipeline {
                 }
             }
         }
-
-        stage('Update Manifest') {
-            when {
-                allOf {
-                    branch 'master'
-                    expression {
-                        def commitMessage = sh(script: 'git log -1 --pretty=%B', returnStdout: true).trim()
-                        return !commitMessage.contains('[skip ci]')
-                    }
-                }
-            }
-            steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'GIT_PUSH_CREDENTIALS',
-                    usernameVariable: 'GIT_USER',
-                    passwordVariable: 'GIT_TOKEN'
-                )]) {
-                    sh '''
-                        set -e
-                        sed -i "s|image: register.l3xx.cc/mint-server:.*|image: register.l3xx.cc/mint-server:${GIT_SHORT_SHA}|" deploy/k8s/mint-server.yaml
-                        git config user.name "Jenkins CI"
-                        git config user.email "ci@l3xx.cc"
-                        git add deploy/k8s/mint-server.yaml
-                        git diff --cached --quiet && echo "manifest unchanged, skip commit" && exit 0
-                        git commit -m "ci: update image to ${GIT_SHORT_SHA} [skip ci]"
-                        git push "https://${GIT_USER}:${GIT_TOKEN}@github.com/ethereal3x/mint-server.git" HEAD:master
-                    '''
-                }
-            }
-        }
     }
 
     post {
