@@ -20,10 +20,9 @@ Jenkins 地址：https://jenkins.l3xx.cc
 
 Agent 节点需安装：
 
-- Go（版本 ≥ `go.mod` 要求，当前 1.25）
-- Docker（含 push 权限）
+- Docker（Verify 阶段通过 `golang:1.25-alpine` 容器执行 `go build/vet/test`，无需本机安装 Go）
 - Git
-- 可选：`buf`、`golangci-lint`
+- 可选：`buf`、`golangci-lint`（装在本机 agent 上，未安装则跳过）
 
 ## 1. 创建 Credentials
 
@@ -78,5 +77,5 @@ Jenkins 任务页 → **Build Now**（master 分支会完整走 verify + 镜像�
 **git push 403**  
 检查 PAT 权限，或 Jenkins 使用的 GitHub 账号是否有 master 写权限。
 
-**Verify 阶段 buf/golangci-lint 被 skip**  
-在 agent 安装对应工具，或仅依赖 `go build/vet/test` 门禁。
+**Verify 阶段 go: not found**  
+Verify 已改为 Docker 内执行 Go 命令，确认 agent 可运行 `docker run golang:1.25-alpine go version`。

@@ -5,6 +5,7 @@ pipeline {
         REGISTRY = 'register.l3xx.cc'
         IMAGE_NAME = "${REGISTRY}/mint-server"
         GOPROXY = 'https://goproxy.cn,direct'
+        GO_IMAGE = 'golang:1.25-alpine'
     }
 
     options {
@@ -30,19 +31,21 @@ pipeline {
                 sh '''
                     set -e
                     echo "branch=${GIT_BRANCH_NAME} commit=${GIT_SHORT_SHA}"
-                    go version
-                    go build ./...
-                    go vet ./...
-                    go test ./...
+                    docker run --rm \
+                        -v "${WORKSPACE}:/app" \
+                        -w /app \
+                        -e GOPROXY="${GOPROXY}" \
+                        "${GO_IMAGE}" \
+                        sh -c 'go version && go build ./... && go vet ./... && go test ./...'
                     if command -v buf >/dev/null 2>&1; then
                         buf lint
                     else
-                        echo "buf not installed, skipping buf lint"
+                        echo "buf not installed on agent, skipping buf lint"
                     fi
                     if command -v golangci-lint >/dev/null 2>&1; then
                         golangci-lint run ./...
                     else
-                        echo "golangci-lint not installed, skipping"
+                        echo "golangci-lint not installed on agent, skipping"
                     fi
                 '''
             }
