@@ -32,6 +32,7 @@ func New(cfgPath string) (*App, error) {
 	if err := apccfg.Load(apccfg.LoadOptions{Path: cfgPath}); err != nil {
 		return nil, fmt.Errorf("load apc config: %w", err)
 	}
+	applyTracingEnvOverrides(apccfg.GetConf())
 	if err := config.Load(config.LoadOptions{Path: cfgPath}); err != nil {
 		return nil, fmt.Errorf("load business config: %w", err)
 	}
